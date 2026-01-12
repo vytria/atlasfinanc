@@ -291,18 +291,18 @@
         }
 
         .charts-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 25px;
             margin-bottom: 30px;
         }
 
         .chart-card {
-            grid-column: span 1;
+            width: 100%;
         }
 
         .chart-card.wide {
-            grid-column: span 2;
+            width: 100%;
         }
 
         .chart-header {
@@ -489,16 +489,6 @@
             cursor: pointer;
         }
 
-        @media (max-width: 1200px) {
-            .charts-container {
-                grid-template-columns: 1fr;
-            }
-            
-            .chart-card.wide {
-                grid-column: span 1;
-            }
-        }
-
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -523,10 +513,6 @@
             
             .stats-cards {
                 grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .charts-container {
-                grid-template-columns: 1fr;
             }
         }
 
@@ -694,47 +680,9 @@
             </div>
         </div>
         
-        <!-- Charts -->
+        <!-- Charts Container - AGORA EM COLUNA -->
         <div class="charts-container">
-            <!-- Gráfico de Rosquinha -->
-            <div class="card chart-card">
-                <div class="chart-header">
-                    <h3>Despesas por Categoria</h3>
-                    <div class="chart-filters">
-                        <select class="chart-filter" id="doughnutMonth">
-                            <option value="all">Ano Todo</option>
-                            <option value="fev" selected>Fevereiro</option>
-                            <option value="mar">Março</option>
-                            <option value="abr">Abril</option>
-                            <option value="mai">Maio</option>
-                        </select>
-                        <select class="chart-filter" id="doughnutAccountType">
-                            <option value="all">Todos os Tipos</option>
-                            <option value="cartao_fixo" selected>Cartão Fixo</option>
-                            <option value="cartao_variavel">Cartão Variável</option>
-                            <option value="dinheiro">Dinheiro</option>
-                        </select>
-                        <select class="chart-filter" id="doughnutCategory">
-                            <option value="all">Todas Categorias</option>
-                            <option value="ml">ML</option>
-                            <option value="gol">GOL</option>
-                            <option value="marco">MARCO</option>
-                        </select>
-                        <div class="chart-checkbox">
-                            <input type="checkbox" id="showValues" checked>
-                            <label for="showValues">Valores R$</label>
-                        </div>
-                    </div>
-                </div>
-                <div class="chart-container">
-                    <canvas id="categoryChart"></canvas>
-                </div>
-                <div class="chart-legend" id="doughnutLegend">
-                    <!-- Gerado por JavaScript -->
-                </div>
-            </div>
-            
-            <!-- Gráfico de Barras -->
+            <!-- Gráfico de Barras (AGORA EM CIMA) -->
             <div class="card chart-card">
                 <div class="chart-header">
                     <h3>Receitas vs Despesas vs Saldo</h3>
@@ -775,7 +723,45 @@
                 </div>
             </div>
             
-            <!-- Gráfico de Linha -->
+            <!-- Gráfico de Rosquinha (AGORA EMBAIXO) -->
+            <div class="card chart-card">
+                <div class="chart-header">
+                    <h3>Despesas por Categoria</h3>
+                    <div class="chart-filters">
+                        <select class="chart-filter" id="doughnutMonth">
+                            <option value="all">Ano Todo</option>
+                            <option value="fev" selected>Fevereiro</option>
+                            <option value="mar">Março</option>
+                            <option value="abr">Abril</option>
+                            <option value="mai">Maio</option>
+                        </select>
+                        <select class="chart-filter" id="doughnutAccountType">
+                            <option value="all">Todos os Tipos</option>
+                            <option value="cartao_fixo" selected>Cartão Fixo</option>
+                            <option value="cartao_variavel">Cartão Variável</option>
+                            <option value="dinheiro">Dinheiro</option>
+                        </select>
+                        <select class="chart-filter" id="doughnutCategory">
+                            <option value="all">Todas Categorias</option>
+                            <option value="ml">ML</option>
+                            <option value="gol">GOL</option>
+                            <option value="marco">MARCO</option>
+                        </select>
+                        <div class="chart-checkbox">
+                            <input type="checkbox" id="showValues" checked>
+                            <label for="showValues">Valores R$</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="categoryChart"></canvas>
+                </div>
+                <div class="chart-legend" id="doughnutLegend">
+                    <!-- Gerado por JavaScript -->
+                </div>
+            </div>
+            
+            <!-- Gráfico de Linha (mantido como estava) -->
             <div class="card chart-card wide">
                 <div class="chart-header">
                     <h3>Evolução do Saldo (2026)</h3>
