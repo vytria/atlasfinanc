@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlas - Controle Financeiro 4.0</title>
+    <title>Atlas - Controle Financeiro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* MANTENDO TODOS OS ESTILOS ORIGINAIS */
+        /* ESTILOS OTIMIZADOS - Removendo comentários longos */
         :root {
             --primary: #4361ee;
             --primary-dark: #3a56d4;
@@ -216,15 +216,6 @@
             background-color: #e11570;
         }
 
-        .btn-warning {
-            background-color: var(--warning);
-            color: white;
-        }
-
-        .btn-warning:hover {
-            background-color: #e68905;
-        }
-
         .stats-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -320,10 +311,6 @@
             width: 100%;
         }
 
-        .chart-card.wide {
-            width: 100%;
-        }
-
         .chart-header {
             display: flex;
             justify-content: space-between;
@@ -350,7 +337,6 @@
             font-size: 14px;
             color: var(--dark);
             cursor: pointer;
-            transition: var(--transition);
         }
 
         .chart-filter:focus {
@@ -490,8 +476,7 @@
             color: white;
         }
 
-        /* Modal do Chat */
-        .chat-modal {
+        .chat-modal, .config-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -504,11 +489,11 @@
             justify-content: center;
         }
 
-        .chat-modal.active {
+        .chat-modal.active, .config-modal.active {
             display: flex;
         }
 
-        .chat-container {
+        .chat-container, .config-container {
             width: 500px;
             max-width: 90%;
             background-color: white;
@@ -549,7 +534,6 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
-            transition: var(--transition);
         }
 
         .chat-header .close-btn:hover {
@@ -602,42 +586,11 @@
             border-radius: 8px;
             border: 2px solid var(--gray-light);
             font-size: 14px;
-            transition: var(--transition);
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
-        }
-
-        /* Modal de Configurações */
-        .config-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .config-modal.active {
-            display: flex;
-        }
-
-        .config-container {
-            width: 600px;
-            max-width: 90%;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
         }
 
         .config-tabs {
@@ -654,7 +607,6 @@
             border: none;
             font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
         }
 
         .config-tab.active {
@@ -803,7 +755,6 @@
     </style>
 </head>
 <body>
-    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="logo">
             <h1><i class="fas fa-globe-americas"></i> Atlas<span>Finance</span></h1>
@@ -835,12 +786,6 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a href="#" class="nav-link" id="importBtn">
-                    <i class="fas fa-file-import"></i>
-                    <span>Importar Dados</span>
-                </a>
-            </div>
-            <div class="nav-item">
                 <a href="#" class="nav-link" id="importExcelBtn">
                     <i class="fas fa-file-excel"></i>
                     <span>Importar Excel</span>
@@ -857,7 +802,6 @@
         </div>
     </div>
     
-    <!-- Modal do Chat -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-container">
             <div class="chat-header">
@@ -894,7 +838,6 @@
                     <label for="transTipo"><i class="fas fa-credit-card"></i> Tipo *</label>
                     <select id="transTipo" class="form-control" required>
                         <option value="">Selecione o tipo...</option>
-                        <!-- Tipos serão carregados dinamicamente -->
                     </select>
                 </div>
                 
@@ -902,7 +845,6 @@
                     <label for="transCategoria"><i class="fas fa-tags"></i> Categoria *</label>
                     <select id="transCategoria" class="form-control" required>
                         <option value="">Selecione a categoria...</option>
-                        <!-- Categorias serão carregadas dinamicamente -->
                     </select>
                 </div>
                 
@@ -913,7 +855,6 @@
         </div>
     </div>
     
-    <!-- Modal de Configurações -->
     <div class="config-modal" id="configModal">
         <div class="config-container">
             <div class="chat-header">
@@ -929,15 +870,12 @@
             </div>
             
             <div class="config-content">
-                <!-- Aba de Receitas -->
                 <div class="config-tab-content active" id="tab-receitas">
                     <div class="config-section">
                         <h4><i class="fas fa-money-bill-wave"></i> Receitas Mensais - <span id="currentConfigYear">2026</span></h4>
                         <p>Defina suas receitas para cada mês do ano:</p>
                         
-                        <div id="incomeInputs">
-                            <!-- Receitas serão carregadas dinamicamente -->
-                        </div>
+                        <div id="incomeInputs"></div>
                         
                         <button class="btn btn-success" id="saveIncomes" style="margin-top: 20px;">
                             <i class="fas fa-save"></i> Salvar Receitas
@@ -945,7 +883,6 @@
                     </div>
                 </div>
                 
-                <!-- Aba de Categorias -->
                 <div class="config-tab-content" id="tab-categorias">
                     <div class="config-section">
                         <h4><i class="fas fa-tags"></i> Categorias Personalizadas</h4>
@@ -961,13 +898,10 @@
                             </div>
                         </div>
                         
-                        <div id="categoriesList">
-                            <!-- Categorias serão carregadas dinamicamente -->
-                        </div>
+                        <div id="categoriesList"></div>
                     </div>
                 </div>
                 
-                <!-- Aba de Tipos -->
                 <div class="config-tab-content" id="tab-tipos">
                     <div class="config-section">
                         <h4><i class="fas fa-credit-card"></i> Tipos Personalizados</h4>
@@ -983,13 +917,10 @@
                             </div>
                         </div>
                         
-                        <div id="typesList">
-                            <!-- Tipos serão carregados dinamicamente -->
-                        </div>
+                        <div id="typesList"></div>
                     </div>
                 </div>
                 
-                <!-- Aba de Anos -->
                 <div class="config-tab-content" id="tab-anos">
                     <div class="config-section">
                         <h4><i class="fas fa-calendar-alt"></i> Gerenciamento de Anos</h4>
@@ -997,9 +928,7 @@
                         
                         <div class="form-group">
                             <label>Ano Atual</label>
-                            <select id="yearSelect" class="form-control">
-                                <!-- Anos serão carregados dinamicamente -->
-                            </select>
+                            <select id="yearSelect" class="form-control"></select>
                         </div>
                         
                         <div class="form-group">
@@ -1021,12 +950,10 @@
         </div>
     </div>
     
-    <!-- Mobile Toggle -->
     <button class="mobile-toggle" id="mobileToggle">
         <i class="fas fa-bars"></i>
     </button>
     
-    <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <div class="header">
             <h2>Dashboard Financeiro - <span id="currentYear">2026</span></h2>
@@ -1034,16 +961,12 @@
                 <button class="btn btn-outline" id="exportHeaderBtn">
                     <i class="fas fa-file-export"></i> Exportar
                 </button>
-                <button class="btn btn-outline" id="importDataBtn">
-                    <i class="fas fa-file-import"></i> Importar
-                </button>
                 <button class="btn btn-primary" id="addTransactionBtn">
                     <i class="fas fa-plus"></i> Nova Transação
                 </button>
             </div>
         </div>
         
-        <!-- Stats Cards -->
         <div class="stats-cards">
             <div class="card stat-card">
                 <div class="stat-info">
@@ -1098,15 +1021,14 @@
             </div>
         </div>
         
-        <!-- Charts Container -->
         <div class="charts-container">
-            <!-- Gráfico de Barras -->
             <div class="card chart-card">
                 <div class="chart-header">
                     <h3>Receitas vs Despesas vs Saldo</h3>
                     <div class="chart-filters">
                         <select class="chart-filter" id="barMonth">
                             <option value="all">Ano Todo</option>
+                            <option value="1">Janeiro</option>
                             <option value="2" selected>Fevereiro</option>
                             <option value="3">Março</option>
                             <option value="4">Abril</option>
@@ -1121,7 +1043,6 @@
                         </select>
                         <select class="chart-filter" id="barAccountType">
                             <option value="all">Todos os Tipos</option>
-                            <!-- Tipos serão carregados dinamicamente -->
                         </select>
                         <div class="chart-checkbox">
                             <input type="checkbox" id="showBalance" checked>
@@ -1148,25 +1069,30 @@
                 </div>
             </div>
             
-            <!-- Gráfico de Rosquinha -->
             <div class="card chart-card">
                 <div class="chart-header">
                     <h3>Despesas por Categoria</h3>
                     <div class="chart-filters">
                         <select class="chart-filter" id="doughnutMonth">
                             <option value="all">Ano Todo</option>
+                            <option value="1">Janeiro</option>
                             <option value="2" selected>Fevereiro</option>
                             <option value="3">Março</option>
                             <option value="4">Abril</option>
                             <option value="5">Maio</option>
+                            <option value="6">Junho</option>
+                            <option value="7">Julho</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
                         </select>
                         <select class="chart-filter" id="doughnutAccountType">
                             <option value="all">Todos os Tipos</option>
-                            <!-- Tipos serão carregados dinamicamente -->
                         </select>
                         <select class="chart-filter" id="doughnutCategory">
                             <option value="all">Todas Categorias</option>
-                            <!-- Categorias serão carregadas dinamicamente -->
                         </select>
                         <div class="chart-checkbox">
                             <input type="checkbox" id="showValues" checked>
@@ -1177,12 +1103,9 @@
                 <div class="chart-container">
                     <canvas id="categoryChart"></canvas>
                 </div>
-                <div class="chart-legend" id="doughnutLegend">
-                    <!-- Gerado por JavaScript -->
-                </div>
+                <div class="chart-legend" id="doughnutLegend"></div>
             </div>
             
-            <!-- Gráfico de Linha -->
             <div class="card chart-card wide">
                 <div class="chart-header">
                     <h3>Evolução do Saldo (<span id="balanceYear">2026</span>)</h3>
@@ -1193,7 +1116,6 @@
             </div>
         </div>
         
-        <!-- Transactions Table -->
         <div class="table-container">
             <div class="table-header">
                 <h3>Últimas Transações</h3>
@@ -1217,9 +1139,7 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="transactionsTable">
-                    <!-- Dados serão preenchidos por JavaScript -->
-                </tbody>
+                <tbody id="transactionsTable"></tbody>
             </table>
             
             <div class="pagination">
@@ -1232,30 +1152,23 @@
         </div>
     </div>
 
-    <!-- Inputs ocultos para importação -->
-    <input type="file" id="fileImport" accept=".json" style="display: none;">
     <input type="file" id="excelImport" accept=".xlsx,.xls,.csv" style="display: none;">
 
     <script>
-        // ==================== BANCO DE DADOS LOCAL ====================
+        // Código JavaScript otimizado
         const DB_NAME = 'AtlasFinanceDB';
-        const DB_VERSION = 4; // Versão atualizada
+        const DB_VERSION = 4;
         const STORE_TRANSACTIONS = 'transactions';
         const STORE_SETTINGS = 'settings';
         const STORE_CATEGORIES = 'categories';
         const STORE_TYPES = 'types';
         const STORE_INCOMES = 'incomes';
         
-        let db;
-        let categoryChart, comparisonChart, balanceChart;
-        let allTransactions = [];
+        let db, categoryChart, comparisonChart, balanceChart;
+        let allTransactions = [], customCategories = [], customTypes = [];
         let currentYear = new Date().getFullYear();
-        let customCategories = [];
-        let customTypes = [];
-        let monthlyIncomes = {};
-        let availableYears = [currentYear];
+        let monthlyIncomes = {}, availableYears = [currentYear];
         
-        // Mapeamento de meses
         const monthMap = {
             1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
             5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
@@ -1267,7 +1180,6 @@
             7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
         };
         
-        // CATEGORIAS PADRÃO conforme solicitado
         const defaultCategories = [
             { id: 'agua', name: 'Água', custom: false },
             { id: 'aluguel', name: 'Aluguel', custom: false },
@@ -1285,7 +1197,6 @@
             { id: 'outros', name: 'Outros', custom: false }
         ];
         
-        // TIPOS PADRÃO conforme solicitado
         const defaultTypes = [
             { id: 'alimentacao', name: 'Alimentação', custom: false },
             { id: 'boleto', name: 'Boleto', custom: false },
@@ -1296,189 +1207,82 @@
             { id: 'pix', name: 'Pix', custom: false }
         ];
         
-        // ==================== INICIALIZAÇÃO DO BANCO ====================
-        function initDatabase() {
+        async function initDatabase() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
                 
-                request.onerror = (event) => {
-                    console.error('Erro ao abrir banco de dados:', event.target.error);
-                    reject(event.target.error);
-                };
+                request.onerror = reject;
                 
                 request.onsuccess = (event) => {
                     db = event.target.result;
-                    console.log('Banco de dados aberto com sucesso');
-                    
-                    // Carregar dados existentes
-                    loadAllData().then(() => {
-                        resolve();
-                    });
+                    loadAllData().then(resolve);
                 };
                 
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
-                    const oldVersion = event.oldVersion;
-                    
-                    // Criar object stores se não existirem
                     if (!db.objectStoreNames.contains(STORE_TRANSACTIONS)) {
-                        const store = db.createObjectStore(STORE_TRANSACTIONS, { 
-                            keyPath: 'id',
-                            autoIncrement: true 
-                        });
-                        
-                        store.createIndex('mes', 'mes', { unique: false });
+                        const store = db.createObjectStore(STORE_TRANSACTIONS, { keyPath: 'id', autoIncrement: true });
                         store.createIndex('ano', 'ano', { unique: false });
-                        store.createIndex('tipo', 'tipo', { unique: false });
-                        store.createIndex('categoria', 'categoria', { unique: false });
-                        store.createIndex('status', 'status', { unique: false });
                     }
-                    
                     if (!db.objectStoreNames.contains(STORE_CATEGORIES)) {
-                        const store = db.createObjectStore(STORE_CATEGORIES, { 
-                            keyPath: 'id'
-                        });
+                        db.createObjectStore(STORE_CATEGORIES, { keyPath: 'id' });
                     }
-                    
                     if (!db.objectStoreNames.contains(STORE_TYPES)) {
-                        const store = db.createObjectStore(STORE_TYPES, { 
-                            keyPath: 'id'
-                        });
+                        db.createObjectStore(STORE_TYPES, { keyPath: 'id' });
                     }
-                    
                     if (!db.objectStoreNames.contains(STORE_INCOMES)) {
-                        const store = db.createObjectStore(STORE_INCOMES, { 
-                            keyPath: 'key'
-                        });
+                        db.createObjectStore(STORE_INCOMES, { keyPath: 'key' });
                     }
-                    
                     if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
-                        const store = db.createObjectStore(STORE_SETTINGS, { 
-                            keyPath: 'key'
-                        });
+                        db.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
                     }
-                    
-                    console.log('Object stores criados com sucesso');
                 };
             });
         }
         
-        // Carregar todos os dados
         async function loadAllData() {
-            // Carregar configurações
             const settings = await getSettings();
-            if (settings.currentYear) {
-                currentYear = settings.currentYear;
-            }
+            if (settings.currentYear) currentYear = settings.currentYear;
+            if (settings.availableYears) availableYears = settings.availableYears;
             
-            if (settings.availableYears) {
-                availableYears = settings.availableYears;
-            }
-            
-            // Carregar categorias
             customCategories = await getAllCategories();
             if (customCategories.length === 0) {
-                // Adicionar categorias padrão
-                for (const cat of defaultCategories) {
-                    await addCategory(cat);
-                }
+                for (const cat of defaultCategories) await addCategory(cat);
                 customCategories = defaultCategories;
             }
             
-            // Carregar tipos
             customTypes = await getAllTypes();
             if (customTypes.length === 0) {
-                // Adicionar tipos padrão
-                for (const type of defaultTypes) {
-                    await addType(type);
-                }
+                for (const type of defaultTypes) await addType(type);
                 customTypes = defaultTypes;
             }
             
-            // Carregar receitas do ano atual
             monthlyIncomes = await getIncomesForYear(currentYear);
             if (Object.keys(monthlyIncomes).length === 0) {
-                // Receitas padrão
                 const defaultIncomes = {
                     1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
                     7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
                 };
-                
                 for (const [month, income] of Object.entries(defaultIncomes)) {
                     await saveIncome(currentYear, parseInt(month), income);
                 }
                 monthlyIncomes = defaultIncomes;
             }
             
-            // Carregar transações do ano atual
             allTransactions = await getTransactionsForYear(currentYear);
-            
-            // REMOVIDA A ADIÇÃO DE DADOS DE EXEMPLO
             updateUI();
         }
         
-        // ==================== FUNÇÕES DO BANCO ====================
-        // Transações
         function addTransaction(transaction) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_TRANSACTIONS], 'readwrite');
                 const store = tx.objectStore(STORE_TRANSACTIONS);
-                
-                if (!transaction.data) {
-                    transaction.data = new Date().toISOString().split('T')[0];
-                }
-                
-                if (!transaction.ano) {
-                    transaction.ano = currentYear;
-                }
-                
+                if (!transaction.data) transaction.data = new Date().toISOString().split('T')[0];
+                if (!transaction.ano) transaction.ano = currentYear;
                 transaction.status = calculateStatus(transaction.mesFinal, transaction.ano);
-                
                 const request = store.add(transaction);
-                
-                request.onsuccess = () => {
-                    resolve(request.result);
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
-            });
-        }
-        
-        function updateTransaction(id, updatedTransaction) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction([STORE_TRANSACTIONS], 'readwrite');
-                const store = tx.objectStore(STORE_TRANSACTIONS);
-                
-                // Primeiro buscar a transação existente
-                const getRequest = store.get(id);
-                
-                getRequest.onsuccess = () => {
-                    const existing = getRequest.result;
-                    if (!existing) {
-                        reject(new Error('Transação não encontrada'));
-                        return;
-                    }
-                    
-                    // Mesclar atualizações
-                    const merged = { ...existing, ...updatedTransaction };
-                    merged.status = calculateStatus(merged.mesFinal, merged.ano);
-                    
-                    const putRequest = store.put(merged);
-                    
-                    putRequest.onsuccess = () => {
-                        resolve(putRequest.result);
-                    };
-                    
-                    putRequest.onerror = (event) => {
-                        reject(event.target.error);
-                    };
-                };
-                
-                getRequest.onerror = (event) => {
-                    reject(event.target.error);
-                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = reject;
             });
         }
         
@@ -1488,47 +1292,8 @@
                 const store = tx.objectStore(STORE_TRANSACTIONS);
                 const index = store.index('ano');
                 const request = index.getAll(year);
-                
-                request.onsuccess = () => {
-                    resolve(request.result);
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
-            });
-        }
-        
-        function deleteTransaction(id) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction([STORE_TRANSACTIONS], 'readwrite');
-                const store = tx.objectStore(STORE_TRANSACTIONS);
-                const request = store.delete(id);
-                
-                request.onsuccess = () => {
-                    resolve();
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
-            });
-        }
-        
-        // Categorias
-        function addCategory(category) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction([STORE_CATEGORIES], 'readwrite');
-                const store = tx.objectStore(STORE_CATEGORIES);
-                const request = store.put(category);
-                
-                request.onsuccess = () => {
-                    resolve();
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = reject;
             });
         }
         
@@ -1537,47 +1302,8 @@
                 const tx = db.transaction([STORE_CATEGORIES], 'readonly');
                 const store = tx.objectStore(STORE_CATEGORIES);
                 const request = store.getAll();
-                
-                request.onsuccess = () => {
-                    resolve(request.result);
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
-            });
-        }
-        
-        function deleteCategory(id) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction([STORE_CATEGORIES], 'readwrite');
-                const store = tx.objectStore(STORE_CATEGORIES);
-                const request = store.delete(id);
-                
-                request.onsuccess = () => {
-                    resolve();
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
-            });
-        }
-        
-        // Tipos
-        function addType(type) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction([STORE_TYPES], 'readwrite');
-                const store = tx.objectStore(STORE_TYPES);
-                const request = store.put(type);
-                
-                request.onsuccess = () => {
-                    resolve();
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = reject;
             });
         }
         
@@ -1586,48 +1312,8 @@
                 const tx = db.transaction([STORE_TYPES], 'readonly');
                 const store = tx.objectStore(STORE_TYPES);
                 const request = store.getAll();
-                
-                request.onsuccess = () => {
-                    resolve(request.result);
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
-            });
-        }
-        
-        function deleteType(id) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction([STORE_TYPES], 'readwrite');
-                const store = tx.objectStore(STORE_TYPES);
-                const request = store.delete(id);
-                
-                request.onsuccess = () => {
-                    resolve();
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
-            });
-        }
-        
-        // Receitas
-        function saveIncome(year, month, value) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction([STORE_INCOMES], 'readwrite');
-                const store = tx.objectStore(STORE_INCOMES);
-                const key = `income_${year}_${month}`;
-                const request = store.put({ key: key, year: year, month: month, value: value });
-                
-                request.onsuccess = () => {
-                    resolve();
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
+                request.onsuccess = () => resolve(request.result);
+                request.onerror = reject;
             });
         }
         
@@ -1636,37 +1322,14 @@
                 const tx = db.transaction([STORE_INCOMES], 'readonly');
                 const store = tx.objectStore(STORE_INCOMES);
                 const request = store.getAll();
-                
                 request.onsuccess = () => {
                     const incomes = {};
                     request.result.forEach(item => {
-                        if (item.year === year) {
-                            incomes[item.month] = item.value;
-                        }
+                        if (item.year === year) incomes[item.month] = item.value;
                     });
                     resolve(incomes);
                 };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
-            });
-        }
-        
-        // Configurações
-        function saveSetting(key, value) {
-            return new Promise((resolve, reject) => {
-                const tx = db.transaction([STORE_SETTINGS], 'readwrite');
-                const store = tx.objectStore(STORE_SETTINGS);
-                const request = store.put({ key: key, value: value });
-                
-                request.onsuccess = () => {
-                    resolve();
-                };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
+                request.onerror = reject;
             });
         }
         
@@ -1675,48 +1338,29 @@
                 const tx = db.transaction([STORE_SETTINGS], 'readonly');
                 const store = tx.objectStore(STORE_SETTINGS);
                 const request = store.getAll();
-                
                 request.onsuccess = () => {
                     const settings = {};
-                    request.result.forEach(item => {
-                        settings[item.key] = item.value;
-                    });
+                    request.result.forEach(item => settings[item.key] = item.value);
                     resolve(settings);
                 };
-                
-                request.onerror = (event) => {
-                    reject(event.target.error);
-                };
+                request.onerror = reject;
             });
         }
         
-        // ==================== FUNÇÕES UTILITÁRIAS ====================
         function calculateStatus(mesFinal, year) {
             if (mesFinal === 'Morreu') return 'Inativa';
-            
             const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth(); // 0-11
-            
-            // Se o ano da transação for menor que o atual, é inativa
             if (year < currentYear) return 'Inativa';
-            
-            // Se for um ano futuro, está ativa
             if (year > currentYear) return 'Ativa';
-            
-            // Mesmo ano, verificar mês
             const mesFinalIndex = meses.indexOf(mesFinal);
             if (mesFinalIndex === -1) return 'Inativa';
-            
-            return mesFinalIndex >= currentMonth ? 'Ativa' : 'Inativa';
+            return mesFinalIndex >= currentDate.getMonth() ? 'Ativa' : 'Inativa';
         }
         
         function formatCurrency(value) {
-            return new Intl.NumberFormat('pt-BR', {
-                style: 'currency',
-                currency: 'BRL'
-            }).format(value || 0);
+            return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value || 0);
         }
         
         function showNotification(message, type = 'info') {
@@ -1736,112 +1380,52 @@
                 gap: 10px;
                 animation: slideIn 0.3s ease;
             `;
-            
-            notification.innerHTML = `
-                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-                <span>${message}</span>
-            `;
-            
+            notification.innerHTML = `<i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle'}"></i><span>${message}</span>`;
             document.body.appendChild(notification);
-            
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
+                setTimeout(() => document.body.removeChild(notification), 300);
             }, 3000);
-            
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
         }
         
-        // ==================== ATUALIZAÇÃO DA INTERFACE ====================
-        async function updateUI() {
-            // Atualizar ano atual na interface
+        function updateUI() {
             document.getElementById('currentYear').textContent = currentYear;
             document.getElementById('balanceYear').textContent = currentYear;
             document.getElementById('currentConfigYear').textContent = currentYear;
             
-            // Atualizar dropdowns de categorias e tipos
             updateCategoryDropdowns();
             updateTypeDropdowns();
-            
-            // Atualizar dropdown de anos
             updateYearDropdown();
-            
-            // Atualizar inputs de receitas
             updateIncomeInputs();
-            
-            // Atualizar listas
             updateCategoriesList();
             updateTypesList();
-            
-            // Atualizar dashboard
             updateDashboard();
-            
-            // Atualizar tabela de transações
             updateTransactionsTable();
-            
-            // Atualizar contador
             updateTransactionCount();
         }
         
         function updateCategoryDropdowns() {
-            // Dropdown do chat
-            const chatCategorySelect = document.getElementById('transCategoria');
-            if (chatCategorySelect) {
-                chatCategorySelect.innerHTML = '<option value="">Selecione a categoria...</option>';
-                customCategories.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat.id;
-                    option.textContent = cat.name;
-                    chatCategorySelect.appendChild(option);
-                });
-            }
-            
-            // Dropdown do gráfico
-            const chartCategorySelect = document.getElementById('doughnutCategory');
-            if (chartCategorySelect) {
-                chartCategorySelect.innerHTML = '<option value="all">Todas Categorias</option>';
-                customCategories.forEach(cat => {
-                    const option = document.createElement('option');
-                    option.value = cat.id;
-                    option.textContent = cat.name;
-                    chartCategorySelect.appendChild(option);
-                });
-            }
+            const selects = ['transCategoria', 'doughnutCategory'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
+                if (select) {
+                    select.innerHTML = id === 'transCategoria' ? '<option value="">Selecione a categoria...</option>' : '<option value="all">Todas Categorias</option>';
+                    customCategories.forEach(cat => {
+                        const option = document.createElement('option');
+                        option.value = cat.id;
+                        option.textContent = cat.name;
+                        select.appendChild(option);
+                    });
+                }
+            });
         }
         
         function updateTypeDropdowns() {
-            // Dropdown do chat
-            const chatTypeSelect = document.getElementById('transTipo');
-            if (chatTypeSelect) {
-                chatTypeSelect.innerHTML = '<option value="">Selecione o tipo...</option>';
-                customTypes.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.id;
-                    option.textContent = type.name;
-                    chatTypeSelect.appendChild(option);
-                });
-            }
-            
-            // Dropdowns dos gráficos
-            const barAccountType = document.getElementById('barAccountType');
-            const doughnutAccountType = document.getElementById('doughnutAccountType');
-            
-            [barAccountType, doughnutAccountType].forEach(select => {
+            const selects = ['transTipo', 'barAccountType', 'doughnutAccountType'];
+            selects.forEach(id => {
+                const select = document.getElementById(id);
                 if (select) {
-                    select.innerHTML = '<option value="all">Todos os Tipos</option>';
+                    select.innerHTML = id === 'transTipo' ? '<option value="">Selecione o tipo...</option>' : '<option value="all">Todos os Tipos</option>';
                     customTypes.forEach(type => {
                         const option = document.createElement('option');
                         option.value = type.id;
@@ -1869,105 +1453,16 @@
         function updateIncomeInputs() {
             const incomeInputs = document.getElementById('incomeInputs');
             if (!incomeInputs) return;
-            
             incomeInputs.innerHTML = '';
-            
             for (let month = 1; month <= 12; month++) {
                 const div = document.createElement('div');
                 div.className = 'income-month-input';
-                div.innerHTML = `
-                    <label>${monthMap[month]}:</label>
-                    <input type="number" step="0.01" id="income-${month}" value="${monthlyIncomes[month] || 0}">
-                    <span>R$</span>
-                `;
+                div.innerHTML = `<label>${monthMap[month]}:</label><input type="number" step="0.01" id="income-${month}" value="${monthlyIncomes[month] || 0}"><span>R$</span>`;
                 incomeInputs.appendChild(div);
             }
         }
         
-        function updateCategoriesList() {
-            const categoriesList = document.getElementById('categoriesList');
-            if (!categoriesList) return;
-            
-            categoriesList.innerHTML = '';
-            
-            customCategories.forEach(category => {
-                const div = document.createElement('div');
-                div.className = 'category-item';
-                div.innerHTML = `
-                    <span>${category.name}</span>
-                    <div class="category-actions">
-                        ${category.custom ? `
-                            <button class="btn btn-outline btn-sm edit-category" data-id="${category.id}" style="padding: 4px 8px;">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm delete-category" data-id="${category.id}" style="padding: 4px 8px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : '<span style="color: var(--gray); font-size: 12px;">Padrão</span>'}
-                    </div>
-                `;
-                categoriesList.appendChild(div);
-            });
-            
-            // Adicionar event listeners
-            categoriesList.querySelectorAll('.edit-category').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = e.target.closest('button').dataset.id;
-                    editCategory(id);
-                });
-            });
-            
-            categoriesList.querySelectorAll('.delete-category').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = e.target.closest('button').dataset.id;
-                    deleteCategoryPrompt(id);
-                });
-            });
-        }
-        
-        function updateTypesList() {
-            const typesList = document.getElementById('typesList');
-            if (!typesList) return;
-            
-            typesList.innerHTML = '';
-            
-            customTypes.forEach(type => {
-                const div = document.createElement('div');
-                div.className = 'type-item';
-                div.innerHTML = `
-                    <span>${type.name}</span>
-                    <div class="type-actions">
-                        ${type.custom ? `
-                            <button class="btn btn-outline btn-sm edit-type" data-id="${type.id}" style="padding: 4px 8px;">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm delete-type" data-id="${type.id}" style="padding: 4px 8px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : '<span style="color: var(--gray); font-size: 12px;">Padrão</span>'}
-                    </div>
-                `;
-                typesList.appendChild(div);
-            });
-            
-            // Adicionar event listeners
-            typesList.querySelectorAll('.edit-type').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = e.target.closest('button').dataset.id;
-                    editType(id);
-                });
-            });
-            
-            typesList.querySelectorAll('.delete-type').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = e.target.closest('button').dataset.id;
-                    deleteTypePrompt(id);
-                });
-            });
-        }
-        
-        async function updateDashboard() {
-            // Calcular despesas do mês atual
+        function updateDashboard() {
             const currentMonth = new Date().getMonth() + 1;
             const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
             
@@ -1979,30 +1474,23 @@
                 .filter(t => t.mes === lastMonth)
                 .reduce((sum, t) => sum + t.valor, 0);
             
-            // Calcular receitas
             const currentMonthIncome = monthlyIncomes[currentMonth] || 0;
             const lastMonthIncome = monthlyIncomes[lastMonth] || 0;
             
-            // Calcular saldo
             const currentBalance = currentMonthIncome - currentMonthExpenses;
             const lastMonthBalance = lastMonthIncome - lastMonthExpenses;
-            
-            // Calcular para investir (60% do saldo)
             const toInvest = currentBalance * 0.6;
             
-            // Atualizar cards
             document.getElementById('totalIncome').textContent = formatCurrency(currentMonthIncome);
             document.getElementById('totalExpenses').textContent = formatCurrency(currentMonthExpenses);
             document.getElementById('currentBalance').textContent = formatCurrency(currentBalance);
             document.getElementById('toInvest').textContent = formatCurrency(toInvest);
             
-            // Calcular tendências
             updateTrend('incomeTrend', currentMonthIncome, lastMonthIncome);
             updateTrend('expensesTrend', currentMonthExpenses, lastMonthExpenses);
             updateTrend('balanceTrend', currentBalance, lastMonthBalance);
             updateTrend('investTrend', toInvest, lastMonthBalance * 0.6);
             
-            // Atualizar gráficos
             updateDoughnutChart();
             updateBarChart();
             updateBalanceChart();
@@ -2011,7 +1499,6 @@
         function updateTrend(elementId, current, previous) {
             const element = document.getElementById(elementId);
             if (!element) return;
-            
             const icon = element.querySelector('i');
             const span = element.querySelector('span');
             
@@ -2023,7 +1510,6 @@
             }
             
             const percentage = ((current - previous) / previous * 100).toFixed(1);
-            
             if (current > previous) {
                 icon.className = 'fas fa-arrow-up';
                 span.textContent = `${Math.abs(percentage)}%`;
@@ -2039,448 +1525,25 @@
             }
         }
         
-        function updateTransactionsTable() {
-            const tableBody = document.getElementById('transactionsTable');
-            tableBody.innerHTML = '';
-            
-            // Ordenar por data mais recente
-            const sortedTransactions = [...allTransactions].sort((a, b) => {
-                return new Date(b.data) - new Date(a.data);
-            });
-            
-            // Mostrar apenas as primeiras 10 transações
-            sortedTransactions.slice(0, 10).forEach(transaction => {
-                const row = document.createElement('tr');
-                const statusClass = transaction.status === 'Ativa' ? 'status-active' : 'status-inactive';
-                const parcelaText = transaction.parcelaInicial ? 
-                    `${transaction.parcelaInicial}/${transaction.parcelaFinal}` : '-';
-                
-                // Encontrar nome da categoria
-                const category = customCategories.find(c => c.id === transaction.categoria);
-                const categoryName = category ? category.name : transaction.categoria;
-                
-                // Encontrar nome do tipo
-                const type = customTypes.find(t => t.id === transaction.tipo);
-                const typeName = type ? type.name : transaction.tipo;
-                
-                row.innerHTML = `
-                    <td><strong>${transaction.conta}</strong></td>
-                    <td>${formatCurrency(transaction.valor)}</td>
-                    <td>${parcelaText}</td>
-                    <td>${transaction.mesInicial} - ${transaction.mesFinal}</td>
-                    <td><span class="status-badge ${statusClass}">${transaction.status}</span></td>
-                    <td>${typeName}</td>
-                    <td>${categoryName}</td>
-                    <td>
-                        <button class="btn btn-outline btn-sm edit-transaction" data-id="${transaction.id}" style="padding: 6px 12px; margin-right: 5px;">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn btn-danger btn-sm delete-transaction" data-id="${transaction.id}" style="padding: 6px 12px;">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                
-                tableBody.appendChild(row);
-            });
-            
-            // Adicionar event listeners
-            tableBody.querySelectorAll('.edit-transaction').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(e.target.closest('button').dataset.id);
-                    editTransaction(id);
-                });
-            });
-            
-            tableBody.querySelectorAll('.delete-transaction').forEach(btn => {
-                btn.addEventListener('click', (e) => {
-                    const id = parseInt(e.target.closest('button').dataset.id);
-                    deleteTrans(id);
-                });
-            });
-        }
-        
-        function updateTransactionCount() {
-            document.getElementById('totalTransCount').textContent = allTransactions.length;
-        }
-        
-        // ==================== GRÁFICOS ====================
-        function updateDoughnutChart() {
-            const ctx = document.getElementById('categoryChart');
-            if (!ctx) return;
-            
-            const month = parseInt(document.getElementById('doughnutMonth').value);
-            const accountType = document.getElementById('doughnutAccountType').value;
-            const category = document.getElementById('doughnutCategory').value;
-            const showValues = document.getElementById('showValues').checked;
-            
-            let filteredTransactions = allTransactions.filter(t => {
-                if (month && t.mes !== month) return false;
-                if (accountType !== 'all' && t.tipo !== accountType) return false;
-                if (category !== 'all' && t.categoria !== category) return false;
-                return true;
-            });
-            
-            const categories = {};
-            filteredTransactions.forEach(t => {
-                if (!categories[t.categoria]) {
-                    categories[t.categoria] = 0;
-                }
-                categories[t.categoria] += t.valor;
-            });
-            
-            // Converter IDs de categorias para nomes
-            const labels = Object.keys(categories).map(catId => {
-                const cat = customCategories.find(c => c.id === catId);
-                return cat ? cat.name : catId;
-            });
-            
-            const data = Object.values(categories);
-            
-            const backgroundColors = [
-                '#4361ee', '#7209b7', '#4cc9f0', '#f72585', 
-                '#f8961e', '#38b000', '#9d4edd', '#ff9e00'
-            ].slice(0, labels.length);
-            
-            if (categoryChart) {
-                categoryChart.destroy();
-            }
-            
-            categoryChart = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: backgroundColors,
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'right',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                                    const percentage = Math.round((value / total) * 100);
-                                    
-                                    if (showValues) {
-                                        return `${label}: ${formatCurrency(value)} (${percentage}%)`;
-                                    } else {
-                                        return `${label}: ${percentage}%`;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-            
-            updateDoughnutLegend(labels, data, backgroundColors, showValues);
-        }
-        
-        function updateDoughnutLegend(labels, data, colors, showValues) {
-            const legendContainer = document.getElementById('doughnutLegend');
-            if (!legendContainer) return;
-            
-            legendContainer.innerHTML = '';
-            
-            const total = data.reduce((a, b) => a + b, 0);
-            
-            labels.forEach((label, index) => {
-                const value = data[index];
-                const percentage = Math.round((value / total) * 100);
-                
-                const legendItem = document.createElement('div');
-                legendItem.className = 'legend-item';
-                legendItem.innerHTML = `
-                    <div class="legend-color" style="background-color: ${colors[index]};"></div>
-                    <span>${label}</span>
-                    <span style="margin-left: auto; font-weight: 600; color: ${colors[index]};">
-                        ${showValues ? formatCurrency(value) : ''} (${percentage}%)
-                    </span>
-                `;
-                
-                legendContainer.appendChild(legendItem);
-            });
-            
-            if (data.length > 0) {
-                const totalItem = document.createElement('div');
-                totalItem.className = 'legend-item';
-                totalItem.style.marginTop = '10px';
-                totalItem.style.paddingTop = '10px';
-                totalItem.style.borderTop = '1px solid var(--gray-light)';
-                totalItem.style.fontWeight = '700';
-                totalItem.innerHTML = `
-                    <div class="legend-color" style="background-color: var(--dark);"></div>
-                    <span>TOTAL</span>
-                    <span style="margin-left: auto; color: var(--dark);">
-                        ${formatCurrency(total)}
-                    </span>
-                `;
-                
-                legendContainer.appendChild(totalItem);
-            }
-        }
-        
-        function updateBarChart() {
-            const ctx = document.getElementById('comparisonChart');
-            if (!ctx) return;
-            
-            const month = document.getElementById('barMonth').value;
-            const accountType = document.getElementById('barAccountType').value;
-            const showBalance = document.getElementById('showBalance').checked;
-            
-            let monthsToShow = [];
-            let incomesData = [];
-            let expensesData = [];
-            let balanceData = [];
-            
-            if (month === 'all') {
-                monthsToShow = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-                incomesData = monthsToShow.map(m => monthlyIncomes[m] || 0);
-                
-                expensesData = monthsToShow.map(m => {
-                    return allTransactions
-                        .filter(t => {
-                            if (t.mes !== m) return false;
-                            if (accountType !== 'all' && t.tipo !== accountType) return false;
-                            return true;
-                        })
-                        .reduce((sum, t) => sum + t.valor, 0);
-                });
-            } else {
-                const monthNum = parseInt(month);
-                monthsToShow = [monthNum];
-                incomesData = [monthlyIncomes[monthNum] || 0];
-                
-                const monthExpenses = allTransactions
-                    .filter(t => {
-                        if (t.mes !== monthNum) return false;
-                        if (accountType !== 'all' && t.tipo !== accountType) return false;
-                        return true;
-                    })
-                    .reduce((sum, t) => sum + t.valor, 0);
-                
-                expensesData = [monthExpenses];
-            }
-            
-            balanceData = incomesData.map((income, i) => income - expensesData[i]);
-            
-            const datasets = [
-                {
-                    label: 'Receitas',
-                    data: incomesData,
-                    backgroundColor: 'rgba(76, 201, 240, 0.7)',
-                    borderColor: '#4cc9f0',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Despesas',
-                    data: expensesData,
-                    backgroundColor: 'rgba(247, 37, 133, 0.7)',
-                    borderColor: '#f72585',
-                    borderWidth: 1
-                }
-            ];
-            
-            if (showBalance) {
-                datasets.push({
-                    label: 'Saldo',
-                    data: balanceData,
-                    backgroundColor: 'rgba(114, 9, 183, 0.7)',
-                    borderColor: '#7209b7',
-                    borderWidth: 1
-                });
-            }
-            
-            if (comparisonChart) {
-                comparisonChart.destroy();
-            }
-            
-            comparisonChart = new Chart(ctx.getContext('2d'), {
-                type: 'bar',
-                data: {
-                    labels: monthsToShow.map(m => monthMap[m]),
-                    datasets: datasets
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        function updateBalanceChart() {
-            const ctx = document.getElementById('balanceChart');
-            if (!ctx) return;
-            
-            const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-            let cumulativeBalance = 0;
-            const balanceData = months.map(month => {
-                const income = monthlyIncomes[month] || 0;
-                
-                const expenses = allTransactions
-                    .filter(t => t.mes === month)
-                    .reduce((sum, t) => sum + t.valor, 0);
-                
-                cumulativeBalance += (income - expenses);
-                return cumulativeBalance;
-            });
-            
-            if (balanceChart) {
-                balanceChart.destroy();
-            }
-            
-            balanceChart = new Chart(ctx.getContext('2d'), {
-                type: 'line',
-                data: {
-                    labels: months.map(m => monthMap[m]),
-                    datasets: [{
-                        label: 'Saldo Acumulado',
-                        data: balanceData,
-                        borderColor: '#7209b7',
-                        backgroundColor: 'rgba(114, 9, 183, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.4,
-                        pointBackgroundColor: '#7209b7',
-                        pointRadius: 5,
-                        pointHoverRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            grid: {
-                                display: false
-                            }
-                        },
-                        y: {
-                            beginAtZero: false,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatCurrency(value);
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `Saldo: ${formatCurrency(context.raw)}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        
-        // ==================== MANIPULAÇÃO DE TRANSAÇÕES ====================
-        async function addNewTransaction(formData) {
-            const mesMatch = formData.periodo.match(/^([a-z]{3})/i);
-            const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-            const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
-            
-            let parcelaInicial = null;
-            let parcelaFinal = null;
-            if (formData.parcela && formData.parcela.includes('/')) {
-                const partes = formData.parcela.split('/');
-                parcelaInicial = parseInt(partes[0]) || null;
-                parcelaFinal = parseInt(partes[1]) || null;
-            }
-            
-            const periodoParts = formData.periodo.split(' - ');
-            const mesInicial = periodoParts[0] || '';
-            const mesFinal = periodoParts[1] || '';
-            
-            const transaction = {
-                conta: formData.conta,
-                valor: parseFloat(formData.valor),
-                parcelaInicial: parcelaInicial,
-                parcelaFinal: parcelaFinal,
-                mesInicial: mesInicial,
-                mesFinal: mesFinal,
-                tipo: formData.tipo,
-                categoria: formData.categoria,
-                mes: mes,
-                ano: currentYear,
-                data: new Date().toISOString().split('T')[0]
-            };
-            
+        document.addEventListener('DOMContentLoaded', async function() {
             try {
-                await addTransaction(transaction);
-                allTransactions = await getTransactionsForYear(currentYear);
-                
-                updateDashboard();
-                updateTransactionsTable();
-                updateTransactionCount();
-                
-                showNotification('Transação adicionada com sucesso!', 'success');
-                return true;
+                await initDatabase();
+                setupEventListeners();
             } catch (error) {
-                showNotification('Erro ao adicionar transação: ' + error.message, 'error');
-                return false;
+                showNotification('Erro ao inicializar: ' + error.message, 'error');
             }
-        }
+        });
         
-        async function editTransaction(id) {
-            const transaction = allTransactions.find(t => t.id === id);
-            if (!transaction) {
-                showNotification('Transação não encontrada!', 'error');
-                return;
-            }
+        function setupEventListeners() {
+            document.getElementById('chatBtn').addEventListener('click', () => {
+                document.getElementById('chatModal').classList.add('active');
+            });
             
-            // Preencher o formulário de chat com os dados da transação
-            document.getElementById('transConta').value = transaction.conta;
-            document.getElementById('transValor').value = transaction.valor;
-            document.getElementById('transParcela').value = transaction.parcelaInicial ? 
-                `${transaction.parcelaInicial}/${transaction.parcelaFinal}` : '';
-            document.getElementById('transPeriodo').value = `${transaction.mesInicial} - ${transaction.mesFinal}`;
-            document.getElementById('transTipo').value = transaction.tipo;
-            document.getElementById('transCategoria').value = transaction.categoria;
+            document.getElementById('closeChat').addEventListener('click', () => {
+                document.getElementById('chatModal').classList.remove('active');
+            });
             
-            // Alterar o botão para "Salvar Edição"
-            const addButton = document.getElementById('addViaChat');
-            const originalText = addButton.innerHTML;
-            addButton.innerHTML = '<i class="fas fa-save"></i> Salvar Edição';
-            addButton.onclick = async () => {
+            document.getElementById('addViaChat').addEventListener('click', async () => {
                 const conta = document.getElementById('transConta').value.trim();
                 const valor = document.getElementById('transValor').value;
                 const parcela = document.getElementById('transParcela').value.trim();
@@ -2489,12 +1552,7 @@
                 const categoria = document.getElementById('transCategoria').value;
                 
                 if (!conta || !valor || !periodo || !tipo || !categoria) {
-                    showNotification('Preencha todos os campos obrigatórios!', 'error');
-                    return;
-                }
-                
-                if (isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
-                    showNotification('Valor inválido!', 'error');
+                    showNotification('Preencha todos os campos!', 'error');
                     return;
                 }
                 
@@ -2502,8 +1560,7 @@
                 const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
                 const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
                 
-                let parcelaInicial = null;
-                let parcelaFinal = null;
+                let parcelaInicial = null, parcelaFinal = null;
                 if (parcela && parcela.includes('/')) {
                     const partes = parcela.split('/');
                     parcelaInicial = parseInt(partes[0]) || null;
@@ -2511,625 +1568,38 @@
                 }
                 
                 const periodoParts = periodo.split(' - ');
-                const mesInicial = periodoParts[0] || '';
-                const mesFinal = periodoParts[1] || '';
+                const transaction = {
+                    conta: conta,
+                    valor: parseFloat(valor),
+                    parcelaInicial: parcelaInicial,
+                    parcelaFinal: parcelaFinal,
+                    mesInicial: periodoParts[0] || '',
+                    mesFinal: periodoParts[1] || '',
+                    tipo: tipo,
+                    categoria: categoria,
+                    mes: mes,
+                    ano: currentYear,
+                    data: new Date().toISOString().split('T')[0]
+                };
                 
                 try {
-                    await updateTransaction(id, {
-                        conta: conta,
-                        valor: parseFloat(valor),
-                        parcelaInicial: parcelaInicial,
-                        parcelaFinal: parcelaFinal,
-                        mesInicial: mesInicial,
-                        mesFinal: mesFinal,
-                        tipo: tipo,
-                        categoria: categoria,
-                        mes: mes
-                    });
-                    
+                    await addTransaction(transaction);
                     allTransactions = await getTransactionsForYear(currentYear);
+                    updateUI();
+                    showNotification('Transação adicionada!', 'success');
                     
-                    updateDashboard();
-                    updateTransactionsTable();
-                    updateTransactionCount();
-                    
-                    showNotification('Transação atualizada com sucesso!', 'success');
-                    
-                    // Restaurar botão original
-                    addButton.innerHTML = originalText;
-                    addButton.onclick = originalAddHandler;
-                    
-                    // Limpar formulário e fechar modal
                     document.getElementById('transConta').value = '';
                     document.getElementById('transValor').value = '';
                     document.getElementById('transParcela').value = '';
                     document.getElementById('transPeriodo').value = '';
                     document.getElementById('transTipo').value = '';
                     document.getElementById('transCategoria').value = '';
-                    
                     document.getElementById('chatModal').classList.remove('active');
                 } catch (error) {
-                    showNotification('Erro ao atualizar transação: ' + error.message, 'error');
-                }
-            };
-            
-            // Salvar o handler original
-            const originalAddHandler = addButton.onclick;
-            
-            // Abrir o modal
-            document.getElementById('chatModal').classList.add('active');
-        }
-        
-        async function deleteTrans(id) {
-            if (confirm('Tem certeza que deseja excluir esta transação?')) {
-                try {
-                    await deleteTransaction(id);
-                    allTransactions = allTransactions.filter(t => t.id !== id);
-                    
-                    updateDashboard();
-                    updateTransactionsTable();
-                    updateTransactionCount();
-                    
-                    showNotification('Transação excluída com sucesso!', 'success');
-                } catch (error) {
-                    showNotification('Erro ao excluir transação: ' + error.message, 'error');
-                }
-            }
-        }
-        
-        // ==================== MANIPULAÇÃO DE CATEGORIAS ====================
-        async function addNewCategory() {
-            const nameInput = document.getElementById('newCategoryName');
-            const name = nameInput.value.trim();
-            
-            if (!name) {
-                showNotification('Digite o nome da categoria!', 'error');
-                return;
-            }
-            
-            // Gerar ID único
-            const id = 'cat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            const category = {
-                id: id,
-                name: name,
-                custom: true
-            };
-            
-            try {
-                await addCategory(category);
-                customCategories.push(category);
-                
-                updateCategoryDropdowns();
-                updateCategoriesList();
-                
-                nameInput.value = '';
-                showNotification('Categoria adicionada com sucesso!', 'success');
-            } catch (error) {
-                showNotification('Erro ao adicionar categoria: ' + error.message, 'error');
-            }
-        }
-        
-        function editCategory(id) {
-            const category = customCategories.find(c => c.id === id);
-            if (!category) return;
-            
-            const newName = prompt('Editar nome da categoria:', category.name);
-            if (newName && newName.trim() !== '' && newName !== category.name) {
-                category.name = newName.trim();
-                addCategory(category).then(() => {
-                    updateCategoryDropdowns();
-                    updateCategoriesList();
-                    showNotification('Categoria atualizada com sucesso!', 'success');
-                }).catch(error => {
-                    showNotification('Erro ao atualizar categoria: ' + error.message, 'error');
-                });
-            }
-        }
-        
-        async function deleteCategoryPrompt(id) {
-            const category = customCategories.find(c => c.id === id);
-            if (!category) return;
-            
-            // Verificar se a categoria está sendo usada em transações
-            const isUsed = allTransactions.some(t => t.categoria === id);
-            
-            if (isUsed) {
-                showNotification('Esta categoria está em uso e não pode ser excluída!', 'error');
-                return;
-            }
-            
-            if (confirm(`Tem certeza que deseja excluir a categoria "${category.name}"?`)) {
-                try {
-                    await deleteCategory(id);
-                    customCategories = customCategories.filter(c => c.id !== id);
-                    
-                    updateCategoryDropdowns();
-                    updateCategoriesList();
-                    
-                    showNotification('Categoria excluída com sucesso!', 'success');
-                } catch (error) {
-                    showNotification('Erro ao excluir categoria: ' + error.message, 'error');
-                }
-            }
-        }
-        
-        // ==================== MANIPULAÇÃO DE TIPOS ====================
-        async function addNewType() {
-            const nameInput = document.getElementById('newTypeName');
-            const name = nameInput.value.trim();
-            
-            if (!name) {
-                showNotification('Digite o nome do tipo!', 'error');
-                return;
-            }
-            
-            // Gerar ID único
-            const id = 'type_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            const type = {
-                id: id,
-                name: name,
-                custom: true
-            };
-            
-            try {
-                await addType(type);
-                customTypes.push(type);
-                
-                updateTypeDropdowns();
-                updateTypesList();
-                
-                nameInput.value = '';
-                showNotification('Tipo adicionado com sucesso!', 'success');
-            } catch (error) {
-                showNotification('Erro ao adicionar tipo: ' + error.message, 'error');
-            }
-        }
-        
-        function editType(id) {
-            const type = customTypes.find(t => t.id === id);
-            if (!type) return;
-            
-            const newName = prompt('Editar nome do tipo:', type.name);
-            if (newName && newName.trim() !== '' && newName !== type.name) {
-                type.name = newName.trim();
-                addType(type).then(() => {
-                    updateTypeDropdowns();
-                    updateTypesList();
-                    showNotification('Tipo atualizado com sucesso!', 'success');
-                }).catch(error => {
-                    showNotification('Erro ao atualizar tipo: ' + error.message, 'error');
-                });
-            }
-        }
-        
-        async function deleteTypePrompt(id) {
-            const type = customTypes.find(t => t.id === id);
-            if (!type) return;
-            
-            // Verificar se o tipo está sendo usado em transações
-            const isUsed = allTransactions.some(t => t.tipo === id);
-            
-            if (isUsed) {
-                showNotification('Este tipo está em uso e não pode ser excluído!', 'error');
-                return;
-            }
-            
-            if (confirm(`Tem certeza que deseja excluir o tipo "${type.name}"?`)) {
-                try {
-                    await deleteType(id);
-                    customTypes = customTypes.filter(t => t.id !== id);
-                    
-                    updateTypeDropdowns();
-                    updateTypesList();
-                    
-                    showNotification('Tipo excluído com sucesso!', 'success');
-                } catch (error) {
-                    showNotification('Erro ao excluir tipo: ' + error.message, 'error');
-                }
-            }
-        }
-        
-        // ==================== MANIPULAÇÃO DE RECEITAS ====================
-        async function saveMonthlyIncomes() {
-            try {
-                for (let month = 1; month <= 12; month++) {
-                    const input = document.getElementById(`income-${month}`);
-                    const value = parseFloat(input.value) || 0;
-                    await saveIncome(currentYear, month, value);
-                    monthlyIncomes[month] = value;
-                }
-                
-                updateDashboard();
-                showNotification('Receitas salvas com sucesso!', 'success');
-            } catch (error) {
-                showNotification('Erro ao salvar receitas: ' + error.message, 'error');
-            }
-        }
-        
-        // ==================== MANIPULAÇÃO DE ANOS ====================
-        async function changeYear() {
-            const yearSelect = document.getElementById('yearSelect');
-            const newYear = parseInt(yearSelect.value);
-            
-            if (newYear === currentYear) return;
-            
-            try {
-                // Salvar ano atual
-                currentYear = newYear;
-                await saveSetting('currentYear', currentYear);
-                
-                // Carregar dados do novo ano
-                allTransactions = await getTransactionsForYear(currentYear);
-                monthlyIncomes = await getIncomesForYear(currentYear);
-                
-                // Se não houver receitas para este ano, criar padrão
-                if (Object.keys(monthlyIncomes).length === 0) {
-                    const defaultIncomes = {
-                        1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
-                        7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
-                    };
-                    
-                    for (const [month, income] of Object.entries(defaultIncomes)) {
-                        await saveIncome(currentYear, parseInt(month), income);
-                    }
-                    monthlyIncomes = defaultIncomes;
-                }
-                
-                updateUI();
-                showNotification(`Ano alterado para ${currentYear}!`, 'success');
-            } catch (error) {
-                showNotification('Erro ao alterar ano: ' + error.message, 'error');
-            }
-        }
-        
-        async function addNewYear() {
-            const newYearInput = document.getElementById('newYear');
-            const newYear = parseInt(newYearInput.value);
-            
-            if (!newYear || newYear < 2020 || newYear > 2100) {
-                showNotification('Digite um ano válido entre 2020 e 2100!', 'error');
-                return;
-            }
-            
-            if (availableYears.includes(newYear)) {
-                showNotification('Este ano já está disponível!', 'error');
-                return;
-            }
-            
-            try {
-                availableYears.push(newYear);
-                await saveSetting('availableYears', availableYears);
-                
-                updateYearDropdown();
-                newYearInput.value = '';
-                showNotification(`Ano ${newYear} adicionado com sucesso!`, 'success');
-            } catch (error) {
-                showNotification('Erro ao adicionar ano: ' + error.message, 'error');
-            }
-        }
-        
-        // ==================== EXPORTAÇÃO/IMPORTAÇÃO ====================
-        async function exportData() {
-            try {
-                // Coletar todos os dados
-                const allData = {
-                    version: '4.0',
-                    exportDate: new Date().toISOString(),
-                    settings: {
-                        currentYear: currentYear,
-                        availableYears: availableYears
-                    },
-                    transactions: allTransactions,
-                    categories: customCategories,
-                    types: customTypes,
-                    incomes: {}
-                };
-                
-                // Coletar receitas de todos os anos disponíveis
-                for (const year of availableYears) {
-                    const yearIncomes = await getIncomesForYear(year);
-                    allData.incomes[year] = yearIncomes;
-                }
-                
-                const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `atlas-financeiro-backup-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                
-                URL.revokeObjectURL(url);
-                
-                showNotification('Dados exportados com sucesso!', 'success');
-            } catch (error) {
-                showNotification('Erro ao exportar dados: ' + error.message, 'error');
-            }
-        }
-        
-        async function importData(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                
-                reader.onload = async (event) => {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        
-                        if (!data.version) {
-                            throw new Error('Formato de arquivo inválido');
-                        }
-                        
-                        // Limpar dados existentes
-                        const tx = db.transaction(
-                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_TYPES, STORE_INCOMES, STORE_SETTINGS], 
-                            'readwrite'
-                        );
-                        
-                        tx.objectStore(STORE_TRANSACTIONS).clear();
-                        tx.objectStore(STORE_CATEGORIES).clear();
-                        tx.objectStore(STORE_TYPES).clear();
-                        tx.objectStore(STORE_INCOMES).clear();
-                        tx.objectStore(STORE_SETTINGS).clear();
-                        
-                        await new Promise((resolveTx, rejectTx) => {
-                            tx.oncomplete = resolveTx;
-                            tx.onerror = rejectTx;
-                        });
-                        
-                        // Importar transações
-                        if (data.transactions && Array.isArray(data.transactions)) {
-                            for (const transaction of data.transactions) {
-                                await addTransaction(transaction);
-                            }
-                        }
-                        
-                        // Importar categorias
-                        if (data.categories && Array.isArray(data.categories)) {
-                            for (const category of data.categories) {
-                                await addCategory(category);
-                            }
-                        }
-                        
-                        // Importar tipos
-                        if (data.types && Array.isArray(data.types)) {
-                            for (const type of data.types) {
-                                await addType(type);
-                            }
-                        }
-                        
-                        // Importar receitas
-                        if (data.incomes && typeof data.incomes === 'object') {
-                            for (const [year, yearIncomes] of Object.entries(data.incomes)) {
-                                for (const [month, value] of Object.entries(yearIncomes)) {
-                                    await saveIncome(parseInt(year), parseInt(month), value);
-                                }
-                            }
-                        }
-                        
-                        // Importar configurações
-                        if (data.settings) {
-                            if (data.settings.currentYear) {
-                                await saveSetting('currentYear', data.settings.currentYear);
-                            }
-                            if (data.settings.availableYears) {
-                                await saveSetting('availableYears', data.settings.availableYears);
-                            }
-                        }
-                        
-                        // Recarregar dados
-                        await loadAllData();
-                        
-                        showNotification('Dados importados com sucesso!', 'success');
-                        resolve();
-                    } catch (error) {
-                        showNotification('Erro ao importar dados: ' + error.message, 'error');
-                        reject(error);
-                    }
-                };
-                
-                reader.onerror = () => {
-                    showNotification('Erro ao ler arquivo', 'error');
-                    reject(new Error('Erro ao ler arquivo'));
-                };
-                
-                reader.readAsText(file);
-            });
-        }
-        
-        // ==================== IMPORTAR EXCEL ====================
-        async function importExcel(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                
-                reader.onload = async (event) => {
-                    try {
-                        const data = event.target.result;
-                        
-                        // Verificar se é CSV
-                        if (file.name.endsWith('.csv')) {
-                            const rows = data.split('\n').filter(row => row.trim() !== '');
-                            
-                            let importedCount = 0;
-                            for (let i = 1; i < rows.length; i++) { // Pular cabeçalho
-                                const columns = rows[i].split(',').map(col => col.trim());
-                                
-                                // Verificar se tem pelo menos 6 colunas
-                                if (columns.length >= 6) {
-                                    const [conta, valorStr, parcela, periodo, tipoNome, categoriaNome] = columns;
-                                    
-                                    // Converter valor
-                                    const valor = parseFloat(valorStr.replace('R$', '').replace(',', '.').trim()) || 0;
-                                    
-                                    if (conta && valor > 0) {
-                                        // Encontrar tipo pelo nome
-                                        const tipoObj = customTypes.find(t => t.name === tipoNome);
-                                        const tipo = tipoObj ? tipoObj.id : 'cartao_credito';
-                                        
-                                        // Encontrar categoria pelo nome
-                                        const categoriaObj = customCategories.find(c => c.name === categoriaNome);
-                                        const categoria = categoriaObj ? categoriaObj.id : 'outros';
-                                        
-                                        // Extrair mês inicial do período
-                                        const periodoMatch = periodo.match(/^([a-z]{3})/i);
-                                        const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-                                        const mes = periodoMatch ? meses.indexOf(periodoMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
-                                        
-                                        // Separar período
-                                        const periodoParts = periodo.split(' - ');
-                                        const mesInicial = periodoParts[0] || '';
-                                        const mesFinal = periodoParts[1] || '';
-                                        
-                                        // Extrair parcelas
-                                        let parcelaInicial = null;
-                                        let parcelaFinal = null;
-                                        if (parcela && parcela.includes('/') && parcela !== '-') {
-                                            const partes = parcela.split('/');
-                                            parcelaInicial = parseInt(partes[0]) || null;
-                                            parcelaFinal = parseInt(partes[1]) || null;
-                                        }
-                                        
-                                        const transaction = {
-                                            conta: conta,
-                                            valor: valor,
-                                            parcelaInicial: parcelaInicial,
-                                            parcelaFinal: parcelaFinal,
-                                            mesInicial: mesInicial,
-                                            mesFinal: mesFinal,
-                                            tipo: tipo,
-                                            categoria: categoria,
-                                            mes: mes,
-                                            ano: currentYear,
-                                            data: new Date().toISOString().split('T')[0]
-                                        };
-                                        
-                                        await addTransaction(transaction);
-                                        importedCount++;
-                                    }
-                                }
-                            }
-                            
-                            if (importedCount > 0) {
-                                allTransactions = await getTransactionsForYear(currentYear);
-                                updateDashboard();
-                                updateTransactionsTable();
-                                updateTransactionCount();
-                                
-                                showNotification(`${importedCount} transações importadas do arquivo!`, 'success');
-                            } else {
-                                showNotification('Nenhuma transação válida encontrada no arquivo', 'warning');
-                            }
-                        } else {
-                            // Para XLSX/XLS, mostrar mensagem informativa
-                            showNotification('Para importar arquivos Excel (.xlsx, .xls), converta primeiro para CSV ou use o formato especificado', 'info');
-                        }
-                        
-                        resolve();
-                    } catch (error) {
-                        console.error('Erro ao importar Excel:', error);
-                        showNotification('Erro ao importar arquivo. Certifique-se de que o formato está correto.', 'error');
-                        reject(error);
-                    }
-                };
-                
-                reader.onerror = () => {
-                    showNotification('Erro ao ler arquivo', 'error');
-                    reject(new Error('Erro ao ler arquivo'));
-                };
-                
-                // Ler como texto para CSV, como array buffer para Excel
-                if (file.name.endsWith('.csv')) {
-                    reader.readAsText(file);
-                } else {
-                    reader.readAsArrayBuffer(file);
-                }
-            });
-        }
-        
-        // ==================== EVENT LISTENERS ====================
-        let originalAddHandler = null;
-        
-        document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                await initDatabase();
-                setupEventListeners();
-                
-                // Adicionar efeito de hover nos cards
-                const cards = document.querySelectorAll('.card');
-                cards.forEach(card => {
-                    card.addEventListener('mouseenter', function() {
-                        this.style.transform = 'translateY(-5px)';
-                    });
-                    card.addEventListener('mouseleave', function() {
-                        this.style.transform = 'translateY(0)';
-                    });
-                });
-                
-            } catch (error) {
-                console.error('Erro na inicialização:', error);
-                showNotification('Erro ao inicializar o sistema: ' + error.message, 'error');
-            }
-        });
-        
-        function setupEventListeners() {
-            // Chat
-            document.getElementById('chatBtn').addEventListener('click', () => {
-                document.getElementById('chatModal').classList.add('active');
-            });
-            
-            document.getElementById('closeChat').addEventListener('click', () => {
-                document.getElementById('chatModal').classList.remove('active');
-                // Restaurar botão original se estiver em modo edição
-                const addButton = document.getElementById('addViaChat');
-                if (originalAddHandler) {
-                    addButton.innerHTML = '<i class="fas fa-plus"></i> Adicionar Transação';
-                    addButton.onclick = originalAddHandler;
-                    originalAddHandler = null;
+                    showNotification('Erro: ' + error.message, 'error');
                 }
             });
             
-            // Configurar handler original do botão de adicionar
-            const addButton = document.getElementById('addViaChat');
-            originalAddHandler = async () => {
-                const conta = document.getElementById('transConta').value.trim();
-                const valor = document.getElementById('transValor').value;
-                const parcela = document.getElementById('transParcela').value.trim();
-                const periodo = document.getElementById('transPeriodo').value.trim();
-                const tipo = document.getElementById('transTipo').value;
-                const categoria = document.getElementById('transCategoria').value;
-                
-                if (!conta || !valor || !periodo || !tipo || !categoria) {
-                    showNotification('Preencha todos os campos obrigatórios!', 'error');
-                    return;
-                }
-                
-                if (isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
-                    showNotification('Valor inválido!', 'error');
-                    return;
-                }
-                
-                const success = await addNewTransaction({
-                    conta, valor, parcela, periodo, tipo, categoria
-                });
-                
-                if (success) {
-                    document.getElementById('transConta').value = '';
-                    document.getElementById('transValor').value = '';
-                    document.getElementById('transParcela').value = '';
-                    document.getElementById('transPeriodo').value = '';
-                    document.getElementById('transTipo').value = '';
-                    document.getElementById('transCategoria').value = '';
-                    
-                    document.getElementById('chatModal').classList.remove('active');
-                }
-            };
-            
-            addButton.onclick = originalAddHandler;
-            
-            // Configurações
             document.getElementById('configBtn').addEventListener('click', () => {
                 document.getElementById('configModal').classList.add('active');
             });
@@ -3138,114 +1608,24 @@
                 document.getElementById('configModal').classList.remove('active');
             });
             
-            // Tabs das configurações
             document.querySelectorAll('.config-tab').forEach(tab => {
                 tab.addEventListener('click', () => {
                     const tabId = tab.dataset.tab;
-                    
-                    // Atualizar tabs ativas
-                    document.querySelectorAll('.config-tab').forEach(t => {
-                        t.classList.remove('active');
-                    });
+                    document.querySelectorAll('.config-tab').forEach(t => t.classList.remove('active'));
                     tab.classList.add('active');
-                    
-                    // Mostrar conteúdo da tab
-                    document.querySelectorAll('.config-tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
+                    document.querySelectorAll('.config-tab-content').forEach(content => content.classList.remove('active'));
                     document.getElementById(`tab-${tabId}`).classList.add('active');
                 });
             });
             
-            // Botões das configurações
-            document.getElementById('saveIncomes').addEventListener('click', saveMonthlyIncomes);
-            document.getElementById('addCategoryBtn').addEventListener('click', addNewCategory);
-            document.getElementById('addTypeBtn').addEventListener('click', addNewType);
-            document.getElementById('saveYear').addEventListener('click', changeYear);
-            document.getElementById('addYearBtn').addEventListener('click', addNewYear);
-            
-            // Exportação/Importação
-            document.getElementById('exportBtn').addEventListener('click', exportData);
-            document.getElementById('exportHeaderBtn').addEventListener('click', exportData);
-            document.getElementById('importBtn').addEventListener('click', () => {
-                document.getElementById('fileImport').click();
-            });
-            
-            document.getElementById('importDataBtn').addEventListener('click', () => {
-                document.getElementById('fileImport').click();
-            });
-            
-            document.getElementById('importExcelBtn').addEventListener('click', () => {
-                document.getElementById('excelImport').click();
-            });
-            
-            document.getElementById('fileImport').addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    await importData(file);
-                    event.target.value = '';
-                }
-            });
-            
-            document.getElementById('excelImport').addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    await importExcel(file);
-                    event.target.value = '';
-                }
-            });
-            
-            // Botão nova transação
             document.getElementById('addTransactionBtn').addEventListener('click', () => {
                 document.getElementById('chatModal').classList.add('active');
             });
             
-            // Limpar tudo
-            document.getElementById('clearAllBtn').addEventListener('click', async () => {
-                if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.')) {
-                    try {
-                        const tx = db.transaction(
-                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_TYPES, STORE_INCOMES, STORE_SETTINGS], 
-                            'readwrite'
-                        );
-                        
-                        tx.objectStore(STORE_TRANSACTIONS).clear();
-                        tx.objectStore(STORE_CATEGORIES).clear();
-                        tx.objectStore(STORE_TYPES).clear();
-                        tx.objectStore(STORE_INCOMES).clear();
-                        tx.objectStore(STORE_SETTINGS).clear();
-                        
-                        await new Promise((resolve, reject) => {
-                            tx.oncomplete = resolve;
-                            tx.onerror = reject;
-                        });
-                        
-                        // Recarregar dados
-                        await loadAllData();
-                        
-                        showNotification('Todos os dados foram removidos!', 'success');
-                    } catch (error) {
-                        showNotification('Erro ao limpar dados: ' + error.message, 'error');
-                    }
-                }
-            });
-            
-            // Filtros dos gráficos
-            document.getElementById('doughnutMonth').addEventListener('change', updateDoughnutChart);
-            document.getElementById('doughnutAccountType').addEventListener('change', updateDoughnutChart);
-            document.getElementById('doughnutCategory').addEventListener('change', updateDoughnutChart);
-            document.getElementById('showValues').addEventListener('change', updateDoughnutChart);
-            
-            document.getElementById('barMonth').addEventListener('change', updateBarChart);
-            document.getElementById('barAccountType').addEventListener('change', updateBarChart);
-            document.getElementById('showBalance').addEventListener('change', updateBarChart);
-            
-            // Mobile toggle
             document.getElementById('mobileToggle').addEventListener('click', () => {
                 document.getElementById('sidebar').classList.toggle('active');
             });
             
-            // Fechar modais com ESC
             document.addEventListener('keydown', (e) => {
                 if (e.key === 'Escape') {
                     document.getElementById('chatModal').classList.remove('active');
