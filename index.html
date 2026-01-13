@@ -1963,19 +1963,33 @@
                 if (row.length >= 6) {
                     const conta = row[0] || '';
                     const valorStr = row[1] || '0';
-                    const parcela = row[2] || '';
-                    const periodo = row[3] || '';
-                    const tipo = row[4] || '';
-                    const categoria = row[5] || '';
-                    
-                    // Converter valor (remover R$, pontos e substituir vírgula por ponto)
-                    const valor = parseFloat(
-                        valorStr.toString()
-                            .replace('R$', '')
-                            .replace(/\./g, '')
-                            .replace(',', '.')
-                            .trim()
-                    ) || 0;
+
+                    // Função que converte formato BR certo
+                    function parseValorBR(valor) {
+                        let str = valor.toString().trim();
+    
+                        // Remove R$
+                        str = str.replace(/R\$/gi, '');
+    
+                        // Se não tem vírgula, converte direto
+                        if (!str.includes(',')) {
+                            return parseFloat(str) || 0;
+                        }
+    
+                        // Se tem vírgula E ponto (ex: 1.500,00)
+                        if (str.includes('.') && str.includes(',')) {
+                            // Remove pontos (milhar) e troca vírgula por ponto (decimal)
+                            str = str.replace(/\./g, '').replace(',', '.');
+                        } 
+                        // Se só tem vírgula (ex: 3,53)
+                        else if (str.includes(',') && !str.includes('.')) {
+                            str = str.replace(',', '.');
+                        }
+    
+                        return parseFloat(str) || 0;
+                    }
+
+                    const valor = parseValorBR(valorStr);
                     
                     if (conta && valor > 0) {
                         // Processar período
@@ -2101,7 +2115,11 @@
                         const data = new Uint8Array(event.target.result);
                         const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { 
+                            header: 1,
+                            raw: false,          // <--- ISSO AQUI É A CHAVE!
+                            defval: ''           // <--- MANTÉM COMO TEXTO
+                        });
                         
                         // Processar dados do Excel
                         const processedData = processExcelData(jsonData.slice(1)); // Pular cabeçalho
