@@ -707,7 +707,7 @@
             border: 2px solid var(--gray-light);
         }
 
-        .category-item {
+        .category-item, .type-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -717,7 +717,7 @@
             margin-bottom: 8px;
         }
 
-        .category-actions {
+        .category-actions, .type-actions {
             display: flex;
             gap: 8px;
         }
@@ -840,6 +840,12 @@
                     <span>Importar Dados</span>
                 </a>
             </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" id="importExcelBtn">
+                    <i class="fas fa-file-excel"></i>
+                    <span>Importar Excel</span>
+                </a>
+            </div>
         </div>
         
         <div class="user-info">
@@ -888,19 +894,7 @@
                     <label for="transTipo"><i class="fas fa-credit-card"></i> Tipo *</label>
                     <select id="transTipo" class="form-control" required>
                         <option value="">Selecione o tipo...</option>
-                        <option value="cartao_credito">Cartão de Crédito</option>
-                        <option value="cartao_debito">Cartão de Débito</option>
-                        <option value="pix">PIX</option>
-                        <option value="dinheiro">Dinheiro</option>
-                        <option value="boleto">Boleto</option>
-                        <option value="debito_conta">Débito em Conta</option>
-                        <option value="alimentacao">Alimentação</option>
-                        <option value="transporte">Transporte</option>
-                        <option value="moradia">Moradia</option>
-                        <option value="lazer">Lazer</option>
-                        <option value="saude">Saúde</option>
-                        <option value="educacao">Educação</option>
-                        <option value="investimento">Investimento</option>
+                        <!-- Tipos serão carregados dinamicamente -->
                     </select>
                 </div>
                 
@@ -930,6 +924,7 @@
             <div class="config-tabs">
                 <button class="config-tab active" data-tab="receitas">Receitas</button>
                 <button class="config-tab" data-tab="categorias">Categorias</button>
+                <button class="config-tab" data-tab="tipos">Tipos</button>
                 <button class="config-tab" data-tab="anos">Anos</button>
             </div>
             
@@ -968,6 +963,28 @@
                         
                         <div id="categoriesList">
                             <!-- Categorias serão carregadas dinamicamente -->
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Aba de Tipos -->
+                <div class="config-tab-content" id="tab-tipos">
+                    <div class="config-section">
+                        <h4><i class="fas fa-credit-card"></i> Tipos Personalizados</h4>
+                        <p>Adicione, edite ou remova tipos de transações:</p>
+                        
+                        <div class="form-group">
+                            <label>Novo Tipo</label>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="text" id="newTypeName" placeholder="Nome do tipo" class="form-control">
+                                <button class="btn btn-primary" id="addTypeBtn">
+                                    <i class="fas fa-plus"></i> Adicionar
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div id="typesList">
+                            <!-- Tipos serão carregados dinamicamente -->
                         </div>
                     </div>
                 </div>
@@ -1026,7 +1043,7 @@
             </div>
         </div>
         
-        <!-- Stats Cards (AGORA DINÂMICOS) -->
+        <!-- Stats Cards -->
         <div class="stats-cards">
             <div class="card stat-card">
                 <div class="stat-info">
@@ -1104,10 +1121,7 @@
                         </select>
                         <select class="chart-filter" id="barAccountType">
                             <option value="all">Todos os Tipos</option>
-                            <option value="cartao_credito">Cartão de Crédito</option>
-                            <option value="cartao_debito">Cartão de Débito</option>
-                            <option value="pix">PIX</option>
-                            <option value="dinheiro">Dinheiro</option>
+                            <!-- Tipos serão carregados dinamicamente -->
                         </select>
                         <div class="chart-checkbox">
                             <input type="checkbox" id="showBalance" checked>
@@ -1148,10 +1162,7 @@
                         </select>
                         <select class="chart-filter" id="doughnutAccountType">
                             <option value="all">Todos os Tipos</option>
-                            <option value="cartao_credito">Cartão de Crédito</option>
-                            <option value="cartao_debito">Cartão de Débito</option>
-                            <option value="pix">PIX</option>
-                            <option value="dinheiro">Dinheiro</option>
+                            <!-- Tipos serão carregados dinamicamente -->
                         </select>
                         <select class="chart-filter" id="doughnutCategory">
                             <option value="all">Todas Categorias</option>
@@ -1221,16 +1232,18 @@
         </div>
     </div>
 
-    <!-- Input oculto para importação -->
+    <!-- Inputs ocultos para importação -->
     <input type="file" id="fileImport" accept=".json" style="display: none;">
+    <input type="file" id="excelImport" accept=".xlsx,.xls,.csv" style="display: none;">
 
     <script>
         // ==================== BANCO DE DADOS LOCAL ====================
         const DB_NAME = 'AtlasFinanceDB';
-        const DB_VERSION = 2; // Versão atualizada
+        const DB_VERSION = 3; // Versão atualizada
         const STORE_TRANSACTIONS = 'transactions';
         const STORE_SETTINGS = 'settings';
         const STORE_CATEGORIES = 'categories';
+        const STORE_TYPES = 'types';
         const STORE_INCOMES = 'incomes';
         
         let db;
@@ -1238,6 +1251,7 @@
         let allTransactions = [];
         let currentYear = new Date().getFullYear();
         let customCategories = [];
+        let customTypes = [];
         let monthlyIncomes = {};
         let availableYears = [currentYear];
         
@@ -1251,23 +1265,6 @@
         const monthAbbr = {
             1: 'jan', 2: 'fev', 3: 'mar', 4: 'abr', 5: 'mai', 6: 'jun',
             7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
-        };
-        
-        // Tipos mapeados
-        const tipoMap = {
-            'cartao_credito': 'Cartão de Crédito',
-            'cartao_debito': 'Cartão de Débito',
-            'pix': 'PIX',
-            'dinheiro': 'Dinheiro',
-            'boleto': 'Boleto',
-            'debito_conta': 'Débito em Conta',
-            'alimentacao': 'Alimentação',
-            'transporte': 'Transporte',
-            'moradia': 'Moradia',
-            'lazer': 'Lazer',
-            'saude': 'Saúde',
-            'educacao': 'Educação',
-            'investimento': 'Investimento'
         };
         
         // Categorias padrão
@@ -1287,6 +1284,23 @@
             { id: 'educacao', name: 'Educação', custom: false },
             { id: 'vestuario', name: 'Vestuário', custom: false },
             { id: 'outros', name: 'Outros', custom: false }
+        ];
+        
+        // Tipos padrão
+        const defaultTypes = [
+            { id: 'cartao_credito', name: 'Cartão de Crédito', custom: false },
+            { id: 'cartao_debito', name: 'Cartão de Débito', custom: false },
+            { id: 'pix', name: 'PIX', custom: false },
+            { id: 'dinheiro', name: 'Dinheiro', custom: false },
+            { id: 'boleto', name: 'Boleto', custom: false },
+            { id: 'debito_conta', name: 'Débito em Conta', custom: false },
+            { id: 'alimentacao', name: 'Alimentação', custom: false },
+            { id: 'transporte', name: 'Transporte', custom: false },
+            { id: 'moradia', name: 'Moradia', custom: false },
+            { id: 'lazer', name: 'Lazer', custom: false },
+            { id: 'saude', name: 'Saúde', custom: false },
+            { id: 'educacao', name: 'Educação', custom: false },
+            { id: 'investimento', name: 'Investimento', custom: false }
         ];
         
         // ==================== INICIALIZAÇÃO DO BANCO ====================
@@ -1333,6 +1347,12 @@
                         });
                     }
                     
+                    if (!db.objectStoreNames.contains(STORE_TYPES)) {
+                        const store = db.createObjectStore(STORE_TYPES, { 
+                            keyPath: 'id'
+                        });
+                    }
+                    
                     if (!db.objectStoreNames.contains(STORE_INCOMES)) {
                         const store = db.createObjectStore(STORE_INCOMES, { 
                             keyPath: 'key'
@@ -1370,6 +1390,16 @@
                     await addCategory(cat);
                 }
                 customCategories = defaultCategories;
+            }
+            
+            // Carregar tipos
+            customTypes = await getAllTypes();
+            if (customTypes.length === 0) {
+                // Adicionar tipos padrão
+                for (const type of defaultTypes) {
+                    await addType(type);
+                }
+                customTypes = defaultTypes;
             }
             
             // Carregar receitas do ano atual
@@ -1562,6 +1592,55 @@
             });
         }
         
+        // Tipos
+        function addType(type) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_TYPES], 'readwrite');
+                const store = tx.objectStore(STORE_TYPES);
+                const request = store.put(type);
+                
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function getAllTypes() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_TYPES], 'readonly');
+                const store = tx.objectStore(STORE_TYPES);
+                const request = store.getAll();
+                
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function deleteType(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_TYPES], 'readwrite');
+                const store = tx.objectStore(STORE_TYPES);
+                const request = store.delete(id);
+                
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
         // Receitas
         function saveIncome(year, month, value) {
             return new Promise((resolve, reject) => {
@@ -1669,7 +1748,6 @@
         }
         
         function showNotification(message, type = 'info') {
-            // Implementação melhorada de notificação
             const notification = document.createElement('div');
             notification.style.cssText = `
                 position: fixed;
@@ -1701,7 +1779,6 @@
                 }, 300);
             }, 3000);
             
-            // Adicionar estilos de animação
             const style = document.createElement('style');
             style.textContent = `
                 @keyframes slideIn {
@@ -1723,8 +1800,9 @@
             document.getElementById('balanceYear').textContent = currentYear;
             document.getElementById('currentConfigYear').textContent = currentYear;
             
-            // Atualizar dropdowns de categorias
+            // Atualizar dropdowns de categorias e tipos
             updateCategoryDropdowns();
+            updateTypeDropdowns();
             
             // Atualizar dropdown de anos
             updateYearDropdown();
@@ -1732,8 +1810,9 @@
             // Atualizar inputs de receitas
             updateIncomeInputs();
             
-            // Atualizar lista de categorias
+            // Atualizar listas
             updateCategoriesList();
+            updateTypesList();
             
             // Atualizar dashboard
             updateDashboard();
@@ -1769,6 +1848,36 @@
                     chartCategorySelect.appendChild(option);
                 });
             }
+        }
+        
+        function updateTypeDropdowns() {
+            // Dropdown do chat
+            const chatTypeSelect = document.getElementById('transTipo');
+            if (chatTypeSelect) {
+                chatTypeSelect.innerHTML = '<option value="">Selecione o tipo...</option>';
+                customTypes.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type.id;
+                    option.textContent = type.name;
+                    chatTypeSelect.appendChild(option);
+                });
+            }
+            
+            // Dropdowns dos gráficos
+            const barAccountType = document.getElementById('barAccountType');
+            const doughnutAccountType = document.getElementById('doughnutAccountType');
+            
+            [barAccountType, doughnutAccountType].forEach(select => {
+                if (select) {
+                    select.innerHTML = '<option value="all">Todos os Tipos</option>';
+                    customTypes.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.id;
+                        option.textContent = type.name;
+                        select.appendChild(option);
+                    });
+                }
+            });
         }
         
         function updateYearDropdown() {
@@ -1828,7 +1937,7 @@
                 categoriesList.appendChild(div);
             });
             
-            // Adicionar event listeners para botões de edição/exclusão
+            // Adicionar event listeners
             categoriesList.querySelectorAll('.edit-category').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     const id = e.target.closest('button').dataset.id;
@@ -1840,6 +1949,47 @@
                 btn.addEventListener('click', (e) => {
                     const id = e.target.closest('button').dataset.id;
                     deleteCategoryPrompt(id);
+                });
+            });
+        }
+        
+        function updateTypesList() {
+            const typesList = document.getElementById('typesList');
+            if (!typesList) return;
+            
+            typesList.innerHTML = '';
+            
+            customTypes.forEach(type => {
+                const div = document.createElement('div');
+                div.className = 'type-item';
+                div.innerHTML = `
+                    <span>${type.name}</span>
+                    <div class="type-actions">
+                        ${type.custom ? `
+                            <button class="btn btn-outline btn-sm edit-type" data-id="${type.id}" style="padding: 4px 8px;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-type" data-id="${type.id}" style="padding: 4px 8px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : '<span style="color: var(--gray); font-size: 12px;">Padrão</span>'}
+                    </div>
+                `;
+                typesList.appendChild(div);
+            });
+            
+            // Adicionar event listeners
+            typesList.querySelectorAll('.edit-type').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').dataset.id;
+                    editType(id);
+                });
+            });
+            
+            typesList.querySelectorAll('.delete-type').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').dataset.id;
+                    deleteTypePrompt(id);
                 });
             });
         }
@@ -1937,13 +2087,17 @@
                 const category = customCategories.find(c => c.id === transaction.categoria);
                 const categoryName = category ? category.name : transaction.categoria;
                 
+                // Encontrar nome do tipo
+                const type = customTypes.find(t => t.id === transaction.tipo);
+                const typeName = type ? type.name : transaction.tipo;
+                
                 row.innerHTML = `
                     <td><strong>${transaction.conta}</strong></td>
                     <td>${formatCurrency(transaction.valor)}</td>
                     <td>${parcelaText}</td>
                     <td>${transaction.mesInicial} - ${transaction.mesFinal}</td>
                     <td><span class="status-badge ${statusClass}">${transaction.status}</span></td>
-                    <td>${tipoMap[transaction.tipo] || transaction.tipo}</td>
+                    <td>${typeName}</td>
                     <td>${categoryName}</td>
                     <td>
                         <button class="btn btn-outline btn-sm edit-transaction" data-id="${transaction.id}" style="padding: 6px 12px; margin-right: 5px;">
@@ -2528,6 +2682,83 @@
             }
         }
         
+        // ==================== MANIPULAÇÃO DE TIPOS ====================
+        async function addNewType() {
+            const nameInput = document.getElementById('newTypeName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showNotification('Digite o nome do tipo!', 'error');
+                return;
+            }
+            
+            // Gerar ID único
+            const id = 'type_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            const type = {
+                id: id,
+                name: name,
+                custom: true
+            };
+            
+            try {
+                await addType(type);
+                customTypes.push(type);
+                
+                updateTypeDropdowns();
+                updateTypesList();
+                
+                nameInput.value = '';
+                showNotification('Tipo adicionado com sucesso!', 'success');
+            } catch (error) {
+                showNotification('Erro ao adicionar tipo: ' + error.message, 'error');
+            }
+        }
+        
+        function editType(id) {
+            const type = customTypes.find(t => t.id === id);
+            if (!type) return;
+            
+            const newName = prompt('Editar nome do tipo:', type.name);
+            if (newName && newName.trim() !== '' && newName !== type.name) {
+                type.name = newName.trim();
+                addType(type).then(() => {
+                    updateTypeDropdowns();
+                    updateTypesList();
+                    showNotification('Tipo atualizado com sucesso!', 'success');
+                }).catch(error => {
+                    showNotification('Erro ao atualizar tipo: ' + error.message, 'error');
+                });
+            }
+        }
+        
+        async function deleteTypePrompt(id) {
+            const type = customTypes.find(t => t.id === id);
+            if (!type) return;
+            
+            // Verificar se o tipo está sendo usado em transações
+            const isUsed = allTransactions.some(t => t.tipo === id);
+            
+            if (isUsed) {
+                showNotification('Este tipo está em uso e não pode ser excluído!', 'error');
+                return;
+            }
+            
+            if (confirm(`Tem certeza que deseja excluir o tipo "${type.name}"?`)) {
+                try {
+                    await deleteType(id);
+                    customTypes = customTypes.filter(t => t.id !== id);
+                    
+                    updateTypeDropdowns();
+                    updateTypesList();
+                    
+                    showNotification('Tipo excluído com sucesso!', 'success');
+                } catch (error) {
+                    showNotification('Erro ao excluir tipo: ' + error.message, 'error');
+                }
+            }
+        }
+        
         // ==================== MANIPULAÇÃO DE RECEITAS ====================
         async function saveMonthlyIncomes() {
             try {
@@ -2612,7 +2843,7 @@
             try {
                 // Coletar todos os dados
                 const allData = {
-                    version: '2.0',
+                    version: '3.0',
                     exportDate: new Date().toISOString(),
                     settings: {
                         currentYear: currentYear,
@@ -2620,6 +2851,7 @@
                     },
                     transactions: allTransactions,
                     categories: customCategories,
+                    types: customTypes,
                     incomes: {}
                 };
                 
@@ -2661,12 +2893,13 @@
                         
                         // Limpar dados existentes
                         const tx = db.transaction(
-                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_INCOMES, STORE_SETTINGS], 
+                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_TYPES, STORE_INCOMES, STORE_SETTINGS], 
                             'readwrite'
                         );
                         
                         tx.objectStore(STORE_TRANSACTIONS).clear();
                         tx.objectStore(STORE_CATEGORIES).clear();
+                        tx.objectStore(STORE_TYPES).clear();
                         tx.objectStore(STORE_INCOMES).clear();
                         tx.objectStore(STORE_SETTINGS).clear();
                         
@@ -2686,6 +2919,13 @@
                         if (data.categories && Array.isArray(data.categories)) {
                             for (const category of data.categories) {
                                 await addCategory(category);
+                            }
+                        }
+                        
+                        // Importar tipos
+                        if (data.types && Array.isArray(data.types)) {
+                            for (const type of data.types) {
+                                await addType(type);
                             }
                         }
                         
@@ -2725,6 +2965,64 @@
                 };
                 
                 reader.readAsText(file);
+            });
+        }
+        
+        // ==================== IMPORTAR EXCEL ====================
+        async function importExcel(file) {
+            return new Promise((resolve, reject) => {
+                // Simulação de importação de Excel
+                // Em produção, você precisaria usar uma biblioteca como SheetJS
+                showNotification('Importação de Excel não implementada neste exemplo. Use o formato JSON para importar.', 'warning');
+                resolve();
+                
+                /*
+                // Código real para importar Excel (requer biblioteca SheetJS)
+                const reader = new FileReader();
+                
+                reader.onload = async (event) => {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        // Processar os dados do Excel
+                        let importedCount = 0;
+                        for (const row of jsonData) {
+                            // Converter dados do Excel para formato do sistema
+                            const transaction = {
+                                conta: row.Conta || row.conta || '',
+                                valor: parseFloat(row.Valor || row.valor || 0),
+                                // ... outros campos
+                            };
+                            
+                            if (transaction.conta && transaction.valor > 0) {
+                                await addTransaction(transaction);
+                                importedCount++;
+                            }
+                        }
+                        
+                        if (importedCount > 0) {
+                            allTransactions = await getTransactionsForYear(currentYear);
+                            updateDashboard();
+                            updateTransactionsTable();
+                            updateTransactionCount();
+                            
+                            showNotification(`${importedCount} transações importadas do Excel!`, 'success');
+                        } else {
+                            showNotification('Nenhuma transação válida encontrada no arquivo Excel', 'warning');
+                        }
+                        
+                        resolve();
+                    } catch (error) {
+                        showNotification('Erro ao importar Excel: ' + error.message, 'error');
+                        reject(error);
+                    }
+                };
+                
+                reader.readAsArrayBuffer(file);
+                */
             });
         }
         
@@ -2839,6 +3137,7 @@
             // Botões das configurações
             document.getElementById('saveIncomes').addEventListener('click', saveMonthlyIncomes);
             document.getElementById('addCategoryBtn').addEventListener('click', addNewCategory);
+            document.getElementById('addTypeBtn').addEventListener('click', addNewType);
             document.getElementById('saveYear').addEventListener('click', changeYear);
             document.getElementById('addYearBtn').addEventListener('click', addNewYear);
             
@@ -2853,10 +3152,22 @@
                 document.getElementById('fileImport').click();
             });
             
+            document.getElementById('importExcelBtn').addEventListener('click', () => {
+                document.getElementById('excelImport').click();
+            });
+            
             document.getElementById('fileImport').addEventListener('change', async (event) => {
                 const file = event.target.files[0];
                 if (file) {
                     await importData(file);
+                    event.target.value = '';
+                }
+            });
+            
+            document.getElementById('excelImport').addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    await importExcel(file);
                     event.target.value = '';
                 }
             });
@@ -2871,12 +3182,13 @@
                 if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.')) {
                     try {
                         const tx = db.transaction(
-                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_INCOMES, STORE_SETTINGS], 
+                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_TYPES, STORE_INCOMES, STORE_SETTINGS], 
                             'readwrite'
                         );
                         
                         tx.objectStore(STORE_TRANSACTIONS).clear();
                         tx.objectStore(STORE_CATEGORIES).clear();
+                        tx.objectStore(STORE_TYPES).clear();
                         tx.objectStore(STORE_INCOMES).clear();
                         tx.objectStore(STORE_SETTINGS).clear();
                         
