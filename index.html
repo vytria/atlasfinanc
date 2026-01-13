@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlas - Controle Financeiro 2.0</title>
+    <title>Atlas - Controle Financeiro 3.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
+        /* MANTENDO TODOS OS ESTILOS ORIGINAIS */
         :root {
             --primary: #4361ee;
             --primary-dark: #3a56d4;
@@ -204,6 +205,15 @@
 
         .btn-success:hover {
             background-color: #3ab0d3;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #e11570;
         }
 
         .stats-cards {
@@ -471,6 +481,126 @@
             color: white;
         }
 
+        /* Modal do Chat */
+        .chat-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .chat-modal.active {
+            display: flex;
+        }
+
+        .chat-container {
+            width: 500px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-header .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .chat-header .close-btn:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+
+        .chat-body {
+            padding: 25px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .chat-message {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 12px;
+        }
+
+        .chat-message.atlas {
+            background-color: rgba(67, 97, 238, 0.1);
+            border-left: 4px solid var(--primary);
+        }
+
+        .chat-message.user {
+            background-color: rgba(248, 150, 30, 0.1);
+            border-left: 4px solid var(--warning);
+            margin-left: 20px;
+        }
+
+        .chat-input-section {
+            padding: 20px;
+            border-top: 1px solid var(--gray-light);
+            background-color: var(--light);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 8px;
+            border: 2px solid var(--gray-light);
+            font-size: 14px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
         .mobile-toggle {
             display: none;
             position: fixed;
@@ -566,33 +696,21 @@
                 </a>
             </div>
             <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Transações</span>
+                <a href="#" class="nav-link" id="chatBtn">
+                    <i class="fas fa-comment-dots"></i>
+                    <span>Adicionar via Chat</span>
                 </a>
             </div>
             <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-chart-pie"></i>
-                    <span>Categorias</span>
+                <a href="#" class="nav-link" id="exportBtn">
+                    <i class="fas fa-file-export"></i>
+                    <span>Exportar Dados</span>
                 </a>
             </div>
             <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-credit-card"></i>
-                    <span>Cartões</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Relatórios</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fas fa-cog"></i>
-                    <span>Configurações</span>
+                <a href="#" class="nav-link" id="importBtn">
+                    <i class="fas fa-file-import"></i>
+                    <span>Importar Dados</span>
                 </a>
             </div>
         </div>
@@ -601,7 +719,89 @@
             <div class="user-avatar">JV</div>
             <div class="user-details">
                 <h4>João Victor</h4>
-                <p>Administrador</p>
+                <p>Transações: <span id="totalTransCount">0</span></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal do Chat -->
+    <div class="chat-modal" id="chatModal">
+        <div class="chat-container">
+            <div class="chat-header">
+                <h3><i class="fas fa-robot"></i> Atlas Assistente</h3>
+                <button class="close-btn" id="closeChat">&times;</button>
+            </div>
+            <div class="chat-body" id="chatBody">
+                <div class="chat-message atlas">
+                    <p><strong>Atlas:</strong> Olá! Sou seu assistente financeiro. Para adicionar uma transação, preencha os campos abaixo:</p>
+                </div>
+            </div>
+            <div class="chat-input-section">
+                <div class="form-group">
+                    <label for="transConta"><i class="fas fa-building"></i> Conta/Nome *</label>
+                    <input type="text" id="transConta" placeholder="Ex: ML, Mercado, Energia..." class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="transValor"><i class="fas fa-money-bill-wave"></i> Valor (R$) *</label>
+                    <input type="number" step="0.01" id="transValor" placeholder="Ex: 150.99" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="transParcela"><i class="fas fa-calendar-alt"></i> Parcela (opcional)</label>
+                    <input type="text" id="transParcela" placeholder="Ex: 7/12 ou deixe em branco" class="form-control">
+                </div>
+                
+                <div class="form-group">
+                    <label for="transPeriodo"><i class="fas fa-calendar"></i> Período *</label>
+                    <input type="text" id="transPeriodo" placeholder="Ex: fev/26 - nov/26" class="form-control" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="transTipo"><i class="fas fa-credit-card"></i> Tipo *</label>
+                    <select id="transTipo" class="form-control" required>
+                        <option value="">Selecione o tipo...</option>
+                        <option value="cartao_credito">Cartão de Crédito</option>
+                        <option value="cartao_debito">Cartão de Débito</option>
+                        <option value="pix">PIX</option>
+                        <option value="dinheiro">Dinheiro</option>
+                        <option value="boleto">Boleto</option>
+                        <option value="debito_conta">Débito em Conta</option>
+                        <option value="alimentacao">Alimentação</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="moradia">Moradia</option>
+                        <option value="lazer">Lazer</option>
+                        <option value="saude">Saúde</option>
+                        <option value="educacao">Educação</option>
+                        <option value="investimento">Investimento</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="transCategoria"><i class="fas fa-tags"></i> Categoria *</label>
+                    <select id="transCategoria" class="form-control" required>
+                        <option value="">Selecione a categoria...</option>
+                        <option value="ml">Mercado Livre (ML)</option>
+                        <option value="mercado">Supermercado</option>
+                        <option value="energia">Energia Elétrica</option>
+                        <option value="agua">Água</option>
+                        <option value="internet">Internet</option>
+                        <option value="celular">Celular</option>
+                        <option value="aluguel">Aluguel</option>
+                        <option value="transporte">Transporte</option>
+                        <option value="combustivel">Combustível</option>
+                        <option value="restaurante">Restaurante</option>
+                        <option value="lazer">Lazer</option>
+                        <option value="saude">Saúde</option>
+                        <option value="educacao">Educação</option>
+                        <option value="vestuario">Vestuário</option>
+                        <option value="outros">Outros</option>
+                    </select>
+                </div>
+                
+                <button class="btn btn-primary" id="addViaChat" style="width: 100%;">
+                    <i class="fas fa-plus"></i> Adicionar Transação
+                </button>
             </div>
         </div>
     </div>
@@ -614,25 +814,25 @@
     <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <div class="header">
-            <h2>Dashboard Financeiro</h2>
+            <h2>Dashboard Financeiro - <span id="currentYear">2026</span></h2>
             <div class="header-actions">
-                <button class="btn btn-outline">
-                    <i class="fas fa-file-import"></i> Importar Dados
+                <button class="btn btn-outline" id="importDataBtn">
+                    <i class="fas fa-file-import"></i> Importar
                 </button>
-                <button class="btn btn-primary" id="addTransaction">
+                <button class="btn btn-primary" id="addTransactionBtn">
                     <i class="fas fa-plus"></i> Nova Transação
                 </button>
             </div>
         </div>
         
-        <!-- Stats Cards -->
+        <!-- Stats Cards (AGORA DINÂMICOS) -->
         <div class="stats-cards">
             <div class="card stat-card">
                 <div class="stat-info">
                     <h3>Receitas Totais</h3>
-                    <div class="value">R$ 8.250,00</div>
-                    <div class="trend up">
-                        <i class="fas fa-arrow-up"></i> 12% vs último mês
+                    <div class="value" id="totalIncome">R$ 0,00</div>
+                    <div class="trend" id="incomeTrend">
+                        <i class="fas fa-minus"></i> <span>0%</span> vs último mês
                     </div>
                 </div>
                 <div class="stat-icon icon-income">
@@ -643,9 +843,9 @@
             <div class="card stat-card">
                 <div class="stat-info">
                     <h3>Despesas Totais</h3>
-                    <div class="value">R$ 6.184,30</div>
-                    <div class="trend down">
-                        <i class="fas fa-arrow-down"></i> 8% vs último mês
+                    <div class="value" id="totalExpenses">R$ 0,00</div>
+                    <div class="trend" id="expensesTrend">
+                        <i class="fas fa-minus"></i> <span>0%</span> vs último mês
                     </div>
                 </div>
                 <div class="stat-icon icon-expense">
@@ -656,9 +856,9 @@
             <div class="card stat-card">
                 <div class="stat-info">
                     <h3>Saldo Atual</h3>
-                    <div class="value">R$ 2.065,70</div>
-                    <div class="trend up">
-                        <i class="fas fa-arrow-up"></i> 5% vs último mês
+                    <div class="value" id="currentBalance">R$ 0,00</div>
+                    <div class="trend" id="balanceTrend">
+                        <i class="fas fa-minus"></i> <span>0%</span> vs último mês
                     </div>
                 </div>
                 <div class="stat-icon icon-balance">
@@ -669,9 +869,9 @@
             <div class="card stat-card">
                 <div class="stat-info">
                     <h3>Para Investir</h3>
-                    <div class="value">R$ 1.240,00</div>
-                    <div class="trend up">
-                        <i class="fas fa-arrow-up"></i> 18% vs último mês
+                    <div class="value" id="toInvest">R$ 0,00</div>
+                    <div class="trend" id="investTrend">
+                        <i class="fas fa-minus"></i> <span>0%</span> vs último mês
                     </div>
                 </div>
                 <div class="stat-icon icon-investment">
@@ -680,23 +880,33 @@
             </div>
         </div>
         
-        <!-- Charts Container - AGORA EM COLUNA -->
+        <!-- Charts Container -->
         <div class="charts-container">
-            <!-- Gráfico de Barras (AGORA EM CIMA) -->
+            <!-- Gráfico de Barras -->
             <div class="card chart-card">
                 <div class="chart-header">
                     <h3>Receitas vs Despesas vs Saldo</h3>
                     <div class="chart-filters">
                         <select class="chart-filter" id="barMonth">
                             <option value="all">Ano Todo</option>
-                            <option value="fev" selected>Fevereiro</option>
-                            <option value="mar">Março</option>
-                            <option value="abr">Abril</option>
+                            <option value="2" selected>Fevereiro</option>
+                            <option value="3">Março</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Maio</option>
+                            <option value="6">Junho</option>
+                            <option value="7">Julho</option>
+                            <option value="8">Agosto</option>
+                            <option value="9">Setembro</option>
+                            <option value="10">Outubro</option>
+                            <option value="11">Novembro</option>
+                            <option value="12">Dezembro</option>
                         </select>
                         <select class="chart-filter" id="barAccountType">
                             <option value="all">Todos os Tipos</option>
-                            <option value="cartao_fixo" selected>Cartão Fixo</option>
-                            <option value="cartao_variavel">Cartão Variável</option>
+                            <option value="cartao_credito">Cartão de Crédito</option>
+                            <option value="cartao_debito">Cartão de Débito</option>
+                            <option value="pix">PIX</option>
+                            <option value="dinheiro">Dinheiro</option>
                         </select>
                         <div class="chart-checkbox">
                             <input type="checkbox" id="showBalance" checked>
@@ -723,29 +933,32 @@
                 </div>
             </div>
             
-            <!-- Gráfico de Rosquinha (AGORA EMBAIXO) -->
+            <!-- Gráfico de Rosquinha -->
             <div class="card chart-card">
                 <div class="chart-header">
                     <h3>Despesas por Categoria</h3>
                     <div class="chart-filters">
                         <select class="chart-filter" id="doughnutMonth">
                             <option value="all">Ano Todo</option>
-                            <option value="fev" selected>Fevereiro</option>
-                            <option value="mar">Março</option>
-                            <option value="abr">Abril</option>
-                            <option value="mai">Maio</option>
+                            <option value="2" selected>Fevereiro</option>
+                            <option value="3">Março</option>
+                            <option value="4">Abril</option>
+                            <option value="5">Maio</option>
                         </select>
                         <select class="chart-filter" id="doughnutAccountType">
                             <option value="all">Todos os Tipos</option>
-                            <option value="cartao_fixo" selected>Cartão Fixo</option>
-                            <option value="cartao_variavel">Cartão Variável</option>
+                            <option value="cartao_credito">Cartão de Crédito</option>
+                            <option value="cartao_debito">Cartão de Débito</option>
+                            <option value="pix">PIX</option>
                             <option value="dinheiro">Dinheiro</option>
                         </select>
                         <select class="chart-filter" id="doughnutCategory">
                             <option value="all">Todas Categorias</option>
                             <option value="ml">ML</option>
-                            <option value="gol">GOL</option>
-                            <option value="marco">MARCO</option>
+                            <option value="mercado">Mercado</option>
+                            <option value="energia">Energia</option>
+                            <option value="agua">Água</option>
+                            <option value="internet">Internet</option>
                         </select>
                         <div class="chart-checkbox">
                             <input type="checkbox" id="showValues" checked>
@@ -761,11 +974,10 @@
                 </div>
             </div>
             
-            <!-- Gráfico de Linha (mantido como estava) -->
+            <!-- Gráfico de Linha -->
             <div class="card chart-card wide">
                 <div class="chart-header">
-                    <h3>Evolução do Saldo (2026)</h3>
-                    <!-- Sem filtros - mantido como estava -->
+                    <h3>Evolução do Saldo (<span id="balanceYear">2026</span>)</h3>
                 </div>
                 <div class="chart-container">
                     <canvas id="balanceChart"></canvas>
@@ -777,9 +989,11 @@
         <div class="table-container">
             <div class="table-header">
                 <h3>Últimas Transações</h3>
-                <button class="btn btn-outline">
-                    <i class="fas fa-filter"></i> Filtrar
-                </button>
+                <div>
+                    <button class="btn btn-outline" id="clearAllBtn">
+                        <i class="fas fa-trash"></i> Limpar Tudo
+                    </button>
+                </div>
             </div>
             
             <table>
@@ -791,6 +1005,7 @@
                         <th>Período</th>
                         <th>Status</th>
                         <th>Tipo</th>
+                        <th>Categoria</th>
                         <th>Ações</th>
                     </tr>
                 </thead>
@@ -809,121 +1024,337 @@
         </div>
     </div>
 
+    <!-- Input oculto para importação -->
+    <input type="file" id="fileImport" accept=".json" style="display: none;">
+
     <script>
-        // Dados de exemplo baseados na sua imagem
-        const transactions = [
-            // Fevereiro - Cartão Fixo
-            { conta: "ML", valor: 3.53, parcelaInicial: 7, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jul", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "ml" },
-            { conta: "ML", valor: 6.04, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "ml" },
-            { conta: "ML", valor: 12.43, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "ml" },
-            { conta: "ML", valor: 7.07, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "ml" },
-            { conta: "ML", valor: 17.10, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "ml" },
-            { conta: "FLEX", valor: 79.00, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "Morreu", status: "Inativa", tipo: "cartao_fixo", mes: "fev", categoria: "flex" },
-            { conta: "MARCO", valor: 108.85, parcelaInicial: 2, parcelaFinal: 6, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "marco" },
-            { conta: "GOL", valor: 253.41, parcelaInicial: 2, parcelaFinal: 10, mesInicial: "fev", mesFinal: "out", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "gol" },
-            { conta: "FERNAN", valor: 37.49, parcelaInicial: 3, parcelaFinal: 4, mesInicial: "fev", mesFinal: "mar", status: "Inativa", tipo: "cartao_fixo", mes: "fev", categoria: "fernan" },
-            { conta: "CEA", valor: 60.00, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "Morreu", status: "Inativa", tipo: "cartao_fixo", mes: "fev", categoria: "cea" },
-            { conta: "TELEFAR", valor: 155.99, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "Morreu", status: "Inativa", tipo: "cartao_fixo", mes: "fev", categoria: "telefar" },
-            { conta: "ML", valor: 5.96, parcelaInicial: 4, parcelaFinal: 12, mesInicial: "fev", mesFinal: "out", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "ml" },
-            { conta: "ML", valor: 11.38, parcelaInicial: 4, parcelaFinal: 12, mesInicial: "fev", mesFinal: "out", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "ml" },
-            { conta: "ML", valor: 8.47, parcelaInicial: 4, parcelaFinal: 12, mesInicial: "fev", mesFinal: "out", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "ml" },
-            { conta: "HAVAN", valor: 59.99, parcelaInicial: 4, parcelaFinal: 10, mesInicial: "fev", mesFinal: "ago", status: "Ativa", tipo: "cartao_fixo", mes: "fev", categoria: "havan" },
-            
-            // Março - Cartão Fixo
-            { conta: "ML", valor: 3.53, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "mar", mesFinal: "jul", status: "Ativa", tipo: "cartao_fixo", mes: "mar", categoria: "ml" },
-            { conta: "ML", valor: 6.04, parcelaInicial: 9, parcelaFinal: 12, mesInicial: "mar", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "mar", categoria: "ml" },
-            { conta: "ML", valor: 12.43, parcelaInicial: 9, parcelaFinal: 12, mesInicial: "mar", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "mar", categoria: "ml" },
-            { conta: "ML", valor: 7.07, parcelaInicial: 9, parcelaFinal: 12, mesInicial: "mar", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "mar", categoria: "ml" },
-            { conta: "ML", valor: 17.10, parcelaInicial: 9, parcelaFinal: 12, mesInicial: "mar", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "mar", categoria: "ml" },
-            { conta: "MARCO", valor: 108.85, parcelaInicial: 3, parcelaFinal: 6, mesInicial: "mar", mesFinal: "jun", status: "Ativa", tipo: "cartao_fixo", mes: "mar", categoria: "marco" },
-            
-            // Outros meses e tipos para demonstração
-            { conta: "ML", valor: 25.00, parcelaInicial: 1, parcelaFinal: 3, mesInicial: "jan", mesFinal: "mar", status: "Ativa", tipo: "cartao_variavel", mes: "jan", categoria: "ml" },
-            { conta: "GOL", valor: 150.00, parcelaInicial: null, parcelaFinal: null, mesInicial: "abr", mesFinal: "abr", status: "Ativa", tipo: "dinheiro", mes: "abr", categoria: "gol" },
-        ];
-
-        // Receitas por mês
-        const monthlyIncomes = {
-            jan: 3200, fev: 4250, mar: 3800, abr: 4100, mai: 3950, jun: 4800,
-            jul: 5200, ago: 4900, set: 5300, out: 5100, nov: 4700, dez: 5500
-        };
-
+        // ==================== BANCO DE DADOS LOCAL ====================
+        const DB_NAME = 'AtlasFinanceDB';
+        const DB_VERSION = 1;
+        const STORE_NAME = 'transactions';
+        
+        let db;
+        let categoryChart, comparisonChart, balanceChart;
+        let allTransactions = [];
+        
         // Mapeamento de meses
         const monthMap = {
-            jan: 'Janeiro', fev: 'Fevereiro', mar: 'Março', abr: 'Abril',
-            mai: 'Maio', jun: 'Junho', jul: 'Julho', ago: 'Agosto',
-            set: 'Setembro', out: 'Outubro', nov: 'Novembro', dez: 'Dezembro'
+            1: 'Janeiro', 2: 'Fevereiro', 3: 'Março', 4: 'Abril',
+            5: 'Maio', 6: 'Junho', 7: 'Julho', 8: 'Agosto',
+            9: 'Setembro', 10: 'Outubro', 11: 'Novembro', 12: 'Dezembro'
         };
-
-        // Mapeamento de tipos de conta
-        const accountTypeMap = {
-            'cartao_fixo': 'Cartão Fixo',
-            'cartao_variavel': 'Cartão Variável',
+        
+        const monthAbbr = {
+            1: 'jan', 2: 'fev', 3: 'mar', 4: 'abr', 5: 'mai', 6: 'jun',
+            7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
+        };
+        
+        // Tipos e categorias mapeadas
+        const tipoMap = {
+            'cartao_credito': 'Cartão de Crédito',
+            'cartao_debito': 'Cartão de Débito',
+            'pix': 'PIX',
             'dinheiro': 'Dinheiro',
-            'all': 'Todos os Tipos'
+            'boleto': 'Boleto',
+            'debito_conta': 'Débito em Conta',
+            'alimentacao': 'Alimentação',
+            'transporte': 'Transporte',
+            'moradia': 'Moradia',
+            'lazer': 'Lazer',
+            'saude': 'Saúde',
+            'educacao': 'Educação',
+            'investimento': 'Investimento'
         };
-
-        // Variáveis para os gráficos
-        let categoryChart, comparisonChart, balanceChart;
-
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', function() {
-            // Preencher tabela
-            populateTransactionsTable();
-            
-            // Inicializar gráficos
-            initializeCharts();
-            
-            // Configurar event listeners
-            setupEventListeners();
-            
-            // Adicionar efeito de hover nos cards
-            const cards = document.querySelectorAll('.card');
-            cards.forEach(card => {
-                card.addEventListener('mouseenter', function() {
-                    this.style.transform = 'translateY(-5px)';
-                });
-                card.addEventListener('mouseleave', function() {
-                    this.style.transform = 'translateY(0)';
-                });
+        
+        const categoriaMap = {
+            'ml': 'Mercado Livre',
+            'mercado': 'Supermercado',
+            'energia': 'Energia Elétrica',
+            'agua': 'Água',
+            'internet': 'Internet',
+            'celular': 'Celular',
+            'aluguel': 'Aluguel',
+            'transporte': 'Transporte',
+            'combustivel': 'Combustível',
+            'restaurante': 'Restaurante',
+            'lazer': 'Lazer',
+            'saude': 'Saúde',
+            'educacao': 'Educação',
+            'vestuario': 'Vestuário',
+            'outros': 'Outros'
+        };
+        
+        // Receitas mensais (pode ser editado pelo usuário)
+        const monthlyIncomes = {
+            1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
+            7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
+        };
+        
+        // ==================== INICIALIZAÇÃO DO BANCO ====================
+        function initDatabase() {
+            return new Promise((resolve, reject) => {
+                const request = indexedDB.open(DB_NAME, DB_VERSION);
+                
+                request.onerror = (event) => {
+                    console.error('Erro ao abrir banco de dados:', event.target.error);
+                    reject(event.target.error);
+                };
+                
+                request.onsuccess = (event) => {
+                    db = event.target.result;
+                    console.log('Banco de dados aberto com sucesso');
+                    
+                    // Carregar dados existentes
+                    loadAllData().then(() => {
+                        resolve();
+                    });
+                };
+                
+                request.onupgradeneeded = (event) => {
+                    const db = event.target.result;
+                    
+                    if (!db.objectStoreNames.contains(STORE_NAME)) {
+                        const store = db.createObjectStore(STORE_NAME, { 
+                            keyPath: 'id',
+                            autoIncrement: true 
+                        });
+                        
+                        // Criar índices para buscas rápidas
+                        store.createIndex('mes', 'mes', { unique: false });
+                        store.createIndex('tipo', 'tipo', { unique: false });
+                        store.createIndex('categoria', 'categoria', { unique: false });
+                        store.createIndex('status', 'status', { unique: false });
+                        
+                        console.log('Object store criado com sucesso');
+                    }
+                };
             });
-        });
-
-        // Configurar event listeners
-        function setupEventListeners() {
-            // Filtros do gráfico de rosquinha
-            document.getElementById('doughnutMonth').addEventListener('change', updateDoughnutChart);
-            document.getElementById('doughnutAccountType').addEventListener('change', updateDoughnutChart);
-            document.getElementById('doughnutCategory').addEventListener('change', updateDoughnutChart);
-            document.getElementById('showValues').addEventListener('change', updateDoughnutChart);
+        }
+        
+        // Carregar todos os dados
+        async function loadAllData() {
+            allTransactions = await getAllTransactions();
             
-            // Filtros do gráfico de barras
-            document.getElementById('barMonth').addEventListener('change', updateBarChart);
-            document.getElementById('barAccountType').addEventListener('change', updateBarChart);
-            document.getElementById('showBalance').addEventListener('change', updateBarChart);
+            // Se não houver transações, adicionar exemplos
+            if (allTransactions.length === 0) {
+                await addSampleData();
+                allTransactions = await getAllTransactions();
+            }
             
-            // Outros controles
-            document.getElementById('mobileToggle').addEventListener('click', toggleSidebar);
-            document.getElementById('addTransaction').addEventListener('click', addTransaction);
+            updateDashboard();
+            updateTransactionsTable();
+            updateTransactionCount();
         }
-
-        // Toggle sidebar mobile
-        function toggleSidebar() {
-            document.getElementById('sidebar').classList.toggle('active');
+        
+        // Adicionar dados de exemplo
+        async function addSampleData() {
+            const sampleData = [
+                { conta: "ML", valor: 3.53, parcelaInicial: 7, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jul", status: "Ativa", tipo: "cartao_credito", mes: 2, categoria: "ml", data: "2026-02-01" },
+                { conta: "ML", valor: 6.04, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_credito", mes: 2, categoria: "ml", data: "2026-02-01" },
+                { conta: "ML", valor: 12.43, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_credito", mes: 2, categoria: "ml", data: "2026-02-01" },
+                { conta: "Energia", valor: 155.99, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "fev", status: "Inativa", tipo: "boleto", mes: 2, categoria: "energia", data: "2026-02-05" },
+                { conta: "Supermercado", valor: 250.75, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "fev", status: "Inativa", tipo: "cartao_debito", mes: 2, categoria: "mercado", data: "2026-02-10" },
+                { conta: "Internet", valor: 89.90, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "fev", status: "Inativa", tipo: "debito_conta", mes: 2, categoria: "internet", data: "2026-02-03" },
+                { conta: "Água", valor: 65.30, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "fev", status: "Inativa", tipo: "boleto", mes: 2, categoria: "agua", data: "2026-02-07" }
+            ];
+            
+            for (const transaction of sampleData) {
+                await addTransaction(transaction);
+            }
+            
+            showNotification('Dados de exemplo adicionados!', 'success');
         }
-
-        // Adicionar transação
-        function addTransaction() {
-            alert('Funcionalidade para adicionar nova transação será implementada em breve!');
+        
+        // ==================== FUNÇÕES DO BANCO ====================
+        function addTransaction(transaction) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                
+                // Adicionar data atual se não existir
+                if (!transaction.data) {
+                    transaction.data = new Date().toISOString().split('T')[0];
+                }
+                
+                // Calcular status automaticamente
+                transaction.status = calculateStatus(transaction.mesFinal);
+                
+                const request = store.add(transaction);
+                
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
         }
-
-        // Preencher tabela de transações
-        function populateTransactionsTable() {
+        
+        function getAllTransactions() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readonly');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.getAll();
+                
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function deleteTransaction(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.delete(id);
+                
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function clearAllTransactions() {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_NAME], 'readwrite');
+                const store = tx.objectStore(STORE_NAME);
+                const request = store.clear();
+                
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        // ==================== FUNÇÕES UTILITÁRIAS ====================
+        function calculateStatus(mesFinal) {
+            // Se mesFinal for "Morreu" ou data passada, é Inativa
+            if (mesFinal === 'Morreu') return 'Inativa';
+            
+            // Lógica simples: se for um mês futuro, está Ativa
+            const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            const mesAtual = new Date().getMonth(); // 0-11
+            
+            // Converter mesFinal para número
+            const mesFinalIndex = meses.indexOf(mesFinal);
+            
+            if (mesFinalIndex === -1) return 'Inativa';
+            
+            return mesFinalIndex >= mesAtual ? 'Ativa' : 'Inativa';
+        }
+        
+        function formatCurrency(value) {
+            return new Intl.NumberFormat('pt-BR', {
+                style: 'currency',
+                currency: 'BRL'
+            }).format(value);
+        }
+        
+        function showNotification(message, type = 'info') {
+            // Implementação simples de notificação
+            alert(`${type.toUpperCase()}: ${message}`);
+        }
+        
+        // ==================== ATUALIZAÇÃO DA INTERFACE ====================
+        async function updateDashboard() {
+            // Calcular totais
+            const totalExpenses = allTransactions.reduce((sum, t) => sum + t.valor, 0);
+            
+            // Obter mês atual
+            const currentMonth = new Date().getMonth() + 1; // 1-12
+            const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
+            
+            // Calcular despesas do mês atual e anterior
+            const currentMonthExpenses = allTransactions
+                .filter(t => t.mes === currentMonth)
+                .reduce((sum, t) => sum + t.valor, 0);
+                
+            const lastMonthExpenses = allTransactions
+                .filter(t => t.mes === lastMonth)
+                .reduce((sum, t) => sum + t.valor, 0);
+            
+            // Calcular receitas
+            const currentMonthIncome = monthlyIncomes[currentMonth] || 0;
+            const lastMonthIncome = monthlyIncomes[lastMonth] || 0;
+            
+            // Calcular saldo
+            const currentBalance = currentMonthIncome - currentMonthExpenses;
+            const lastMonthBalance = lastMonthIncome - lastMonthExpenses;
+            
+            // Calcular para investir (60% do saldo)
+            const toInvest = currentBalance * 0.6;
+            
+            // Atualizar cards
+            document.getElementById('totalIncome').textContent = formatCurrency(currentMonthIncome);
+            document.getElementById('totalExpenses').textContent = formatCurrency(currentMonthExpenses);
+            document.getElementById('currentBalance').textContent = formatCurrency(currentBalance);
+            document.getElementById('toInvest').textContent = formatCurrency(toInvest);
+            
+            // Calcular tendências
+            updateTrend('incomeTrend', currentMonthIncome, lastMonthIncome);
+            updateTrend('expensesTrend', currentMonthExpenses, lastMonthExpenses);
+            updateTrend('balanceTrend', currentBalance, lastMonthBalance);
+            updateTrend('investTrend', toInvest, lastMonthBalance * 0.6);
+            
+            // Atualizar gráficos
+            updateDoughnutChart();
+            updateBarChart();
+            updateBalanceChart();
+        }
+        
+        function updateTrend(elementId, current, previous) {
+            const element = document.getElementById(elementId);
+            const icon = element.querySelector('i');
+            const span = element.querySelector('span');
+            
+            if (previous === 0) {
+                icon.className = 'fas fa-minus';
+                span.textContent = '0%';
+                element.className = 'trend';
+                return;
+            }
+            
+            const percentage = ((current - previous) / previous * 100).toFixed(1);
+            
+            if (current > previous) {
+                icon.className = 'fas fa-arrow-up';
+                span.textContent = `${Math.abs(percentage)}%`;
+                element.className = 'trend up';
+            } else if (current < previous) {
+                icon.className = 'fas fa-arrow-down';
+                span.textContent = `${Math.abs(percentage)}%`;
+                element.className = 'trend down';
+            } else {
+                icon.className = 'fas fa-minus';
+                span.textContent = '0%';
+                element.className = 'trend';
+            }
+        }
+        
+        function updateTransactionsTable() {
             const tableBody = document.getElementById('transactionsTable');
             tableBody.innerHTML = '';
             
+            // Ordenar por data mais recente
+            const sortedTransactions = [...allTransactions].sort((a, b) => {
+                return new Date(b.data) - new Date(a.data);
+            });
+            
             // Mostrar apenas as primeiras 10 transações
-            transactions.slice(0, 10).forEach(transaction => {
+            sortedTransactions.slice(0, 10).forEach(transaction => {
                 const row = document.createElement('tr');
                 const statusClass = transaction.status === 'Ativa' ? 'status-active' : 'status-inactive';
                 const parcelaText = transaction.parcelaInicial ? 
@@ -931,14 +1362,15 @@
                 
                 row.innerHTML = `
                     <td><strong>${transaction.conta}</strong></td>
-                    <td>R$ ${transaction.valor.toFixed(2)}</td>
+                    <td>${formatCurrency(transaction.valor)}</td>
                     <td>${parcelaText}</td>
                     <td>${transaction.mesInicial} - ${transaction.mesFinal}</td>
                     <td><span class="status-badge ${statusClass}">${transaction.status}</span></td>
-                    <td>${accountTypeMap[transaction.tipo] || transaction.tipo}</td>
+                    <td>${tipoMap[transaction.tipo] || transaction.tipo}</td>
+                    <td>${categoriaMap[transaction.categoria] || transaction.categoria}</td>
                     <td>
-                        <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;">
-                            <i class="fas fa-edit"></i>
+                        <button class="btn btn-outline" style="padding: 6px 12px; font-size: 12px;" onclick="deleteTrans(${transaction.id})">
+                            <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 `;
@@ -946,27 +1378,25 @@
                 tableBody.appendChild(row);
             });
         }
-
-        // Inicializar gráficos
-        function initializeCharts() {
-            updateDoughnutChart();
-            updateBarChart();
-            createBalanceChart();
+        
+        function updateTransactionCount() {
+            document.getElementById('totalTransCount').textContent = allTransactions.length;
         }
-
-        // Atualizar gráfico de rosquinha
+        
+        // ==================== GRÁFICOS ====================
         function updateDoughnutChart() {
-            const ctx = document.getElementById('categoryChart').getContext('2d');
+            const ctx = document.getElementById('categoryChart');
+            if (!ctx) return;
             
             // Obter valores dos filtros
-            const month = document.getElementById('doughnutMonth').value;
+            const month = parseInt(document.getElementById('doughnutMonth').value);
             const accountType = document.getElementById('doughnutAccountType').value;
             const category = document.getElementById('doughnutCategory').value;
             const showValues = document.getElementById('showValues').checked;
             
             // Filtrar transações
-            let filteredTransactions = transactions.filter(t => {
-                if (month !== 'all' && t.mes !== month) return false;
+            let filteredTransactions = allTransactions.filter(t => {
+                if (month && t.mes !== month) return false;
                 if (accountType !== 'all' && t.tipo !== accountType) return false;
                 if (category !== 'all' && t.categoria !== category) return false;
                 return true;
@@ -982,7 +1412,7 @@
             });
             
             // Preparar dados para o gráfico
-            const labels = Object.keys(categories).map(c => c.toUpperCase());
+            const labels = Object.keys(categories).map(c => categoriaMap[c] || c);
             const data = Object.values(categories);
             
             // Cores
@@ -1024,7 +1454,7 @@
                                     const percentage = Math.round((value / total) * 100);
                                     
                                     if (showValues) {
-                                        return `${label}: R$ ${value.toFixed(2)} (${percentage}%)`;
+                                        return `${label}: ${formatCurrency(value)} (${percentage}%)`;
                                     } else {
                                         return `${label}: ${percentage}%`;
                                     }
@@ -1038,10 +1468,11 @@
             // Atualizar legenda
             updateDoughnutLegend(labels, data, backgroundColors, showValues);
         }
-
-        // Atualizar legenda do gráfico de rosquinha
+        
         function updateDoughnutLegend(labels, data, colors, showValues) {
             const legendContainer = document.getElementById('doughnutLegend');
+            if (!legendContainer) return;
+            
             legendContainer.innerHTML = '';
             
             const total = data.reduce((a, b) => a + b, 0);
@@ -1056,7 +1487,7 @@
                     <div class="legend-color" style="background-color: ${colors[index]};"></div>
                     <span>${label}</span>
                     <span style="margin-left: auto; font-weight: 600; color: ${colors[index]};">
-                        ${showValues ? `R$ ${value.toFixed(2)}` : ''} (${percentage}%)
+                        ${showValues ? formatCurrency(value) : ''} (${percentage}%)
                     </span>
                 `;
                 
@@ -1064,26 +1495,28 @@
             });
             
             // Adicionar total
-            const totalItem = document.createElement('div');
-            totalItem.className = 'legend-item';
-            totalItem.style.marginTop = '10px';
-            totalItem.style.paddingTop = '10px';
-            totalItem.style.borderTop = '1px solid var(--gray-light)';
-            totalItem.style.fontWeight = '700';
-            totalItem.innerHTML = `
-                <div class="legend-color" style="background-color: var(--dark);"></div>
-                <span>TOTAL</span>
-                <span style="margin-left: auto; color: var(--dark);">
-                    R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </span>
-            `;
-            
-            legendContainer.appendChild(totalItem);
+            if (data.length > 0) {
+                const totalItem = document.createElement('div');
+                totalItem.className = 'legend-item';
+                totalItem.style.marginTop = '10px';
+                totalItem.style.paddingTop = '10px';
+                totalItem.style.borderTop = '1px solid var(--gray-light)';
+                totalItem.style.fontWeight = '700';
+                totalItem.innerHTML = `
+                    <div class="legend-color" style="background-color: var(--dark);"></div>
+                    <span>TOTAL</span>
+                    <span style="margin-left: auto; color: var(--dark);">
+                        ${formatCurrency(total)}
+                    </span>
+                `;
+                
+                legendContainer.appendChild(totalItem);
+            }
         }
-
-        // Atualizar gráfico de barras
+        
         function updateBarChart() {
-            const ctx = document.getElementById('comparisonChart').getContext('2d');
+            const ctx = document.getElementById('comparisonChart');
+            if (!ctx) return;
             
             // Obter valores dos filtros
             const month = document.getElementById('barMonth').value;
@@ -1097,13 +1530,13 @@
             let balanceData = [];
             
             if (month === 'all') {
-                // Mostrar ano todo (simplificado)
-                monthsToShow = ['jan', 'fev', 'mar', 'abr'];
-                incomesData = monthsToShow.map(m => monthlyIncomes[m]);
+                // Mostrar ano todo
+                monthsToShow = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                incomesData = monthsToShow.map(m => monthlyIncomes[m] || 0);
                 
                 // Calcular despesas para cada mês
                 expensesData = monthsToShow.map(m => {
-                    return transactions
+                    return allTransactions
                         .filter(t => {
                             if (t.mes !== m) return false;
                             if (accountType !== 'all' && t.tipo !== accountType) return false;
@@ -1113,13 +1546,14 @@
                 });
             } else {
                 // Mostrar apenas o mês selecionado
-                monthsToShow = [month];
-                incomesData = [monthlyIncomes[month] || 0];
+                const monthNum = parseInt(month);
+                monthsToShow = [monthNum];
+                incomesData = [monthlyIncomes[monthNum] || 0];
                 
                 // Calcular despesas para o mês
-                const monthExpenses = transactions
+                const monthExpenses = allTransactions
                     .filter(t => {
-                        if (t.mes !== month) return false;
+                        if (t.mes !== monthNum) return false;
                         if (accountType !== 'all' && t.tipo !== accountType) return false;
                         return true;
                     })
@@ -1166,7 +1600,7 @@
             }
             
             // Criar novo gráfico
-            comparisonChart = new Chart(ctx, {
+            comparisonChart = new Chart(ctx.getContext('2d'), {
                 type: 'bar',
                 data: {
                     labels: monthsToShow.map(m => monthMap[m]),
@@ -1185,7 +1619,7 @@
                             beginAtZero: true,
                             ticks: {
                                 callback: function(value) {
-                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                    return formatCurrency(value);
                                 }
                             }
                         }
@@ -1194,7 +1628,7 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return `${context.dataset.label}: R$ ${context.raw.toLocaleString('pt-BR')}`;
+                                    return `${context.dataset.label}: ${formatCurrency(context.raw)}`;
                                 }
                             }
                         }
@@ -1202,19 +1636,19 @@
                 }
             });
         }
-
-        // Criar gráfico de linha (não tem filtros)
-        function createBalanceChart() {
-            const ctx = document.getElementById('balanceChart').getContext('2d');
+        
+        function updateBalanceChart() {
+            const ctx = document.getElementById('balanceChart');
+            if (!ctx) return;
             
             // Calcular saldo acumulado
-            const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            const months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
             let cumulativeBalance = 0;
             const balanceData = months.map(month => {
                 const income = monthlyIncomes[month] || 0;
                 
                 // Calcular despesas do mês
-                const expenses = transactions
+                const expenses = allTransactions
                     .filter(t => t.mes === month)
                     .reduce((sum, t) => sum + t.valor, 0);
                 
@@ -1222,8 +1656,13 @@
                 return cumulativeBalance;
             });
             
+            // Destruir gráfico anterior se existir
+            if (balanceChart) {
+                balanceChart.destroy();
+            }
+            
             // Criar gráfico
-            balanceChart = new Chart(ctx, {
+            balanceChart = new Chart(ctx.getContext('2d'), {
                 type: 'line',
                 data: {
                     labels: months.map(m => monthMap[m]),
@@ -1253,7 +1692,7 @@
                             beginAtZero: false,
                             ticks: {
                                 callback: function(value) {
-                                    return 'R$ ' + value.toLocaleString('pt-BR');
+                                    return formatCurrency(value);
                                 }
                             }
                         }
@@ -1262,12 +1701,287 @@
                         tooltip: {
                             callbacks: {
                                 label: function(context) {
-                                    return `Saldo: R$ ${context.raw.toLocaleString('pt-BR')}`;
+                                    return `Saldo: ${formatCurrency(context.raw)}`;
                                 }
                             }
                         }
                     }
                 }
+            });
+        }
+        
+        // ==================== MANIPULAÇÃO DE TRANSAÇÕES ====================
+        async function addNewTransaction(formData) {
+            // Extrair mês do período (assume que o primeiro mês é o mês da transação)
+            const mesMatch = formData.periodo.match(/^([a-z]{3})/i);
+            const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+            
+            // Extrair parcela inicial/final
+            let parcelaInicial = null;
+            let parcelaFinal = null;
+            if (formData.parcela && formData.parcela.includes('/')) {
+                const partes = formData.parcela.split('/');
+                parcelaInicial = parseInt(partes[0]) || null;
+                parcelaFinal = parseInt(partes[1]) || null;
+            }
+            
+            // Extrair meses inicial/final
+            const periodoParts = formData.periodo.split(' - ');
+            const mesInicial = periodoParts[0] || '';
+            const mesFinal = periodoParts[1] || '';
+            
+            const transaction = {
+                conta: formData.conta,
+                valor: parseFloat(formData.valor),
+                parcelaInicial: parcelaInicial,
+                parcelaFinal: parcelaFinal,
+                mesInicial: mesInicial,
+                mesFinal: mesFinal,
+                tipo: formData.tipo,
+                categoria: formData.categoria,
+                mes: mes,
+                data: new Date().toISOString().split('T')[0]
+            };
+            
+            try {
+                await addTransaction(transaction);
+                allTransactions = await getAllTransactions();
+                
+                updateDashboard();
+                updateTransactionsTable();
+                updateTransactionCount();
+                
+                showNotification('Transação adicionada com sucesso!', 'success');
+                return true;
+            } catch (error) {
+                showNotification('Erro ao adicionar transação: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        async function deleteTrans(id) {
+            if (confirm('Tem certeza que deseja excluir esta transação?')) {
+                try {
+                    await deleteTransaction(id);
+                    allTransactions = allTransactions.filter(t => t.id !== id);
+                    
+                    updateDashboard();
+                    updateTransactionsTable();
+                    updateTransactionCount();
+                    
+                    showNotification('Transação excluída com sucesso!', 'success');
+                } catch (error) {
+                    showNotification('Erro ao excluir transação: ' + error.message, 'error');
+                }
+            }
+        }
+        
+        // ==================== EXPORTAÇÃO/IMPORTAÇÃO ====================
+        async function exportData() {
+            try {
+                const data = {
+                    version: '1.0',
+                    exportDate: new Date().toISOString(),
+                    transactions: allTransactions,
+                    monthlyIncomes: monthlyIncomes
+                };
+                
+                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `atlas-financeiro-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                URL.revokeObjectURL(url);
+                
+                showNotification('Dados exportados com sucesso!', 'success');
+            } catch (error) {
+                showNotification('Erro ao exportar dados: ' + error.message, 'error');
+            }
+        }
+        
+        async function importData(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        // Validar dados
+                        if (!data.transactions || !Array.isArray(data.transactions)) {
+                            throw new Error('Formato de arquivo inválido');
+                        }
+                        
+                        // Limpar transações existentes
+                        await clearAllTransactions();
+                        
+                        // Adicionar novas transações
+                        for (const transaction of data.transactions) {
+                            await addTransaction(transaction);
+                        }
+                        
+                        // Atualizar dados
+                        allTransactions = await getAllTransactions();
+                        
+                        updateDashboard();
+                        updateTransactionsTable();
+                        updateTransactionCount();
+                        
+                        showNotification('Dados importados com sucesso!', 'success');
+                        resolve();
+                    } catch (error) {
+                        showNotification('Erro ao importar dados: ' + error.message, 'error');
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => {
+                    showNotification('Erro ao ler arquivo', 'error');
+                    reject(new Error('Erro ao ler arquivo'));
+                };
+                
+                reader.readAsText(file);
+            });
+        }
+        
+        // ==================== EVENT LISTENERS ====================
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                // Inicializar banco de dados
+                await initDatabase();
+                
+                // Configurar event listeners
+                setupEventListeners();
+                
+                // Adicionar efeito de hover nos cards
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px)';
+                    });
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                    });
+                });
+                
+                // Atualizar ano atual
+                const currentYear = new Date().getFullYear();
+                document.getElementById('currentYear').textContent = currentYear;
+                document.getElementById('balanceYear').textContent = currentYear;
+                
+            } catch (error) {
+                console.error('Erro na inicialização:', error);
+                showNotification('Erro ao inicializar o sistema: ' + error.message, 'error');
+            }
+        });
+        
+        function setupEventListeners() {
+            // Chat
+            document.getElementById('chatBtn').addEventListener('click', () => {
+                document.getElementById('chatModal').classList.add('active');
+            });
+            
+            document.getElementById('closeChat').addEventListener('click', () => {
+                document.getElementById('chatModal').classList.remove('active');
+            });
+            
+            document.getElementById('addViaChat').addEventListener('click', async () => {
+                const conta = document.getElementById('transConta').value.trim();
+                const valor = document.getElementById('transValor').value;
+                const parcela = document.getElementById('transParcela').value.trim();
+                const periodo = document.getElementById('transPeriodo').value.trim();
+                const tipo = document.getElementById('transTipo').value;
+                const categoria = document.getElementById('transCategoria').value;
+                
+                // Validação
+                if (!conta || !valor || !periodo || !tipo || !categoria) {
+                    showNotification('Preencha todos os campos obrigatórios!', 'error');
+                    return;
+                }
+                
+                if (isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
+                    showNotification('Valor inválido!', 'error');
+                    return;
+                }
+                
+                const success = await addNewTransaction({
+                    conta, valor, parcela, periodo, tipo, categoria
+                });
+                
+                if (success) {
+                    // Limpar formulário
+                    document.getElementById('transConta').value = '';
+                    document.getElementById('transValor').value = '';
+                    document.getElementById('transParcela').value = '';
+                    document.getElementById('transPeriodo').value = '';
+                    document.getElementById('transTipo').value = '';
+                    document.getElementById('transCategoria').value = '';
+                    
+                    // Fechar chat
+                    document.getElementById('chatModal').classList.remove('active');
+                }
+            });
+            
+            // Exportação/Importação
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => {
+                document.getElementById('fileImport').click();
+            });
+            
+            document.getElementById('importDataBtn').addEventListener('click', () => {
+                document.getElementById('fileImport').click();
+            });
+            
+            document.getElementById('fileImport').addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    await importData(file);
+                    event.target.value = ''; // Limpar input
+                }
+            });
+            
+            // Botão nova transação
+            document.getElementById('addTransactionBtn').addEventListener('click', () => {
+                document.getElementById('chatModal').classList.add('active');
+            });
+            
+            // Limpar tudo
+            document.getElementById('clearAllBtn').addEventListener('click', async () => {
+                if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.')) {
+                    try {
+                        await clearAllTransactions();
+                        allTransactions = [];
+                        
+                        updateDashboard();
+                        updateTransactionsTable();
+                        updateTransactionCount();
+                        
+                        showNotification('Todos os dados foram removidos!', 'success');
+                    } catch (error) {
+                        showNotification('Erro ao limpar dados: ' + error.message, 'error');
+                    }
+                }
+            });
+            
+            // Filtros dos gráficos
+            document.getElementById('doughnutMonth').addEventListener('change', updateDoughnutChart);
+            document.getElementById('doughnutAccountType').addEventListener('change', updateDoughnutChart);
+            document.getElementById('doughnutCategory').addEventListener('change', updateDoughnutChart);
+            document.getElementById('showValues').addEventListener('change', updateDoughnutChart);
+            
+            document.getElementById('barMonth').addEventListener('change', updateBarChart);
+            document.getElementById('barAccountType').addEventListener('change', updateBarChart);
+            document.getElementById('showBalance').addEventListener('change', updateBarChart);
+            
+            // Mobile toggle
+            document.getElementById('mobileToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('active');
             });
         }
     </script>
