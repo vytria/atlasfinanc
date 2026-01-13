@@ -3,11 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlas - Controle Financeiro</title>
+    <title>Atlas - Controle Financeiro 4.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* ESTILOS COMPLETOS */
+        /* MANTENDO TODOS OS ESTILOS ORIGINAIS */
         :root {
             --primary: #4361ee;
             --primary-dark: #3a56d4;
@@ -216,6 +217,15 @@
             background-color: #e11570;
         }
 
+        .btn-warning {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .btn-warning:hover {
+            background-color: #e68905;
+        }
+
         .stats-cards {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -311,6 +321,10 @@
             width: 100%;
         }
 
+        .chart-card.wide {
+            width: 100%;
+        }
+
         .chart-header {
             display: flex;
             justify-content: space-between;
@@ -337,6 +351,7 @@
             font-size: 14px;
             color: var(--dark);
             cursor: pointer;
+            transition: var(--transition);
         }
 
         .chart-filter:focus {
@@ -476,7 +491,8 @@
             color: white;
         }
 
-        .chat-modal, .config-modal {
+        /* Modal do Chat */
+        .chat-modal {
             display: none;
             position: fixed;
             top: 0;
@@ -489,11 +505,11 @@
             justify-content: center;
         }
 
-        .chat-modal.active, .config-modal.active {
+        .chat-modal.active {
             display: flex;
         }
 
-        .chat-container, .config-container {
+        .chat-container {
             width: 500px;
             max-width: 90%;
             background-color: white;
@@ -534,6 +550,7 @@
             align-items: center;
             justify-content: center;
             border-radius: 50%;
+            transition: var(--transition);
         }
 
         .chat-header .close-btn:hover {
@@ -586,11 +603,42 @@
             border-radius: 8px;
             border: 2px solid var(--gray-light);
             font-size: 14px;
+            transition: var(--transition);
         }
 
         .form-control:focus {
             outline: none;
             border-color: var(--primary);
+        }
+
+        /* Modal de Configurações */
+        .config-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .config-modal.active {
+            display: flex;
+        }
+
+        .config-container {
+            width: 600px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
         }
 
         .config-tabs {
@@ -607,6 +655,7 @@
             border: none;
             font-weight: 600;
             cursor: pointer;
+            transition: var(--transition);
         }
 
         .config-tab.active {
@@ -672,6 +721,127 @@
         .category-actions, .type-actions {
             display: flex;
             gap: 8px;
+        }
+
+        /* Modal de Importação Excel */
+        .excel-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .excel-modal.active {
+            display: flex;
+        }
+
+        .excel-container {
+            width: 500px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .excel-header {
+            background-color: var(--success);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .excel-header h3 {
+            font-size: 20px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .excel-content {
+            padding: 25px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .excel-instructions {
+            background-color: rgba(67, 97, 238, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .excel-instructions h4 {
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .excel-instructions ul {
+            margin-left: 20px;
+            margin-bottom: 10px;
+        }
+
+        .excel-instructions li {
+            margin-bottom: 5px;
+        }
+
+        .excel-format-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        .excel-format-table th {
+            background-color: var(--gray-light);
+            padding: 10px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .excel-format-table td {
+            padding: 10px;
+            border: 1px solid var(--gray-light);
+        }
+
+        .excel-dropzone {
+            border: 2px dashed var(--primary);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            margin: 20px 0;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .excel-dropzone:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .excel-dropzone i {
+            font-size: 48px;
+            color: var(--primary);
+            margin-bottom: 15px;
+        }
+
+        .excel-preview {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 20px;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
         }
 
         .mobile-toggle {
@@ -755,6 +925,7 @@
     </style>
 </head>
 <body>
+    <!-- Sidebar -->
     <div class="sidebar" id="sidebar">
         <div class="logo">
             <h1><i class="fas fa-globe-americas"></i> Atlas<span>Finance</span></h1>
@@ -786,6 +957,12 @@
                 </a>
             </div>
             <div class="nav-item">
+                <a href="#" class="nav-link" id="importBtn">
+                    <i class="fas fa-file-import"></i>
+                    <span>Importar Dados</span>
+                </a>
+            </div>
+            <div class="nav-item">
                 <a href="#" class="nav-link" id="importExcelBtn">
                     <i class="fas fa-file-excel"></i>
                     <span>Importar Excel</span>
@@ -802,6 +979,7 @@
         </div>
     </div>
     
+    <!-- Modal do Chat -->
     <div class="chat-modal" id="chatModal">
         <div class="chat-container">
             <div class="chat-header">
@@ -838,6 +1016,7 @@
                     <label for="transTipo"><i class="fas fa-credit-card"></i> Tipo *</label>
                     <select id="transTipo" class="form-control" required>
                         <option value="">Selecione o tipo...</option>
+                        <!-- Tipos serão carregados dinamicamente -->
                     </select>
                 </div>
                 
@@ -845,6 +1024,7 @@
                     <label for="transCategoria"><i class="fas fa-tags"></i> Categoria *</label>
                     <select id="transCategoria" class="form-control" required>
                         <option value="">Selecione a categoria...</option>
+                        <!-- Categorias serão carregadas dinamicamente -->
                     </select>
                 </div>
                 
@@ -855,6 +1035,7 @@
         </div>
     </div>
     
+    <!-- Modal de Configurações -->
     <div class="config-modal" id="configModal">
         <div class="config-container">
             <div class="chat-header">
@@ -870,12 +1051,15 @@
             </div>
             
             <div class="config-content">
+                <!-- Aba de Receitas -->
                 <div class="config-tab-content active" id="tab-receitas">
                     <div class="config-section">
                         <h4><i class="fas fa-money-bill-wave"></i> Receitas Mensais - <span id="currentConfigYear">2026</span></h4>
                         <p>Defina suas receitas para cada mês do ano:</p>
                         
-                        <div id="incomeInputs"></div>
+                        <div id="incomeInputs">
+                            <!-- Receitas serão carregadas dinamicamente -->
+                        </div>
                         
                         <button class="btn btn-success" id="saveIncomes" style="margin-top: 20px;">
                             <i class="fas fa-save"></i> Salvar Receitas
@@ -883,6 +1067,7 @@
                     </div>
                 </div>
                 
+                <!-- Aba de Categorias -->
                 <div class="config-tab-content" id="tab-categorias">
                     <div class="config-section">
                         <h4><i class="fas fa-tags"></i> Categorias Personalizadas</h4>
@@ -898,10 +1083,13 @@
                             </div>
                         </div>
                         
-                        <div id="categoriesList"></div>
+                        <div id="categoriesList">
+                            <!-- Categorias serão carregadas dinamicamente -->
+                        </div>
                     </div>
                 </div>
                 
+                <!-- Aba de Tipos -->
                 <div class="config-tab-content" id="tab-tipos">
                     <div class="config-section">
                         <h4><i class="fas fa-credit-card"></i> Tipos Personalizados</h4>
@@ -917,10 +1105,13 @@
                             </div>
                         </div>
                         
-                        <div id="typesList"></div>
+                        <div id="typesList">
+                            <!-- Tipos serão carregados dinamicamente -->
+                        </div>
                     </div>
                 </div>
                 
+                <!-- Aba de Anos -->
                 <div class="config-tab-content" id="tab-anos">
                     <div class="config-section">
                         <h4><i class="fas fa-calendar-alt"></i> Gerenciamento de Anos</h4>
@@ -928,7 +1119,9 @@
                         
                         <div class="form-group">
                             <label>Ano Atual</label>
-                            <select id="yearSelect" class="form-control"></select>
+                            <select id="yearSelect" class="form-control">
+                                <!-- Anos serão carregados dinamicamente -->
+                            </select>
                         </div>
                         
                         <div class="form-group">
@@ -950,10 +1143,76 @@
         </div>
     </div>
     
+    <!-- Modal de Importação Excel -->
+    <div class="excel-modal" id="excelModal">
+        <div class="excel-container">
+            <div class="excel-header">
+                <h3><i class="fas fa-file-excel"></i> Importar Excel</h3>
+                <button class="close-btn" id="closeExcel">&times;</button>
+            </div>
+            <div class="excel-content">
+                <div class="excel-instructions">
+                    <h4>Formato do Arquivo Excel</h4>
+                    <p>O arquivo Excel deve conter as colunas na seguinte ordem:</p>
+                    <table class="excel-format-table">
+                        <tr>
+                            <th>Coluna 1</th>
+                            <th>Coluna 2</th>
+                            <th>Coluna 3</th>
+                            <th>Coluna 4</th>
+                            <th>Coluna 5</th>
+                            <th>Coluna 6</th>
+                        </tr>
+                        <tr>
+                            <td>Conta/Nome</td>
+                            <td>Valor</td>
+                            <td>Parcela</td>
+                            <td>Período</td>
+                            <td>Tipo</td>
+                            <td>Categoria</td>
+                        </tr>
+                    </table>
+                    <p><strong>Exemplo:</strong> "Shopping", "150,00", "7/12", "fev/26 - dez/26", "Cartão de Crédito", "Lazer"</p>
+                </div>
+                
+                <div class="excel-dropzone" id="excelDropzone">
+                    <i class="fas fa-file-upload"></i>
+                    <h4>Arraste e solte seu arquivo Excel aqui</h4>
+                    <p>ou clique para selecionar</p>
+                    <p style="font-size: 12px; color: var(--gray); margin-top: 10px;">
+                        Formatos suportados: .xlsx, .xls, .csv
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin: 20px 0;">
+                    <p>ou</p>
+                    <button class="btn btn-primary" id="browseExcelBtn">
+                        <i class="fas fa-folder-open"></i> Procurar Arquivo
+                    </button>
+                </div>
+                
+                <div id="excelPreview" class="excel-preview" style="display: none;">
+                    <!-- Pré-visualização dos dados será exibida aqui -->
+                </div>
+                
+                <div id="excelActions" style="display: none; margin-top: 20px; text-align: center;">
+                    <button class="btn btn-success" id="confirmImportBtn">
+                        <i class="fas fa-check"></i> Confirmar Importação
+                    </button>
+                    <button class="btn btn-outline" id="cancelImportBtn" style="margin-left: 10px;">
+                        <i class="fas fa-times"></i> Cancelar
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Mobile Toggle -->
     <button class="mobile-toggle" id="mobileToggle">
         <i class="fas fa-bars"></i>
     </button>
     
+    <!-- Main Content -->
     <div class="main-content" id="mainContent">
         <div class="header">
             <h2>Dashboard Financeiro - <span id="currentYear">2026</span></h2>
@@ -961,12 +1220,16 @@
                 <button class="btn btn-outline" id="exportHeaderBtn">
                     <i class="fas fa-file-export"></i> Exportar
                 </button>
+                <button class="btn btn-outline" id="importDataBtn">
+                    <i class="fas fa-file-import"></i> Importar
+                </button>
                 <button class="btn btn-primary" id="addTransactionBtn">
                     <i class="fas fa-plus"></i> Nova Transação
                 </button>
             </div>
         </div>
         
+        <!-- Stats Cards -->
         <div class="stats-cards">
             <div class="card stat-card">
                 <div class="stat-info">
@@ -1021,14 +1284,15 @@
             </div>
         </div>
         
+        <!-- Charts Container -->
         <div class="charts-container">
+            <!-- Gráfico de Barras -->
             <div class="card chart-card">
                 <div class="chart-header">
                     <h3>Receitas vs Despesas vs Saldo</h3>
                     <div class="chart-filters">
                         <select class="chart-filter" id="barMonth">
                             <option value="all">Ano Todo</option>
-                            <option value="1">Janeiro</option>
                             <option value="2" selected>Fevereiro</option>
                             <option value="3">Março</option>
                             <option value="4">Abril</option>
@@ -1043,6 +1307,7 @@
                         </select>
                         <select class="chart-filter" id="barAccountType">
                             <option value="all">Todos os Tipos</option>
+                            <!-- Tipos serão carregados dinamicamente -->
                         </select>
                         <div class="chart-checkbox">
                             <input type="checkbox" id="showBalance" checked>
@@ -1069,30 +1334,25 @@
                 </div>
             </div>
             
+            <!-- Gráfico de Rosquinha -->
             <div class="card chart-card">
                 <div class="chart-header">
                     <h3>Despesas por Categoria</h3>
                     <div class="chart-filters">
                         <select class="chart-filter" id="doughnutMonth">
                             <option value="all">Ano Todo</option>
-                            <option value="1">Janeiro</option>
                             <option value="2" selected>Fevereiro</option>
                             <option value="3">Março</option>
                             <option value="4">Abril</option>
                             <option value="5">Maio</option>
-                            <option value="6">Junho</option>
-                            <option value="7">Julho</option>
-                            <option value="8">Agosto</option>
-                            <option value="9">Setembro</option>
-                            <option value="10">Outubro</option>
-                            <option value="11">Novembro</option>
-                            <option value="12">Dezembro</option>
                         </select>
                         <select class="chart-filter" id="doughnutAccountType">
                             <option value="all">Todos os Tipos</option>
+                            <!-- Tipos serão carregados dinamicamente -->
                         </select>
                         <select class="chart-filter" id="doughnutCategory">
                             <option value="all">Todas Categorias</option>
+                            <!-- Categorias serão carregadas dinamicamente -->
                         </select>
                         <div class="chart-checkbox">
                             <input type="checkbox" id="showValues" checked>
@@ -1103,9 +1363,12 @@
                 <div class="chart-container">
                     <canvas id="categoryChart"></canvas>
                 </div>
-                <div class="chart-legend" id="doughnutLegend"></div>
+                <div class="chart-legend" id="doughnutLegend">
+                    <!-- Gerado por JavaScript -->
+                </div>
             </div>
             
+            <!-- Gráfico de Linha -->
             <div class="card chart-card wide">
                 <div class="chart-header">
                     <h3>Evolução do Saldo (<span id="balanceYear">2026</span>)</h3>
@@ -1116,6 +1379,7 @@
             </div>
         </div>
         
+        <!-- Transactions Table -->
         <div class="table-container">
             <div class="table-header">
                 <h3>Últimas Transações</h3>
@@ -1139,7 +1403,9 @@
                         <th>Ações</th>
                     </tr>
                 </thead>
-                <tbody id="transactionsTable"></tbody>
+                <tbody id="transactionsTable">
+                    <!-- Dados serão preenchidos por JavaScript -->
+                </tbody>
             </table>
             
             <div class="pagination">
@@ -1152,20 +1418,20 @@
         </div>
     </div>
 
-    <input type="file" id="excelImport" accept=".xlsx,.xls,.csv" style="display: none;">
+    <!-- Inputs ocultos para importação -->
     <input type="file" id="fileImport" accept=".json" style="display: none;">
+    <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display: none;">
 
     <script>
-        // Configurações do banco de dados
+        // ==================== BANCO DE DADOS LOCAL ====================
         const DB_NAME = 'AtlasFinanceDB';
-        const DB_VERSION = 4;
+        const DB_VERSION = 4; // Versão atualizada
         const STORE_TRANSACTIONS = 'transactions';
         const STORE_SETTINGS = 'settings';
         const STORE_CATEGORIES = 'categories';
         const STORE_TYPES = 'types';
         const STORE_INCOMES = 'incomes';
         
-        // Variáveis globais
         let db;
         let categoryChart, comparisonChart, balanceChart;
         let allTransactions = [];
@@ -1174,6 +1440,7 @@
         let customTypes = [];
         let monthlyIncomes = {};
         let availableYears = [currentYear];
+        let excelImportData = [];
         
         // Mapeamento de meses
         const monthMap = {
@@ -1187,14 +1454,14 @@
             7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
         };
         
-        // Categorias padrão
+        // Categorias iniciais conforme solicitado
         const defaultCategories = [
             { id: 'agua', name: 'Água', custom: false },
             { id: 'aluguel', name: 'Aluguel', custom: false },
             { id: 'celular', name: 'Celular', custom: false },
             { id: 'combustivel', name: 'Combustível', custom: false },
             { id: 'educacao', name: 'Educação', custom: false },
-            { id: 'energia_eletrica', name: 'Energia Elétrica', custom: false },
+            { id: 'energia', name: 'Energia Elétrica', custom: false },
             { id: 'internet', name: 'Internet', custom: false },
             { id: 'lazer', name: 'Lazer', custom: false },
             { id: 'moradia', name: 'Moradia', custom: false },
@@ -1205,7 +1472,7 @@
             { id: 'outros', name: 'Outros', custom: false }
         ];
         
-        // Tipos padrão
+        // Tipos iniciais conforme solicitado
         const defaultTypes = [
             { id: 'alimentacao', name: 'Alimentação', custom: false },
             { id: 'boleto', name: 'Boleto', custom: false },
@@ -1216,21 +1483,8 @@
             { id: 'pix', name: 'Pix', custom: false }
         ];
         
-        // ==================== INICIALIZAÇÃO ====================
-        document.addEventListener('DOMContentLoaded', async function() {
-            try {
-                console.log('Inicializando aplicação...');
-                await initDatabase();
-                await setupEventListeners();
-                await updateUI();
-                console.log('Aplicação inicializada com sucesso!');
-            } catch (error) {
-                console.error('Erro na inicialização:', error);
-                showNotification('Erro ao inicializar o sistema: ' + error.message, 'error');
-            }
-        });
-        
-        async function initDatabase() {
+        // ==================== INICIALIZAÇÃO DO BANCO ====================
+        function initDatabase() {
             return new Promise((resolve, reject) => {
                 const request = indexedDB.open(DB_NAME, DB_VERSION);
                 
@@ -1242,11 +1496,16 @@
                 request.onsuccess = (event) => {
                     db = event.target.result;
                     console.log('Banco de dados aberto com sucesso');
-                    resolve();
+                    
+                    // Carregar dados existentes
+                    loadAllData().then(() => {
+                        resolve();
+                    });
                 };
                 
                 request.onupgradeneeded = (event) => {
                     const db = event.target.result;
+                    const oldVersion = event.oldVersion;
                     
                     // Criar object stores se não existirem
                     if (!db.objectStoreNames.contains(STORE_TRANSACTIONS)) {
@@ -1254,86 +1513,101 @@
                             keyPath: 'id',
                             autoIncrement: true 
                         });
+                        
+                        store.createIndex('mes', 'mes', { unique: false });
                         store.createIndex('ano', 'ano', { unique: false });
+                        store.createIndex('tipo', 'tipo', { unique: false });
+                        store.createIndex('categoria', 'categoria', { unique: false });
+                        store.createIndex('status', 'status', { unique: false });
                     }
                     
                     if (!db.objectStoreNames.contains(STORE_CATEGORIES)) {
-                        db.createObjectStore(STORE_CATEGORIES, { keyPath: 'id' });
+                        const store = db.createObjectStore(STORE_CATEGORIES, { 
+                            keyPath: 'id'
+                        });
                     }
                     
                     if (!db.objectStoreNames.contains(STORE_TYPES)) {
-                        db.createObjectStore(STORE_TYPES, { keyPath: 'id' });
+                        const store = db.createObjectStore(STORE_TYPES, { 
+                            keyPath: 'id'
+                        });
                     }
                     
                     if (!db.objectStoreNames.contains(STORE_INCOMES)) {
-                        db.createObjectStore(STORE_INCOMES, { keyPath: 'key' });
+                        const store = db.createObjectStore(STORE_INCOMES, { 
+                            keyPath: 'key'
+                        });
                     }
                     
                     if (!db.objectStoreNames.contains(STORE_SETTINGS)) {
-                        db.createObjectStore(STORE_SETTINGS, { keyPath: 'key' });
+                        const store = db.createObjectStore(STORE_SETTINGS, { 
+                            keyPath: 'key'
+                        });
                     }
+                    
+                    console.log('Object stores criados com sucesso');
                 };
             });
         }
         
+        // Carregar todos os dados
         async function loadAllData() {
-            try {
-                // Carregar configurações
-                const settings = await getSettings();
-                if (settings.currentYear) {
-                    currentYear = settings.currentYear;
-                }
-                
-                if (settings.availableYears) {
-                    availableYears = settings.availableYears;
-                }
-                
-                // Carregar categorias
-                customCategories = await getAllCategories();
-                if (customCategories.length === 0) {
-                    console.log('Adicionando categorias padrão...');
-                    for (const cat of defaultCategories) {
-                        await addCategory(cat);
-                    }
-                    customCategories = defaultCategories;
-                }
-                
-                // Carregar tipos
-                customTypes = await getAllTypes();
-                if (customTypes.length === 0) {
-                    console.log('Adicionando tipos padrão...');
-                    for (const type of defaultTypes) {
-                        await addType(type);
-                    }
-                    customTypes = defaultTypes;
-                }
-                
-                // Carregar receitas
-                monthlyIncomes = await getIncomesForYear(currentYear);
-                if (Object.keys(monthlyIncomes).length === 0) {
-                    console.log('Configurando receitas padrão...');
-                    const defaultIncomes = {
-                        1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
-                        7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
-                    };
-                    
-                    for (const [month, income] of Object.entries(defaultIncomes)) {
-                        await saveIncome(currentYear, parseInt(month), income);
-                    }
-                    monthlyIncomes = defaultIncomes;
-                }
-                
-                // Carregar transações
-                allTransactions = await getTransactionsForYear(currentYear);
-                console.log('Dados carregados:', allTransactions.length, 'transações');
-                
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                throw error;
+            // Carregar configurações
+            const settings = await getSettings();
+            if (settings.currentYear) {
+                currentYear = settings.currentYear;
             }
+            
+            if (settings.availableYears) {
+                availableYears = settings.availableYears;
+            }
+            
+            // Carregar categorias
+            customCategories = await getAllCategories();
+            if (customCategories.length === 0) {
+                // Adicionar categorias padrão
+                for (const cat of defaultCategories) {
+                    await addCategory(cat);
+                }
+                customCategories = defaultCategories;
+            }
+            
+            // Carregar tipos
+            customTypes = await getAllTypes();
+            if (customTypes.length === 0) {
+                // Adicionar tipos padrão
+                for (const type of defaultTypes) {
+                    await addType(type);
+                }
+                customTypes = defaultTypes;
+            }
+            
+            // Carregar receitas do ano atual
+            monthlyIncomes = await getIncomesForYear(currentYear);
+            if (Object.keys(monthlyIncomes).length === 0) {
+                // Receitas padrão
+                const defaultIncomes = {
+                    1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
+                    7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
+                };
+                
+                for (const [month, income] of Object.entries(defaultIncomes)) {
+                    await saveIncome(currentYear, parseInt(month), income);
+                }
+                monthlyIncomes = defaultIncomes;
+            }
+            
+            // Carregar transações do ano atual
+            allTransactions = await getTransactionsForYear(currentYear);
+            
+            // Remover dados de exemplo (conforme solicitado)
+            // Não adicionar dados de exemplo automaticamente
+            
+            updateUI();
         }
         
         // ==================== FUNÇÕES DO BANCO ====================
+        // Transações
         function addTransaction(transaction) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_TRANSACTIONS], 'readwrite');
@@ -1361,6 +1635,42 @@
             });
         }
         
+        function updateTransaction(id, updatedTransaction) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_TRANSACTIONS], 'readwrite');
+                const store = tx.objectStore(STORE_TRANSACTIONS);
+                
+                // Primeiro buscar a transação existente
+                const getRequest = store.get(id);
+                
+                getRequest.onsuccess = () => {
+                    const existing = getRequest.result;
+                    if (!existing) {
+                        reject(new Error('Transação não encontrada'));
+                        return;
+                    }
+                    
+                    // Mesclar atualizações
+                    const merged = { ...existing, ...updatedTransaction };
+                    merged.status = calculateStatus(merged.mesFinal, merged.ano);
+                    
+                    const putRequest = store.put(merged);
+                    
+                    putRequest.onsuccess = () => {
+                        resolve(putRequest.result);
+                    };
+                    
+                    putRequest.onerror = (event) => {
+                        reject(event.target.error);
+                    };
+                };
+                
+                getRequest.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
         function getTransactionsForYear(year) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_TRANSACTIONS], 'readonly');
@@ -1369,7 +1679,7 @@
                 const request = index.getAll(year);
                 
                 request.onsuccess = () => {
-                    resolve(request.result || []);
+                    resolve(request.result);
                 };
                 
                 request.onerror = (event) => {
@@ -1378,14 +1688,36 @@
             });
         }
         
+        function deleteTransaction(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_TRANSACTIONS], 'readwrite');
+                const store = tx.objectStore(STORE_TRANSACTIONS);
+                const request = store.delete(id);
+                
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        // Categorias
         function addCategory(category) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_CATEGORIES], 'readwrite');
                 const store = tx.objectStore(STORE_CATEGORIES);
                 const request = store.put(category);
                 
-                request.onsuccess = () => resolve();
-                request.onerror = (event) => reject(event.target.error);
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
             });
         }
         
@@ -1395,19 +1727,46 @@
                 const store = tx.objectStore(STORE_CATEGORIES);
                 const request = store.getAll();
                 
-                request.onsuccess = () => resolve(request.result || []);
-                request.onerror = (event) => reject(event.target.error);
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
             });
         }
         
+        function deleteCategory(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_CATEGORIES], 'readwrite');
+                const store = tx.objectStore(STORE_CATEGORIES);
+                const request = store.delete(id);
+                
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        // Tipos
         function addType(type) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_TYPES], 'readwrite');
                 const store = tx.objectStore(STORE_TYPES);
                 const request = store.put(type);
                 
-                request.onsuccess = () => resolve();
-                request.onerror = (event) => reject(event.target.error);
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
             });
         }
         
@@ -1417,11 +1776,33 @@
                 const store = tx.objectStore(STORE_TYPES);
                 const request = store.getAll();
                 
-                request.onsuccess = () => resolve(request.result || []);
-                request.onerror = (event) => reject(event.target.error);
+                request.onsuccess = () => {
+                    resolve(request.result);
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
             });
         }
         
+        function deleteType(id) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_TYPES], 'readwrite');
+                const store = tx.objectStore(STORE_TYPES);
+                const request = store.delete(id);
+                
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        // Receitas
         function saveIncome(year, month, value) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_INCOMES], 'readwrite');
@@ -1429,8 +1810,13 @@
                 const key = `income_${year}_${month}`;
                 const request = store.put({ key: key, year: year, month: month, value: value });
                 
-                request.onsuccess = () => resolve();
-                request.onerror = (event) => reject(event.target.error);
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
             });
         }
         
@@ -1442,7 +1828,7 @@
                 
                 request.onsuccess = () => {
                     const incomes = {};
-                    (request.result || []).forEach(item => {
+                    request.result.forEach(item => {
                         if (item.year === year) {
                             incomes[item.month] = item.value;
                         }
@@ -1450,18 +1836,26 @@
                     resolve(incomes);
                 };
                 
-                request.onerror = (event) => reject(event.target.error);
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
             });
         }
         
+        // Configurações
         function saveSetting(key, value) {
             return new Promise((resolve, reject) => {
                 const tx = db.transaction([STORE_SETTINGS], 'readwrite');
                 const store = tx.objectStore(STORE_SETTINGS);
                 const request = store.put({ key: key, value: value });
                 
-                request.onsuccess = () => resolve();
-                request.onerror = (event) => reject(event.target.error);
+                request.onsuccess = () => {
+                    resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
             });
         }
         
@@ -1473,31 +1867,38 @@
                 
                 request.onsuccess = () => {
                     const settings = {};
-                    (request.result || []).forEach(item => {
+                    request.result.forEach(item => {
                         settings[item.key] = item.value;
                     });
                     resolve(settings);
                 };
                 
-                request.onerror = (event) => reject(event.target.error);
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
             });
         }
         
         // ==================== FUNÇÕES UTILITÁRIAS ====================
         function calculateStatus(mesFinal, year) {
-            if (!mesFinal || mesFinal === 'Morreu') return 'Inativa';
+            if (mesFinal === 'Morreu') return 'Inativa';
             
             const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
+            const currentMonth = currentDate.getMonth(); // 0-11
             
+            // Se o ano da transação for menor que o atual, é inativa
             if (year < currentYear) return 'Inativa';
+            
+            // Se for um ano futuro, está ativa
             if (year > currentYear) return 'Ativa';
             
+            // Mesmo ano, verificar mês
             const mesFinalIndex = meses.indexOf(mesFinal);
             if (mesFinalIndex === -1) return 'Inativa';
             
-            return mesFinalIndex >= currentDate.getMonth() ? 'Ativa' : 'Inativa';
+            return mesFinalIndex >= currentMonth ? 'Ativa' : 'Inativa';
         }
         
         function formatCurrency(value) {
@@ -1538,94 +1939,311 @@
                     document.body.removeChild(notification);
                 }, 300);
             }, 3000);
+            
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
         }
         
-        // ==================== ATUALIZAÇÃO DA INTERFACE ====================
-        async function updateUI() {
+        // ==================== FUNÇÕES DE IMPORTAR EXCEL ====================
+        function processExcelData(data) {
+            const transactions = [];
+            
+            data.forEach((row, index) => {
+                // Verificar se tem as colunas mínimas necessárias
+                if (row.length >= 6) {
+                    const conta = row[0] || '';
+                    const valorStr = row[1] || '0';
+                    const parcela = row[2] || '';
+                    const periodo = row[3] || '';
+                    const tipo = row[4] || '';
+                    const categoria = row[5] || '';
+                    
+                    // Converter valor (remover R$, pontos e substituir vírgula por ponto)
+                    const valor = parseFloat(
+                        valorStr.toString()
+                            .replace('R$', '')
+                            .replace(/\./g, '')
+                            .replace(',', '.')
+                            .trim()
+                    ) || 0;
+                    
+                    if (conta && valor > 0) {
+                        // Processar período
+                        const periodoParts = periodo.split('-').map(p => p.trim());
+                        const mesInicial = periodoParts[0] || '';
+                        const mesFinal = periodoParts[1] || mesInicial;
+                        
+                        // Processar parcela
+                        let parcelaInicial = null;
+                        let parcelaFinal = null;
+                        if (parcela && parcela.includes('/')) {
+                            const partes = parcela.split('/');
+                            parcelaInicial = parseInt(partes[0]) || null;
+                            parcelaFinal = parseInt(partes[1]) || null;
+                        }
+                        
+                        // Determinar mês a partir do período
+                        const mesMatch = mesInicial.match(/^([a-z]{3})/i);
+                        const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                        const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+                        
+                        // Encontrar IDs correspondentes
+                        const tipoObj = customTypes.find(t => 
+                            t.name.toLowerCase() === tipo.toLowerCase() || t.id === tipo.toLowerCase()
+                        );
+                        
+                        const categoriaObj = customCategories.find(c => 
+                            c.name.toLowerCase() === categoria.toLowerCase() || c.id === categoria.toLowerCase()
+                        );
+                        
+                        transactions.push({
+                            conta: conta,
+                            valor: valor,
+                            parcelaInicial: parcelaInicial,
+                            parcelaFinal: parcelaFinal,
+                            mesInicial: mesInicial,
+                            mesFinal: mesFinal,
+                            tipo: tipoObj ? tipoObj.id : tipo || 'outros',
+                            categoria: categoriaObj ? categoriaObj.id : categoria || 'outros',
+                            mes: mes,
+                            ano: currentYear,
+                            data: new Date().toISOString().split('T')[0]
+                        });
+                    }
+                }
+            });
+            
+            return transactions;
+        }
+        
+        function showExcelPreview(data) {
+            const previewDiv = document.getElementById('excelPreview');
+            const actionsDiv = document.getElementById('excelActions');
+            
+            if (data.length === 0) {
+                previewDiv.innerHTML = '<p style="color: var(--danger); padding: 20px; text-align: center;">Nenhum dado válido encontrado no arquivo.</p>';
+                actionsDiv.style.display = 'none';
+                return;
+            }
+            
+            let html = `
+                <div style="padding: 15px;">
+                    <h4 style="margin-bottom: 15px;">Pré-visualização (${data.length} transações encontradas)</h4>
+                    <table style="width: 100%; border-collapse: collapse;">
+                        <thead>
+                            <tr style="background-color: var(--gray-light);">
+                                <th style="padding: 8px; border: 1px solid var(--gray);">Conta</th>
+                                <th style="padding: 8px; border: 1px solid var(--gray);">Valor</th>
+                                <th style="padding: 8px; border: 1px solid var(--gray);">Parcela</th>
+                                <th style="padding: 8px; border: 1px solid var(--gray);">Período</th>
+                                <th style="padding: 8px; border: 1px solid var(--gray);">Tipo</th>
+                                <th style="padding: 8px; border: 1px solid var(--gray);">Categoria</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+            
+            // Mostrar apenas as primeiras 10 linhas
+            data.slice(0, 10).forEach((transaction, index) => {
+                html += `
+                    <tr>
+                        <td style="padding: 8px; border: 1px solid var(--gray-light);">${transaction.conta}</td>
+                        <td style="padding: 8px; border: 1px solid var(--gray-light);">${formatCurrency(transaction.valor)}</td>
+                        <td style="padding: 8px; border: 1px solid var(--gray-light);">${transaction.parcelaInicial ? `${transaction.parcelaInicial}/${transaction.parcelaFinal}` : '-'}</td>
+                        <td style="padding: 8px; border: 1px solid var(--gray-light);">${transaction.mesInicial} ${transaction.mesFinal ? '- ' + transaction.mesFinal : ''}</td>
+                        <td style="padding: 8px; border: 1px solid var(--gray-light);">
+                            ${customTypes.find(t => t.id === transaction.tipo)?.name || transaction.tipo}
+                        </td>
+                        <td style="padding: 8px; border: 1px solid var(--gray-light);">
+                            ${customCategories.find(c => c.id === transaction.categoria)?.name || transaction.categoria}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            if (data.length > 10) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="padding: 8px; text-align: center; font-style: italic;">
+                            ... e mais ${data.length - 10} transações
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+            
+            previewDiv.innerHTML = html;
+            previewDiv.style.display = 'block';
+            actionsDiv.style.display = 'block';
+        }
+        
+        async function importExcelFile(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async (event) => {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        
+                        // Processar dados do Excel
+                        const processedData = processExcelData(jsonData.slice(1)); // Pular cabeçalho
+                        excelImportData = processedData;
+                        
+                        // Mostrar pré-visualização
+                        showExcelPreview(processedData);
+                        
+                        resolve(processedData);
+                    } catch (error) {
+                        showNotification('Erro ao processar arquivo Excel: ' + error.message, 'error');
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => {
+                    showNotification('Erro ao ler arquivo Excel', 'error');
+                    reject(new Error('Erro ao ler arquivo Excel'));
+                };
+                
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
+        async function confirmExcelImport() {
+            if (excelImportData.length === 0) {
+                showNotification('Nenhum dado para importar', 'error');
+                return;
+            }
+            
             try {
-                await loadAllData();
+                let importedCount = 0;
+                for (const transaction of excelImportData) {
+                    await addTransaction(transaction);
+                    importedCount++;
+                }
                 
-                // Atualizar ano atual
-                document.getElementById('currentYear').textContent = currentYear;
-                document.getElementById('balanceYear').textContent = currentYear;
-                document.getElementById('currentConfigYear').textContent = currentYear;
+                // Atualizar dados
+                allTransactions = await getTransactionsForYear(currentYear);
                 
-                // Atualizar dropdowns
-                updateCategoryDropdowns();
-                updateTypeDropdowns();
-                updateYearDropdown();
-                updateIncomeInputs();
-                updateCategoriesList();
-                updateTypesList();
+                // Atualizar interface
                 updateDashboard();
                 updateTransactionsTable();
                 updateTransactionCount();
                 
-                console.log('Interface atualizada com sucesso');
+                // Fechar modal e limpar dados
+                document.getElementById('excelModal').classList.remove('active');
+                excelImportData = [];
+                document.getElementById('excelPreview').style.display = 'none';
+                document.getElementById('excelActions').style.display = 'none';
+                
+                showNotification(`${importedCount} transações importadas com sucesso!`, 'success');
             } catch (error) {
-                console.error('Erro ao atualizar UI:', error);
+                showNotification('Erro ao importar transações: ' + error.message, 'error');
             }
         }
         
-        function updateCategoryDropdowns() {
-            const chatSelect = document.getElementById('transCategoria');
-            const chartSelect = document.getElementById('doughnutCategory');
+        // ==================== ATUALIZAÇÃO DA INTERFACE ====================
+        async function updateUI() {
+            // Atualizar ano atual na interface
+            document.getElementById('currentYear').textContent = currentYear;
+            document.getElementById('balanceYear').textContent = currentYear;
+            document.getElementById('currentConfigYear').textContent = currentYear;
             
-            if (chatSelect) {
-                chatSelect.innerHTML = '<option value="">Selecione a categoria...</option>';
+            // Atualizar dropdowns de categorias e tipos
+            updateCategoryDropdowns();
+            updateTypeDropdowns();
+            
+            // Atualizar dropdown de anos
+            updateYearDropdown();
+            
+            // Atualizar inputs de receitas
+            updateIncomeInputs();
+            
+            // Atualizar listas
+            updateCategoriesList();
+            updateTypesList();
+            
+            // Atualizar dashboard
+            updateDashboard();
+            
+            // Atualizar tabela de transações
+            updateTransactionsTable();
+            
+            // Atualizar contador
+            updateTransactionCount();
+        }
+        
+        function updateCategoryDropdowns() {
+            // Dropdown do chat
+            const chatCategorySelect = document.getElementById('transCategoria');
+            if (chatCategorySelect) {
+                chatCategorySelect.innerHTML = '<option value="">Selecione a categoria...</option>';
                 customCategories.forEach(cat => {
                     const option = document.createElement('option');
                     option.value = cat.id;
                     option.textContent = cat.name;
-                    chatSelect.appendChild(option);
+                    chatCategorySelect.appendChild(option);
                 });
             }
             
-            if (chartSelect) {
-                chartSelect.innerHTML = '<option value="all">Todas Categorias</option>';
+            // Dropdown do gráfico
+            const chartCategorySelect = document.getElementById('doughnutCategory');
+            if (chartCategorySelect) {
+                chartCategorySelect.innerHTML = '<option value="all">Todas Categorias</option>';
                 customCategories.forEach(cat => {
                     const option = document.createElement('option');
                     option.value = cat.id;
                     option.textContent = cat.name;
-                    chartSelect.appendChild(option);
+                    chartCategorySelect.appendChild(option);
                 });
             }
         }
         
         function updateTypeDropdowns() {
-            const chatSelect = document.getElementById('transTipo');
-            const barSelect = document.getElementById('barAccountType');
-            const doughnutSelect = document.getElementById('doughnutAccountType');
-            
-            if (chatSelect) {
-                chatSelect.innerHTML = '<option value="">Selecione o tipo...</option>';
+            // Dropdown do chat
+            const chatTypeSelect = document.getElementById('transTipo');
+            if (chatTypeSelect) {
+                chatTypeSelect.innerHTML = '<option value="">Selecione o tipo...</option>';
                 customTypes.forEach(type => {
                     const option = document.createElement('option');
                     option.value = type.id;
                     option.textContent = type.name;
-                    chatSelect.appendChild(option);
+                    chatTypeSelect.appendChild(option);
                 });
             }
             
-            if (barSelect) {
-                barSelect.innerHTML = '<option value="all">Todos os Tipos</option>';
-                customTypes.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.id;
-                    option.textContent = type.name;
-                    barSelect.appendChild(option);
-                });
-            }
+            // Dropdowns dos gráficos
+            const barAccountType = document.getElementById('barAccountType');
+            const doughnutAccountType = document.getElementById('doughnutAccountType');
             
-            if (doughnutSelect) {
-                doughnutSelect.innerHTML = '<option value="all">Todos os Tipos</option>';
-                customTypes.forEach(type => {
-                    const option = document.createElement('option');
-                    option.value = type.id;
-                    option.textContent = type.name;
-                    doughnutSelect.appendChild(option);
-                });
-            }
+            [barAccountType, doughnutAccountType].forEach(select => {
+                if (select) {
+                    select.innerHTML = '<option value="all">Todos os Tipos</option>';
+                    customTypes.forEach(type => {
+                        const option = document.createElement('option');
+                        option.value = type.id;
+                        option.textContent = type.name;
+                        select.appendChild(option);
+                    });
+                }
+            });
         }
         
         function updateYearDropdown() {
@@ -1660,7 +2278,90 @@
             }
         }
         
-        function updateDashboard() {
+        function updateCategoriesList() {
+            const categoriesList = document.getElementById('categoriesList');
+            if (!categoriesList) return;
+            
+            categoriesList.innerHTML = '';
+            
+            customCategories.forEach(category => {
+                const div = document.createElement('div');
+                div.className = 'category-item';
+                div.innerHTML = `
+                    <span>${category.name}</span>
+                    <div class="category-actions">
+                        ${category.custom ? `
+                            <button class="btn btn-outline btn-sm edit-category" data-id="${category.id}" style="padding: 4px 8px;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-category" data-id="${category.id}" style="padding: 4px 8px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : '<span style="color: var(--gray); font-size: 12px;">Padrão</span>'}
+                    </div>
+                `;
+                categoriesList.appendChild(div);
+            });
+            
+            // Adicionar event listeners
+            categoriesList.querySelectorAll('.edit-category').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').dataset.id;
+                    editCategory(id);
+                });
+            });
+            
+            categoriesList.querySelectorAll('.delete-category').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').dataset.id;
+                    deleteCategoryPrompt(id);
+                });
+            });
+        }
+        
+        function updateTypesList() {
+            const typesList = document.getElementById('typesList');
+            if (!typesList) return;
+            
+            typesList.innerHTML = '';
+            
+            customTypes.forEach(type => {
+                const div = document.createElement('div');
+                div.className = 'type-item';
+                div.innerHTML = `
+                    <span>${type.name}</span>
+                    <div class="type-actions">
+                        ${type.custom ? `
+                            <button class="btn btn-outline btn-sm edit-type" data-id="${type.id}" style="padding: 4px 8px;">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm delete-type" data-id="${type.id}" style="padding: 4px 8px;">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        ` : '<span style="color: var(--gray); font-size: 12px;">Padrão</span>'}
+                    </div>
+                `;
+                typesList.appendChild(div);
+            });
+            
+            // Adicionar event listeners
+            typesList.querySelectorAll('.edit-type').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').dataset.id;
+                    editType(id);
+                });
+            });
+            
+            typesList.querySelectorAll('.delete-type').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = e.target.closest('button').dataset.id;
+                    deleteTypePrompt(id);
+                });
+            });
+        }
+        
+        async function updateDashboard() {
+            // Calcular despesas do mês atual
             const currentMonth = new Date().getMonth() + 1;
             const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
             
@@ -1672,11 +2373,15 @@
                 .filter(t => t.mes === lastMonth)
                 .reduce((sum, t) => sum + t.valor, 0);
             
+            // Calcular receitas
             const currentMonthIncome = monthlyIncomes[currentMonth] || 0;
             const lastMonthIncome = monthlyIncomes[lastMonth] || 0;
             
+            // Calcular saldo
             const currentBalance = currentMonthIncome - currentMonthExpenses;
             const lastMonthBalance = lastMonthIncome - lastMonthExpenses;
+            
+            // Calcular para investir (60% do saldo)
             const toInvest = currentBalance * 0.6;
             
             // Atualizar cards
@@ -1685,7 +2390,7 @@
             document.getElementById('currentBalance').textContent = formatCurrency(currentBalance);
             document.getElementById('toInvest').textContent = formatCurrency(toInvest);
             
-            // Atualizar tendências
+            // Calcular tendências
             updateTrend('incomeTrend', currentMonthIncome, lastMonthIncome);
             updateTrend('expensesTrend', currentMonthExpenses, lastMonthExpenses);
             updateTrend('balanceTrend', currentBalance, lastMonthBalance);
@@ -1707,6 +2412,7 @@
             if (previous === 0) {
                 icon.className = 'fas fa-minus';
                 span.textContent = '0%';
+                element.className = 'trend';
                 return;
             }
             
@@ -1771,623 +2477,25 @@
                 
                 tableBody.appendChild(row);
             });
+            
+            // Adicionar event listeners
+            tableBody.querySelectorAll('.edit-transaction').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.closest('button').dataset.id);
+                    editTransaction(id);
+                });
+            });
+            
+            tableBody.querySelectorAll('.delete-transaction').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    const id = parseInt(e.target.closest('button').dataset.id);
+                    deleteTrans(id);
+                });
+            });
         }
         
         function updateTransactionCount() {
             document.getElementById('totalTransCount').textContent = allTransactions.length;
-        }
-        
-        // ==================== EVENT LISTENERS ====================
-        async function setupEventListeners() {
-            console.log('Configurando event listeners...');
-            
-            // Botão do chat
-            document.getElementById('chatBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Chat button clicked');
-                document.getElementById('chatModal').classList.add('active');
-            });
-            
-            // Botão de configurações
-            document.getElementById('configBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Config button clicked');
-                document.getElementById('configModal').classList.add('active');
-            });
-            
-            // Botão de exportar
-            document.getElementById('exportBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Export button clicked');
-                exportData();
-            });
-            
-            // Botão de importar Excel
-            document.getElementById('importExcelBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Import Excel button clicked');
-                document.getElementById('excelImport').click();
-            });
-            
-            // Botão exportar do header
-            document.getElementById('exportHeaderBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Export header button clicked');
-                exportData();
-            });
-            
-            // Botão nova transação
-            document.getElementById('addTransactionBtn').addEventListener('click', (e) => {
-                e.preventDefault();
-                console.log('Add transaction button clicked');
-                document.getElementById('chatModal').classList.add('active');
-            });
-            
-            // Fechar modais
-            document.getElementById('closeChat').addEventListener('click', () => {
-                document.getElementById('chatModal').classList.remove('active');
-            });
-            
-            document.getElementById('closeConfig').addEventListener('click', () => {
-                document.getElementById('configModal').classList.remove('active');
-            });
-            
-            // Botão adicionar via chat
-            document.getElementById('addViaChat').addEventListener('click', async () => {
-                console.log('Add via chat button clicked');
-                await addTransactionFromForm();
-            });
-            
-            // Botões das configurações
-            document.getElementById('saveIncomes').addEventListener('click', saveMonthlyIncomes);
-            document.getElementById('addCategoryBtn').addEventListener('click', addNewCategory);
-            document.getElementById('addTypeBtn').addEventListener('click', addNewType);
-            document.getElementById('saveYear').addEventListener('click', changeYear);
-            document.getElementById('addYearBtn').addEventListener('click', addNewYear);
-            
-            // Importar Excel
-            document.getElementById('excelImport').addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    await importExcel(file);
-                    event.target.value = '';
-                }
-            });
-            
-            // Importar JSON
-            document.getElementById('fileImport').addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    await importData(file);
-                    event.target.value = '';
-                }
-            });
-            
-            // Mobile toggle
-            document.getElementById('mobileToggle').addEventListener('click', () => {
-                document.getElementById('sidebar').classList.toggle('active');
-            });
-            
-            // Tabs das configurações
-            document.querySelectorAll('.config-tab').forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const tabId = tab.dataset.tab;
-                    
-                    document.querySelectorAll('.config-tab').forEach(t => {
-                        t.classList.remove('active');
-                    });
-                    tab.classList.add('active');
-                    
-                    document.querySelectorAll('.config-tab-content').forEach(content => {
-                        content.classList.remove('active');
-                    });
-                    document.getElementById(`tab-${tabId}`).classList.add('active');
-                });
-            });
-            
-            // Fechar modais com ESC
-            document.addEventListener('keydown', (e) => {
-                if (e.key === 'Escape') {
-                    document.getElementById('chatModal').classList.remove('active');
-                    document.getElementById('configModal').classList.remove('active');
-                }
-            });
-            
-            console.log('Event listeners configurados');
-        }
-        
-        async function addTransactionFromForm() {
-            const conta = document.getElementById('transConta').value.trim();
-            const valor = document.getElementById('transValor').value;
-            const parcela = document.getElementById('transParcela').value.trim();
-            const periodo = document.getElementById('transPeriodo').value.trim();
-            const tipo = document.getElementById('transTipo').value;
-            const categoria = document.getElementById('transCategoria').value;
-            
-            if (!conta || !valor || !periodo || !tipo || !categoria) {
-                showNotification('Preencha todos os campos obrigatórios!', 'error');
-                return;
-            }
-            
-            if (isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
-                showNotification('Valor inválido!', 'error');
-                return;
-            }
-            
-            const mesMatch = periodo.match(/^([a-z]{3})/i);
-            const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-            const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
-            
-            let parcelaInicial = null;
-            let parcelaFinal = null;
-            if (parcela && parcela.includes('/')) {
-                const partes = parcela.split('/');
-                parcelaInicial = parseInt(partes[0]) || null;
-                parcelaFinal = parseInt(partes[1]) || null;
-            }
-            
-            const periodoParts = periodo.split(' - ');
-            const mesInicial = periodoParts[0] || '';
-            const mesFinal = periodoParts[1] || '';
-            
-            const transaction = {
-                conta: conta,
-                valor: parseFloat(valor),
-                parcelaInicial: parcelaInicial,
-                parcelaFinal: parcelaFinal,
-                mesInicial: mesInicial,
-                mesFinal: mesFinal,
-                tipo: tipo,
-                categoria: categoria,
-                mes: mes,
-                ano: currentYear,
-                data: new Date().toISOString().split('T')[0]
-            };
-            
-            try {
-                await addTransaction(transaction);
-                allTransactions = await getTransactionsForYear(currentYear);
-                
-                updateUI();
-                showNotification('Transação adicionada com sucesso!', 'success');
-                
-                // Limpar formulário
-                document.getElementById('transConta').value = '';
-                document.getElementById('transValor').value = '';
-                document.getElementById('transParcela').value = '';
-                document.getElementById('transPeriodo').value = '';
-                document.getElementById('transTipo').value = '';
-                document.getElementById('transCategoria').value = '';
-                
-                document.getElementById('chatModal').classList.remove('active');
-            } catch (error) {
-                showNotification('Erro ao adicionar transação: ' + error.message, 'error');
-            }
-        }
-        
-        // ==================== FUNÇÕES DAS CONFIGURAÇÕES ====================
-        async function saveMonthlyIncomes() {
-            try {
-                for (let month = 1; month <= 12; month++) {
-                    const input = document.getElementById(`income-${month}`);
-                    const value = parseFloat(input.value) || 0;
-                    await saveIncome(currentYear, month, value);
-                    monthlyIncomes[month] = value;
-                }
-                
-                updateDashboard();
-                showNotification('Receitas salvas com sucesso!', 'success');
-            } catch (error) {
-                showNotification('Erro ao salvar receitas: ' + error.message, 'error');
-            }
-        }
-        
-        async function addNewCategory() {
-            const nameInput = document.getElementById('newCategoryName');
-            const name = nameInput.value.trim();
-            
-            if (!name) {
-                showNotification('Digite o nome da categoria!', 'error');
-                return;
-            }
-            
-            // Gerar ID único
-            const id = 'cat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            const category = {
-                id: id,
-                name: name,
-                custom: true
-            };
-            
-            try {
-                await addCategory(category);
-                customCategories.push(category);
-                
-                updateCategoryDropdowns();
-                updateCategoriesList();
-                
-                nameInput.value = '';
-                showNotification('Categoria adicionada com sucesso!', 'success');
-            } catch (error) {
-                showNotification('Erro ao adicionar categoria: ' + error.message, 'error');
-            }
-        }
-        
-        function updateCategoriesList() {
-            const categoriesList = document.getElementById('categoriesList');
-            if (!categoriesList) return;
-            
-            categoriesList.innerHTML = '';
-            
-            customCategories.forEach(category => {
-                const div = document.createElement('div');
-                div.className = 'category-item';
-                div.innerHTML = `
-                    <span>${category.name}</span>
-                    <div class="category-actions">
-                        ${category.custom ? `
-                            <button class="btn btn-outline btn-sm edit-category" data-id="${category.id}" style="padding: 4px 8px;">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm delete-category" data-id="${category.id}" style="padding: 4px 8px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : '<span style="color: var(--gray); font-size: 12px;">Padrão</span>'}
-                    </div>
-                `;
-                categoriesList.appendChild(div);
-            });
-        }
-        
-        function updateTypesList() {
-            const typesList = document.getElementById('typesList');
-            if (!typesList) return;
-            
-            typesList.innerHTML = '';
-            
-            customTypes.forEach(type => {
-                const div = document.createElement('div');
-                div.className = 'type-item';
-                div.innerHTML = `
-                    <span>${type.name}</span>
-                    <div class="type-actions">
-                        ${type.custom ? `
-                            <button class="btn btn-outline btn-sm edit-type" data-id="${type.id}" style="padding: 4px 8px;">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <button class="btn btn-danger btn-sm delete-type" data-id="${type.id}" style="padding: 4px 8px;">
-                                <i class="fas fa-trash"></i>
-                            </button>
-                        ` : '<span style="color: var(--gray); font-size: 12px;">Padrão</span>'}
-                    </div>
-                `;
-                typesList.appendChild(div);
-            });
-        }
-        
-        async function addNewType() {
-            const nameInput = document.getElementById('newTypeName');
-            const name = nameInput.value.trim();
-            
-            if (!name) {
-                showNotification('Digite o nome do tipo!', 'error');
-                return;
-            }
-            
-            // Gerar ID único
-            const id = 'type_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
-            
-            const type = {
-                id: id,
-                name: name,
-                custom: true
-            };
-            
-            try {
-                await addType(type);
-                customTypes.push(type);
-                
-                updateTypeDropdowns();
-                updateTypesList();
-                
-                nameInput.value = '';
-                showNotification('Tipo adicionado com sucesso!', 'success');
-            } catch (error) {
-                showNotification('Erro ao adicionar tipo: ' + error.message, 'error');
-            }
-        }
-        
-        async function changeYear() {
-            const yearSelect = document.getElementById('yearSelect');
-            const newYear = parseInt(yearSelect.value);
-            
-            if (newYear === currentYear) return;
-            
-            try {
-                currentYear = newYear;
-                await saveSetting('currentYear', currentYear);
-                
-                allTransactions = await getTransactionsForYear(currentYear);
-                monthlyIncomes = await getIncomesForYear(currentYear);
-                
-                if (Object.keys(monthlyIncomes).length === 0) {
-                    const defaultIncomes = {
-                        1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
-                        7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
-                    };
-                    
-                    for (const [month, income] of Object.entries(defaultIncomes)) {
-                        await saveIncome(currentYear, parseInt(month), income);
-                    }
-                    monthlyIncomes = defaultIncomes;
-                }
-                
-                updateUI();
-                showNotification(`Ano alterado para ${currentYear}!`, 'success');
-            } catch (error) {
-                showNotification('Erro ao alterar ano: ' + error.message, 'error');
-            }
-        }
-        
-        async function addNewYear() {
-            const newYearInput = document.getElementById('newYear');
-            const newYear = parseInt(newYearInput.value);
-            
-            if (!newYear || newYear < 2020 || newYear > 2100) {
-                showNotification('Digite um ano válido entre 2020 e 2100!', 'error');
-                return;
-            }
-            
-            if (availableYears.includes(newYear)) {
-                showNotification('Este ano já está disponível!', 'error');
-                return;
-            }
-            
-            try {
-                availableYears.push(newYear);
-                await saveSetting('availableYears', availableYears);
-                
-                updateYearDropdown();
-                newYearInput.value = '';
-                showNotification(`Ano ${newYear} adicionado com sucesso!`, 'success');
-            } catch (error) {
-                showNotification('Erro ao adicionar ano: ' + error.message, 'error');
-            }
-        }
-        
-        // ==================== EXPORTAÇÃO/IMPORTAÇÃO ====================
-        async function exportData() {
-            try {
-                const allData = {
-                    version: '4.0',
-                    exportDate: new Date().toISOString(),
-                    settings: {
-                        currentYear: currentYear,
-                        availableYears: availableYears
-                    },
-                    transactions: allTransactions,
-                    categories: customCategories,
-                    types: customTypes,
-                    incomes: {}
-                };
-                
-                for (const year of availableYears) {
-                    const yearIncomes = await getIncomesForYear(year);
-                    allData.incomes[year] = yearIncomes;
-                }
-                
-                const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `atlas-financeiro-backup-${new Date().toISOString().split('T')[0]}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                
-                URL.revokeObjectURL(url);
-                
-                showNotification('Dados exportados com sucesso!', 'success');
-            } catch (error) {
-                showNotification('Erro ao exportar dados: ' + error.message, 'error');
-            }
-        }
-        
-        async function importData(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                
-                reader.onload = async (event) => {
-                    try {
-                        const data = JSON.parse(event.target.result);
-                        
-                        if (!data.version) {
-                            throw new Error('Formato de arquivo inválido');
-                        }
-                        
-                        showNotification('Importando dados...', 'info');
-                        
-                        // Limpar dados existentes
-                        const tx = db.transaction(
-                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_TYPES, STORE_INCOMES, STORE_SETTINGS], 
-                            'readwrite'
-                        );
-                        
-                        tx.objectStore(STORE_TRANSACTIONS).clear();
-                        tx.objectStore(STORE_CATEGORIES).clear();
-                        tx.objectStore(STORE_TYPES).clear();
-                        tx.objectStore(STORE_INCOMES).clear();
-                        tx.objectStore(STORE_SETTINGS).clear();
-                        
-                        await new Promise((resolveTx, rejectTx) => {
-                            tx.oncomplete = resolveTx;
-                            tx.onerror = rejectTx;
-                        });
-                        
-                        // Importar categorias
-                        if (data.categories && Array.isArray(data.categories)) {
-                            for (const category of data.categories) {
-                                await addCategory(category);
-                            }
-                        }
-                        
-                        // Importar tipos
-                        if (data.types && Array.isArray(data.types)) {
-                            for (const type of data.types) {
-                                await addType(type);
-                            }
-                        }
-                        
-                        // Importar receitas
-                        if (data.incomes && typeof data.incomes === 'object') {
-                            for (const [year, yearIncomes] of Object.entries(data.incomes)) {
-                                for (const [month, value] of Object.entries(yearIncomes)) {
-                                    await saveIncome(parseInt(year), parseInt(month), value);
-                                }
-                            }
-                        }
-                        
-                        // Importar configurações
-                        if (data.settings) {
-                            if (data.settings.currentYear) {
-                                await saveSetting('currentYear', data.settings.currentYear);
-                            }
-                            if (data.settings.availableYears) {
-                                await saveSetting('availableYears', data.settings.availableYears);
-                            }
-                        }
-                        
-                        // Importar transações
-                        if (data.transactions && Array.isArray(data.transactions)) {
-                            for (const transaction of data.transactions) {
-                                await addTransaction(transaction);
-                            }
-                        }
-                        
-                        // Recarregar dados
-                        await loadAllData();
-                        
-                        showNotification('Dados importados com sucesso!', 'success');
-                        resolve();
-                    } catch (error) {
-                        showNotification('Erro ao importar dados: ' + error.message, 'error');
-                        reject(error);
-                    }
-                };
-                
-                reader.onerror = () => {
-                    showNotification('Erro ao ler arquivo', 'error');
-                    reject(new Error('Erro ao ler arquivo'));
-                };
-                
-                reader.readAsText(file);
-            });
-        }
-        
-        async function importExcel(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                
-                reader.onload = async (event) => {
-                    try {
-                        let data = event.target.result;
-                        let rows = [];
-                        
-                        if (file.name.endsWith('.csv')) {
-                            rows = data.split('\n').filter(row => row.trim() !== '');
-                        } else {
-                            showNotification('Por favor, use arquivos CSV para importação.', 'info');
-                            resolve();
-                            return;
-                        }
-                        
-                        let importedCount = 0;
-                        for (let i = 1; i < rows.length; i++) {
-                            const columns = rows[i].split(',').map(col => col.trim().replace(/"/g, ''));
-                            
-                            if (columns.length >= 6) {
-                                const [conta, valorStr, parcela, periodo, tipoNome, categoriaNome] = columns;
-                                
-                                // Converter valor
-                                const valor = parseFloat(valorStr.replace('R$', '').replace(',', '.').trim()) || 0;
-                                
-                                if (conta && valor > 0) {
-                                    // Encontrar tipo
-                                    const tipoObj = customTypes.find(t => t.name === tipoNome);
-                                    const tipo = tipoObj ? tipoObj.id : 'cartao_credito';
-                                    
-                                    // Encontrar categoria
-                                    const categoriaObj = customCategories.find(c => c.name === categoriaNome);
-                                    const categoria = categoriaObj ? categoriaObj.id : 'outros';
-                                    
-                                    // Extrair mês inicial
-                                    const periodoMatch = periodo.match(/^([a-z]{3})/i);
-                                    const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-                                    const mes = periodoMatch ? meses.indexOf(periodoMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
-                                    
-                                    // Separar período
-                                    const periodoParts = periodo.split(' - ');
-                                    const mesInicial = periodoParts[0] || '';
-                                    const mesFinal = periodoParts[1] || '';
-                                    
-                                    // Extrair parcelas
-                                    let parcelaInicial = null;
-                                    let parcelaFinal = null;
-                                    if (parcela && parcela.includes('/') && parcela !== '-') {
-                                        const partes = parcela.split('/');
-                                        parcelaInicial = parseInt(partes[0]) || null;
-                                        parcelaFinal = parseInt(partes[1]) || null;
-                                    }
-                                    
-                                    const transaction = {
-                                        conta: conta,
-                                        valor: valor,
-                                        parcelaInicial: parcelaInicial,
-                                        parcelaFinal: parcelaFinal,
-                                        mesInicial: mesInicial,
-                                        mesFinal: mesFinal,
-                                        tipo: tipo,
-                                        categoria: categoria,
-                                        mes: mes,
-                                        ano: currentYear,
-                                        data: new Date().toISOString().split('T')[0]
-                                    };
-                                    
-                                    await addTransaction(transaction);
-                                    importedCount++;
-                                }
-                            }
-                        }
-                        
-                        if (importedCount > 0) {
-                            allTransactions = await getTransactionsForYear(currentYear);
-                            updateUI();
-                            showNotification(`${importedCount} transações importadas do Excel!`, 'success');
-                        } else {
-                            showNotification('Nenhuma transação válida encontrada no arquivo', 'warning');
-                        }
-                        
-                        resolve();
-                    } catch (error) {
-                        console.error('Erro ao importar Excel:', error);
-                        showNotification('Erro ao importar arquivo. Verifique o formato.', 'error');
-                        reject(error);
-                    }
-                };
-                
-                reader.onerror = () => {
-                    showNotification('Erro ao ler arquivo', 'error');
-                    reject(new Error('Erro ao ler arquivo'));
-                };
-                
-                if (file.name.endsWith('.csv')) {
-                    reader.readAsText(file);
-                } else {
-                    reader.readAsArrayBuffer(file);
-                }
-            });
         }
         
         // ==================== GRÁFICOS ====================
@@ -2401,7 +2509,7 @@
             const showValues = document.getElementById('showValues').checked;
             
             let filteredTransactions = allTransactions.filter(t => {
-                if (month && month !== 'all' && t.mes !== month) return false;
+                if (month && t.mes !== month) return false;
                 if (accountType !== 'all' && t.tipo !== accountType) return false;
                 if (category !== 'all' && t.categoria !== category) return false;
                 return true;
@@ -2415,6 +2523,7 @@
                 categories[t.categoria] += t.valor;
             });
             
+            // Converter IDs de categorias para nomes
             const labels = Object.keys(categories).map(catId => {
                 const cat = customCategories.find(c => c.id === catId);
                 return cat ? cat.name : catId;
@@ -2429,31 +2538,6 @@
             
             if (categoryChart) {
                 categoryChart.destroy();
-            }
-            
-            if (labels.length === 0) {
-                categoryChart = new Chart(ctx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Sem dados'],
-                        datasets: [{
-                            data: [1],
-                            backgroundColor: ['#e9ecef'],
-                            borderWidth: 2,
-                            borderColor: '#fff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                            }
-                        }
-                    }
-                });
-                return;
             }
             
             categoryChart = new Chart(ctx, {
@@ -2493,6 +2577,52 @@
                     }
                 }
             });
+            
+            updateDoughnutLegend(labels, data, backgroundColors, showValues);
+        }
+        
+        function updateDoughnutLegend(labels, data, colors, showValues) {
+            const legendContainer = document.getElementById('doughnutLegend');
+            if (!legendContainer) return;
+            
+            legendContainer.innerHTML = '';
+            
+            const total = data.reduce((a, b) => a + b, 0);
+            
+            labels.forEach((label, index) => {
+                const value = data[index];
+                const percentage = Math.round((value / total) * 100);
+                
+                const legendItem = document.createElement('div');
+                legendItem.className = 'legend-item';
+                legendItem.innerHTML = `
+                    <div class="legend-color" style="background-color: ${colors[index]};"></div>
+                    <span>${label}</span>
+                    <span style="margin-left: auto; font-weight: 600; color: ${colors[index]};">
+                        ${showValues ? formatCurrency(value) : ''} (${percentage}%)
+                    </span>
+                `;
+                
+                legendContainer.appendChild(legendItem);
+            });
+            
+            if (data.length > 0) {
+                const totalItem = document.createElement('div');
+                totalItem.className = 'legend-item';
+                totalItem.style.marginTop = '10px';
+                totalItem.style.paddingTop = '10px';
+                totalItem.style.borderTop = '1px solid var(--gray-light)';
+                totalItem.style.fontWeight = '700';
+                totalItem.innerHTML = `
+                    <div class="legend-color" style="background-color: var(--dark);"></div>
+                    <span>TOTAL</span>
+                    <span style="margin-left: auto; color: var(--dark);">
+                        ${formatCurrency(total)}
+                    </span>
+                `;
+                
+                legendContainer.appendChild(totalItem);
+            }
         }
         
         function updateBarChart() {
@@ -2672,6 +2802,802 @@
                             }
                         }
                     }
+                }
+            });
+        }
+        
+        // ==================== MANIPULAÇÃO DE TRANSAÇÕES ====================
+        async function addNewTransaction(formData) {
+            const mesMatch = formData.periodo.match(/^([a-z]{3})/i);
+            const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+            
+            let parcelaInicial = null;
+            let parcelaFinal = null;
+            if (formData.parcela && formData.parcela.includes('/')) {
+                const partes = formData.parcela.split('/');
+                parcelaInicial = parseInt(partes[0]) || null;
+                parcelaFinal = parseInt(partes[1]) || null;
+            }
+            
+            const periodoParts = formData.periodo.split(' - ');
+            const mesInicial = periodoParts[0] || '';
+            const mesFinal = periodoParts[1] || '';
+            
+            const transaction = {
+                conta: formData.conta,
+                valor: parseFloat(formData.valor),
+                parcelaInicial: parcelaInicial,
+                parcelaFinal: parcelaFinal,
+                mesInicial: mesInicial,
+                mesFinal: mesFinal,
+                tipo: formData.tipo,
+                categoria: formData.categoria,
+                mes: mes,
+                ano: currentYear,
+                data: new Date().toISOString().split('T')[0]
+            };
+            
+            try {
+                await addTransaction(transaction);
+                allTransactions = await getTransactionsForYear(currentYear);
+                
+                updateDashboard();
+                updateTransactionsTable();
+                updateTransactionCount();
+                
+                showNotification('Transação adicionada com sucesso!', 'success');
+                return true;
+            } catch (error) {
+                showNotification('Erro ao adicionar transação: ' + error.message, 'error');
+                return false;
+            }
+        }
+        
+        async function editTransaction(id) {
+            const transaction = allTransactions.find(t => t.id === id);
+            if (!transaction) {
+                showNotification('Transação não encontrada!', 'error');
+                return;
+            }
+            
+            // Preencher o formulário de chat com os dados da transação
+            document.getElementById('transConta').value = transaction.conta;
+            document.getElementById('transValor').value = transaction.valor;
+            document.getElementById('transParcela').value = transaction.parcelaInicial ? 
+                `${transaction.parcelaInicial}/${transaction.parcelaFinal}` : '';
+            document.getElementById('transPeriodo').value = `${transaction.mesInicial} - ${transaction.mesFinal}`;
+            document.getElementById('transTipo').value = transaction.tipo;
+            document.getElementById('transCategoria').value = transaction.categoria;
+            
+            // Alterar o botão para "Salvar Edição"
+            const addButton = document.getElementById('addViaChat');
+            const originalText = addButton.innerHTML;
+            addButton.innerHTML = '<i class="fas fa-save"></i> Salvar Edição';
+            addButton.onclick = async () => {
+                const conta = document.getElementById('transConta').value.trim();
+                const valor = document.getElementById('transValor').value;
+                const parcela = document.getElementById('transParcela').value.trim();
+                const periodo = document.getElementById('transPeriodo').value.trim();
+                const tipo = document.getElementById('transTipo').value;
+                const categoria = document.getElementById('transCategoria').value;
+                
+                if (!conta || !valor || !periodo || !tipo || !categoria) {
+                    showNotification('Preencha todos os campos obrigatórios!', 'error');
+                    return;
+                }
+                
+                if (isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
+                    showNotification('Valor inválido!', 'error');
+                    return;
+                }
+                
+                const mesMatch = periodo.match(/^([a-z]{3})/i);
+                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+                
+                let parcelaInicial = null;
+                let parcelaFinal = null;
+                if (parcela && parcela.includes('/')) {
+                    const partes = parcela.split('/');
+                    parcelaInicial = parseInt(partes[0]) || null;
+                    parcelaFinal = parseInt(partes[1]) || null;
+                }
+                
+                const periodoParts = periodo.split(' - ');
+                const mesInicial = periodoParts[0] || '';
+                const mesFinal = periodoParts[1] || '';
+                
+                try {
+                    await updateTransaction(id, {
+                        conta: conta,
+                        valor: parseFloat(valor),
+                        parcelaInicial: parcelaInicial,
+                        parcelaFinal: parcelaFinal,
+                        mesInicial: mesInicial,
+                        mesFinal: mesFinal,
+                        tipo: tipo,
+                        categoria: categoria,
+                        mes: mes
+                    });
+                    
+                    allTransactions = await getTransactionsForYear(currentYear);
+                    
+                    updateDashboard();
+                    updateTransactionsTable();
+                    updateTransactionCount();
+                    
+                    showNotification('Transação atualizada com sucesso!', 'success');
+                    
+                    // Restaurar botão original
+                    addButton.innerHTML = originalText;
+                    addButton.onclick = originalAddHandler;
+                    
+                    // Limpar formulário e fechar modal
+                    document.getElementById('transConta').value = '';
+                    document.getElementById('transValor').value = '';
+                    document.getElementById('transParcela').value = '';
+                    document.getElementById('transPeriodo').value = '';
+                    document.getElementById('transTipo').value = '';
+                    document.getElementById('transCategoria').value = '';
+                    
+                    document.getElementById('chatModal').classList.remove('active');
+                } catch (error) {
+                    showNotification('Erro ao atualizar transação: ' + error.message, 'error');
+                }
+            };
+            
+            // Salvar o handler original
+            const originalAddHandler = addButton.onclick;
+            
+            // Abrir o modal
+            document.getElementById('chatModal').classList.add('active');
+        }
+        
+        async function deleteTrans(id) {
+            if (confirm('Tem certeza que deseja excluir esta transação?')) {
+                try {
+                    await deleteTransaction(id);
+                    allTransactions = allTransactions.filter(t => t.id !== id);
+                    
+                    updateDashboard();
+                    updateTransactionsTable();
+                    updateTransactionCount();
+                    
+                    showNotification('Transação excluída com sucesso!', 'success');
+                } catch (error) {
+                    showNotification('Erro ao excluir transação: ' + error.message, 'error');
+                }
+            }
+        }
+        
+        // ==================== MANIPULAÇÃO DE CATEGORIAS ====================
+        async function addNewCategory() {
+            const nameInput = document.getElementById('newCategoryName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showNotification('Digite o nome da categoria!', 'error');
+                return;
+            }
+            
+            // Verificar se já existe
+            const exists = customCategories.find(c => c.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                showNotification('Esta categoria já existe!', 'error');
+                return;
+            }
+            
+            // Gerar ID único
+            const id = 'cat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            const category = {
+                id: id,
+                name: name,
+                custom: true
+            };
+            
+            try {
+                await addCategory(category);
+                customCategories.push(category);
+                
+                updateCategoryDropdowns();
+                updateCategoriesList();
+                
+                nameInput.value = '';
+                showNotification('Categoria adicionada com sucesso!', 'success');
+            } catch (error) {
+                showNotification('Erro ao adicionar categoria: ' + error.message, 'error');
+            }
+        }
+        
+        function editCategory(id) {
+            const category = customCategories.find(c => c.id === id);
+            if (!category || !category.custom) return;
+            
+            const newName = prompt('Editar nome da categoria:', category.name);
+            if (newName && newName.trim() !== '' && newName !== category.name) {
+                category.name = newName.trim();
+                addCategory(category).then(() => {
+                    updateCategoryDropdowns();
+                    updateCategoriesList();
+                    showNotification('Categoria atualizada com sucesso!', 'success');
+                }).catch(error => {
+                    showNotification('Erro ao atualizar categoria: ' + error.message, 'error');
+                });
+            }
+        }
+        
+        async function deleteCategoryPrompt(id) {
+            const category = customCategories.find(c => c.id === id);
+            if (!category || !category.custom) return;
+            
+            // Verificar se a categoria está sendo usada em transações
+            const isUsed = allTransactions.some(t => t.categoria === id);
+            
+            if (isUsed) {
+                showNotification('Esta categoria está em uso e não pode ser excluída!', 'error');
+                return;
+            }
+            
+            if (confirm(`Tem certeza que deseja excluir a categoria "${category.name}"?`)) {
+                try {
+                    await deleteCategory(id);
+                    customCategories = customCategories.filter(c => c.id !== id);
+                    
+                    updateCategoryDropdowns();
+                    updateCategoriesList();
+                    
+                    showNotification('Categoria excluída com sucesso!', 'success');
+                } catch (error) {
+                    showNotification('Erro ao excluir categoria: ' + error.message, 'error');
+                }
+            }
+        }
+        
+        // ==================== MANIPULAÇÃO DE TIPOS ====================
+        async function addNewType() {
+            const nameInput = document.getElementById('newTypeName');
+            const name = nameInput.value.trim();
+            
+            if (!name) {
+                showNotification('Digite o nome do tipo!', 'error');
+                return;
+            }
+            
+            // Verificar se já existe
+            const exists = customTypes.find(t => t.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                showNotification('Este tipo já existe!', 'error');
+                return;
+            }
+            
+            // Gerar ID único
+            const id = 'type_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            
+            const type = {
+                id: id,
+                name: name,
+                custom: true
+            };
+            
+            try {
+                await addType(type);
+                customTypes.push(type);
+                
+                updateTypeDropdowns();
+                updateTypesList();
+                
+                nameInput.value = '';
+                showNotification('Tipo adicionado com sucesso!', 'success');
+            } catch (error) {
+                showNotification('Erro ao adicionar tipo: ' + error.message, 'error');
+            }
+        }
+        
+        function editType(id) {
+            const type = customTypes.find(t => t.id === id);
+            if (!type || !type.custom) return;
+            
+            const newName = prompt('Editar nome do tipo:', type.name);
+            if (newName && newName.trim() !== '' && newName !== type.name) {
+                type.name = newName.trim();
+                addType(type).then(() => {
+                    updateTypeDropdowns();
+                    updateTypesList();
+                    showNotification('Tipo atualizado com sucesso!', 'success');
+                }).catch(error => {
+                    showNotification('Erro ao atualizar tipo: ' + error.message, 'error');
+                });
+            }
+        }
+        
+        async function deleteTypePrompt(id) {
+            const type = customTypes.find(t => t.id === id);
+            if (!type || !type.custom) return;
+            
+            // Verificar se o tipo está sendo usado em transações
+            const isUsed = allTransactions.some(t => t.tipo === id);
+            
+            if (isUsed) {
+                showNotification('Este tipo está em uso e não pode ser excluído!', 'error');
+                return;
+            }
+            
+            if (confirm(`Tem certeza que deseja excluir o tipo "${type.name}"?`)) {
+                try {
+                    await deleteType(id);
+                    customTypes = customTypes.filter(t => t.id !== id);
+                    
+                    updateTypeDropdowns();
+                    updateTypesList();
+                    
+                    showNotification('Tipo excluído com sucesso!', 'success');
+                } catch (error) {
+                    showNotification('Erro ao excluir tipo: ' + error.message, 'error');
+                }
+            }
+        }
+        
+        // ==================== MANIPULAÇÃO DE RECEITAS ====================
+        async function saveMonthlyIncomes() {
+            try {
+                for (let month = 1; month <= 12; month++) {
+                    const input = document.getElementById(`income-${month}`);
+                    const value = parseFloat(input.value) || 0;
+                    await saveIncome(currentYear, month, value);
+                    monthlyIncomes[month] = value;
+                }
+                
+                updateDashboard();
+                showNotification('Receitas salvas com sucesso!', 'success');
+            } catch (error) {
+                showNotification('Erro ao salvar receitas: ' + error.message, 'error');
+            }
+        }
+        
+        // ==================== MANIPULAÇÃO DE ANOS ====================
+        async function changeYear() {
+            const yearSelect = document.getElementById('yearSelect');
+            const newYear = parseInt(yearSelect.value);
+            
+            if (newYear === currentYear) return;
+            
+            try {
+                // Salvar ano atual
+                currentYear = newYear;
+                await saveSetting('currentYear', currentYear);
+                
+                // Carregar dados do novo ano
+                allTransactions = await getTransactionsForYear(currentYear);
+                monthlyIncomes = await getIncomesForYear(currentYear);
+                
+                // Se não houver receitas para este ano, criar padrão
+                if (Object.keys(monthlyIncomes).length === 0) {
+                    const defaultIncomes = {
+                        1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
+                        7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
+                    };
+                    
+                    for (const [month, income] of Object.entries(defaultIncomes)) {
+                        await saveIncome(currentYear, parseInt(month), income);
+                    }
+                    monthlyIncomes = defaultIncomes;
+                }
+                
+                updateUI();
+                showNotification(`Ano alterado para ${currentYear}!`, 'success');
+            } catch (error) {
+                showNotification('Erro ao alterar ano: ' + error.message, 'error');
+            }
+        }
+        
+        async function addNewYear() {
+            const newYearInput = document.getElementById('newYear');
+            const newYear = parseInt(newYearInput.value);
+            
+            if (!newYear || newYear < 2020 || newYear > 2100) {
+                showNotification('Digite um ano válido entre 2020 e 2100!', 'error');
+                return;
+            }
+            
+            if (availableYears.includes(newYear)) {
+                showNotification('Este ano já está disponível!', 'error');
+                return;
+            }
+            
+            try {
+                availableYears.push(newYear);
+                await saveSetting('availableYears', availableYears);
+                
+                updateYearDropdown();
+                newYearInput.value = '';
+                showNotification(`Ano ${newYear} adicionado com sucesso!`, 'success');
+            } catch (error) {
+                showNotification('Erro ao adicionar ano: ' + error.message, 'error');
+            }
+        }
+        
+        // ==================== EXPORTAÇÃO/IMPORTAÇÃO ====================
+        async function exportData() {
+            try {
+                // Coletar todos os dados
+                const allData = {
+                    version: '4.0',
+                    exportDate: new Date().toISOString(),
+                    settings: {
+                        currentYear: currentYear,
+                        availableYears: availableYears
+                    },
+                    transactions: allTransactions,
+                    categories: customCategories,
+                    types: customTypes,
+                    incomes: {}
+                };
+                
+                // Coletar receitas de todos os anos disponíveis
+                for (const year of availableYears) {
+                    const yearIncomes = await getIncomesForYear(year);
+                    allData.incomes[year] = yearIncomes;
+                }
+                
+                const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `atlas-financeiro-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                URL.revokeObjectURL(url);
+                
+                showNotification('Dados exportados com sucesso!', 'success');
+            } catch (error) {
+                showNotification('Erro ao exportar dados: ' + error.message, 'error');
+            }
+        }
+        
+        async function importData(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async (event) => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        
+                        if (!data.version) {
+                            throw new Error('Formato de arquivo inválido');
+                        }
+                        
+                        // Limpar dados existentes
+                        const tx = db.transaction(
+                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_TYPES, STORE_INCOMES, STORE_SETTINGS], 
+                            'readwrite'
+                        );
+                        
+                        tx.objectStore(STORE_TRANSACTIONS).clear();
+                        tx.objectStore(STORE_CATEGORIES).clear();
+                        tx.objectStore(STORE_TYPES).clear();
+                        tx.objectStore(STORE_INCOMES).clear();
+                        tx.objectStore(STORE_SETTINGS).clear();
+                        
+                        await new Promise((resolveTx, rejectTx) => {
+                            tx.oncomplete = resolveTx;
+                            tx.onerror = rejectTx;
+                        });
+                        
+                        // Importar transações
+                        if (data.transactions && Array.isArray(data.transactions)) {
+                            for (const transaction of data.transactions) {
+                                await addTransaction(transaction);
+                            }
+                        }
+                        
+                        // Importar categorias
+                        if (data.categories && Array.isArray(data.categories)) {
+                            for (const category of data.categories) {
+                                await addCategory(category);
+                            }
+                        }
+                        
+                        // Importar tipos
+                        if (data.types && Array.isArray(data.types)) {
+                            for (const type of data.types) {
+                                await addType(type);
+                            }
+                        }
+                        
+                        // Importar receitas
+                        if (data.incomes && typeof data.incomes === 'object') {
+                            for (const [year, yearIncomes] of Object.entries(data.incomes)) {
+                                for (const [month, value] of Object.entries(yearIncomes)) {
+                                    await saveIncome(parseInt(year), parseInt(month), value);
+                                }
+                            }
+                        }
+                        
+                        // Importar configurações
+                        if (data.settings) {
+                            if (data.settings.currentYear) {
+                                await saveSetting('currentYear', data.settings.currentYear);
+                            }
+                            if (data.settings.availableYears) {
+                                await saveSetting('availableYears', data.settings.availableYears);
+                            }
+                        }
+                        
+                        // Recarregar dados
+                        await loadAllData();
+                        
+                        showNotification('Dados importados com sucesso!', 'success');
+                        resolve();
+                    } catch (error) {
+                        showNotification('Erro ao importar dados: ' + error.message, 'error');
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => {
+                    showNotification('Erro ao ler arquivo', 'error');
+                    reject(new Error('Erro ao ler arquivo'));
+                };
+                
+                reader.readAsText(file);
+            });
+        }
+        
+        // ==================== EVENT LISTENERS ====================
+        let originalAddHandler = null;
+        
+        document.addEventListener('DOMContentLoaded', async function() {
+            try {
+                await initDatabase();
+                setupEventListeners();
+                
+                // Adicionar efeito de hover nos cards
+                const cards = document.querySelectorAll('.card');
+                cards.forEach(card => {
+                    card.addEventListener('mouseenter', function() {
+                        this.style.transform = 'translateY(-5px)';
+                    });
+                    card.addEventListener('mouseleave', function() {
+                        this.style.transform = 'translateY(0)';
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Erro na inicialização:', error);
+                showNotification('Erro ao inicializar o sistema: ' + error.message, 'error');
+            }
+        });
+        
+        function setupEventListeners() {
+            // Chat
+            document.getElementById('chatBtn').addEventListener('click', () => {
+                document.getElementById('chatModal').classList.add('active');
+            });
+            
+            document.getElementById('closeChat').addEventListener('click', () => {
+                document.getElementById('chatModal').classList.remove('active');
+                // Restaurar botão original se estiver em modo edição
+                const addButton = document.getElementById('addViaChat');
+                if (originalAddHandler) {
+                    addButton.innerHTML = '<i class="fas fa-plus"></i> Adicionar Transação';
+                    addButton.onclick = originalAddHandler;
+                    originalAddHandler = null;
+                }
+            });
+            
+            // Configurar handler original do botão de adicionar
+            const addButton = document.getElementById('addViaChat');
+            originalAddHandler = async () => {
+                const conta = document.getElementById('transConta').value.trim();
+                const valor = document.getElementById('transValor').value;
+                const parcela = document.getElementById('transParcela').value.trim();
+                const periodo = document.getElementById('transPeriodo').value.trim();
+                const tipo = document.getElementById('transTipo').value;
+                const categoria = document.getElementById('transCategoria').value;
+                
+                if (!conta || !valor || !periodo || !tipo || !categoria) {
+                    showNotification('Preencha todos os campos obrigatórios!', 'error');
+                    return;
+                }
+                
+                if (isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
+                    showNotification('Valor inválido!', 'error');
+                    return;
+                }
+                
+                const success = await addNewTransaction({
+                    conta, valor, parcela, periodo, tipo, categoria
+                });
+                
+                if (success) {
+                    document.getElementById('transConta').value = '';
+                    document.getElementById('transValor').value = '';
+                    document.getElementById('transParcela').value = '';
+                    document.getElementById('transPeriodo').value = '';
+                    document.getElementById('transTipo').value = '';
+                    document.getElementById('transCategoria').value = '';
+                    
+                    document.getElementById('chatModal').classList.remove('active');
+                }
+            };
+            
+            addButton.onclick = originalAddHandler;
+            
+            // Configurações
+            document.getElementById('configBtn').addEventListener('click', () => {
+                document.getElementById('configModal').classList.add('active');
+            });
+            
+            document.getElementById('closeConfig').addEventListener('click', () => {
+                document.getElementById('configModal').classList.remove('active');
+            });
+            
+            // Tabs das configurações
+            document.querySelectorAll('.config-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const tabId = tab.dataset.tab;
+                    
+                    // Atualizar tabs ativas
+                    document.querySelectorAll('.config-tab').forEach(t => {
+                        t.classList.remove('active');
+                    });
+                    tab.classList.add('active');
+                    
+                    // Mostrar conteúdo da tab
+                    document.querySelectorAll('.config-tab-content').forEach(content => {
+                        content.classList.remove('active');
+                    });
+                    document.getElementById(`tab-${tabId}`).classList.add('active');
+                });
+            });
+            
+            // Botões das configurações
+            document.getElementById('saveIncomes').addEventListener('click', saveMonthlyIncomes);
+            document.getElementById('addCategoryBtn').addEventListener('click', addNewCategory);
+            document.getElementById('addTypeBtn').addEventListener('click', addNewType);
+            document.getElementById('saveYear').addEventListener('click', changeYear);
+            document.getElementById('addYearBtn').addEventListener('click', addNewYear);
+            
+            // Exportação/Importação
+            document.getElementById('exportBtn').addEventListener('click', exportData);
+            document.getElementById('exportHeaderBtn').addEventListener('click', exportData);
+            document.getElementById('importBtn').addEventListener('click', () => {
+                document.getElementById('fileImport').click();
+            });
+            
+            document.getElementById('importDataBtn').addEventListener('click', () => {
+                document.getElementById('fileImport').click();
+            });
+            
+            // Importar Excel
+            document.getElementById('importExcelBtn').addEventListener('click', () => {
+                document.getElementById('excelModal').classList.add('active');
+            });
+            
+            document.getElementById('closeExcel').addEventListener('click', () => {
+                document.getElementById('excelModal').classList.remove('active');
+                excelImportData = [];
+                document.getElementById('excelPreview').style.display = 'none';
+                document.getElementById('excelActions').style.display = 'none';
+            });
+            
+            document.getElementById('browseExcelBtn').addEventListener('click', () => {
+                document.getElementById('excelFileInput').click();
+            });
+            
+            document.getElementById('excelFileInput').addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    await importExcelFile(file);
+                    event.target.value = '';
+                }
+            });
+            
+            // Drag and drop para Excel
+            const dropzone = document.getElementById('excelDropzone');
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
+            });
+            
+            dropzone.addEventListener('dragleave', (e) => {
+                e.preventDefault();
+                dropzone.style.backgroundColor = '';
+            });
+            
+            dropzone.addEventListener('drop', async (e) => {
+                e.preventDefault();
+                dropzone.style.backgroundColor = '';
+                
+                const file = e.dataTransfer.files[0];
+                if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv'))) {
+                    await importExcelFile(file);
+                } else {
+                    showNotification('Por favor, selecione um arquivo Excel (.xlsx, .xls, .csv)', 'error');
+                }
+            });
+            
+            dropzone.addEventListener('click', () => {
+                document.getElementById('excelFileInput').click();
+            });
+            
+            // Botões do modal de Excel
+            document.getElementById('confirmImportBtn').addEventListener('click', confirmExcelImport);
+            document.getElementById('cancelImportBtn').addEventListener('click', () => {
+                excelImportData = [];
+                document.getElementById('excelPreview').style.display = 'none';
+                document.getElementById('excelActions').style.display = 'none';
+            });
+            
+            document.getElementById('fileImport').addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    await importData(file);
+                    event.target.value = '';
+                }
+            });
+            
+            // Botão nova transação
+            document.getElementById('addTransactionBtn').addEventListener('click', () => {
+                document.getElementById('chatModal').classList.add('active');
+            });
+            
+            // Limpar tudo
+            document.getElementById('clearAllBtn').addEventListener('click', async () => {
+                if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.')) {
+                    try {
+                        const tx = db.transaction(
+                            [STORE_TRANSACTIONS, STORE_CATEGORIES, STORE_TYPES, STORE_INCOMES, STORE_SETTINGS], 
+                            'readwrite'
+                        );
+                        
+                        tx.objectStore(STORE_TRANSACTIONS).clear();
+                        tx.objectStore(STORE_CATEGORIES).clear();
+                        tx.objectStore(STORE_TYPES).clear();
+                        tx.objectStore(STORE_INCOMES).clear();
+                        tx.objectStore(STORE_SETTINGS).clear();
+                        
+                        await new Promise((resolve, reject) => {
+                            tx.oncomplete = resolve;
+                            tx.onerror = reject;
+                        });
+                        
+                        // Recarregar dados
+                        await loadAllData();
+                        
+                        showNotification('Todos os dados foram removidos!', 'success');
+                    } catch (error) {
+                        showNotification('Erro ao limpar dados: ' + error.message, 'error');
+                    }
+                }
+            });
+            
+            // Filtros dos gráficos
+            document.getElementById('doughnutMonth').addEventListener('change', updateDoughnutChart);
+            document.getElementById('doughnutAccountType').addEventListener('change', updateDoughnutChart);
+            document.getElementById('doughnutCategory').addEventListener('change', updateDoughnutChart);
+            document.getElementById('showValues').addEventListener('change', updateDoughnutChart);
+            
+            document.getElementById('barMonth').addEventListener('change', updateBarChart);
+            document.getElementById('barAccountType').addEventListener('change', updateBarChart);
+            document.getElementById('showBalance').addEventListener('change', updateBarChart);
+            
+            // Mobile toggle
+            document.getElementById('mobileToggle').addEventListener('click', () => {
+                document.getElementById('sidebar').classList.toggle('active');
+            });
+            
+            // Fechar modais com ESC
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    document.getElementById('chatModal').classList.remove('active');
+                    document.getElementById('configModal').classList.remove('active');
+                    document.getElementById('excelModal').classList.remove('active');
                 }
             });
         }
