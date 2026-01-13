@@ -1239,7 +1239,7 @@
     <script>
         // ==================== BANCO DE DADOS LOCAL ====================
         const DB_NAME = 'AtlasFinanceDB';
-        const DB_VERSION = 3; // Versão atualizada
+        const DB_VERSION = 4; // Versão atualizada
         const STORE_TRANSACTIONS = 'transactions';
         const STORE_SETTINGS = 'settings';
         const STORE_CATEGORIES = 'categories';
@@ -1267,40 +1267,33 @@
             7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
         };
         
-        // Categorias padrão
+        // CATEGORIAS PADRÃO conforme solicitado
         const defaultCategories = [
-            { id: 'ml', name: 'Mercado Livre (ML)', custom: false },
-            { id: 'mercado', name: 'Supermercado', custom: false },
-            { id: 'energia', name: 'Energia Elétrica', custom: false },
             { id: 'agua', name: 'Água', custom: false },
-            { id: 'internet', name: 'Internet', custom: false },
-            { id: 'celular', name: 'Celular', custom: false },
             { id: 'aluguel', name: 'Aluguel', custom: false },
-            { id: 'transporte', name: 'Transporte', custom: false },
+            { id: 'celular', name: 'Celular', custom: false },
             { id: 'combustivel', name: 'Combustível', custom: false },
-            { id: 'restaurante', name: 'Restaurante', custom: false },
-            { id: 'lazer', name: 'Lazer', custom: false },
-            { id: 'saude', name: 'Saúde', custom: false },
             { id: 'educacao', name: 'Educação', custom: false },
+            { id: 'energia_eletrica', name: 'Energia Elétrica', custom: false },
+            { id: 'internet', name: 'Internet', custom: false },
+            { id: 'lazer', name: 'Lazer', custom: false },
+            { id: 'moradia', name: 'Moradia', custom: false },
+            { id: 'supermercado', name: 'Supermercado', custom: false },
+            { id: 'saude', name: 'Saúde', custom: false },
+            { id: 'transporte', name: 'Transporte', custom: false },
             { id: 'vestuario', name: 'Vestuário', custom: false },
             { id: 'outros', name: 'Outros', custom: false }
         ];
         
-        // Tipos padrão
+        // TIPOS PADRÃO conforme solicitado
         const defaultTypes = [
+            { id: 'alimentacao', name: 'Alimentação', custom: false },
+            { id: 'boleto', name: 'Boleto', custom: false },
             { id: 'cartao_credito', name: 'Cartão de Crédito', custom: false },
             { id: 'cartao_debito', name: 'Cartão de Débito', custom: false },
-            { id: 'pix', name: 'PIX', custom: false },
-            { id: 'dinheiro', name: 'Dinheiro', custom: false },
-            { id: 'boleto', name: 'Boleto', custom: false },
             { id: 'debito_conta', name: 'Débito em Conta', custom: false },
-            { id: 'alimentacao', name: 'Alimentação', custom: false },
-            { id: 'transporte', name: 'Transporte', custom: false },
-            { id: 'moradia', name: 'Moradia', custom: false },
-            { id: 'lazer', name: 'Lazer', custom: false },
-            { id: 'saude', name: 'Saúde', custom: false },
-            { id: 'educacao', name: 'Educação', custom: false },
-            { id: 'investimento', name: 'Investimento', custom: false }
+            { id: 'dinheiro', name: 'Dinheiro', custom: false },
+            { id: 'pix', name: 'Pix', custom: false }
         ];
         
         // ==================== INICIALIZAÇÃO DO BANCO ====================
@@ -1420,29 +1413,8 @@
             // Carregar transações do ano atual
             allTransactions = await getTransactionsForYear(currentYear);
             
-            // Se não houver transações, adicionar exemplos
-            if (allTransactions.length === 0) {
-                await addSampleData();
-                allTransactions = await getTransactionsForYear(currentYear);
-            }
-            
+            // REMOVIDA A ADIÇÃO DE DADOS DE EXEMPLO
             updateUI();
-        }
-        
-        // Adicionar dados de exemplo
-        async function addSampleData() {
-            const sampleData = [
-                { conta: "ML", valor: 3.53, parcelaInicial: 7, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jul", status: "Ativa", tipo: "cartao_credito", mes: 2, categoria: "ml", ano: currentYear, data: `${currentYear}-02-01` },
-                { conta: "ML", valor: 6.04, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_credito", mes: 2, categoria: "ml", ano: currentYear, data: `${currentYear}-02-01` },
-                { conta: "Energia", valor: 155.99, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "fev", status: "Inativa", tipo: "boleto", mes: 2, categoria: "energia", ano: currentYear, data: `${currentYear}-02-05` },
-                { conta: "Supermercado", valor: 250.75, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "fev", status: "Inativa", tipo: "cartao_debito", mes: 2, categoria: "mercado", ano: currentYear, data: `${currentYear}-02-10` }
-            ];
-            
-            for (const transaction of sampleData) {
-                await addTransaction(transaction);
-            }
-            
-            showNotification('Dados de exemplo adicionados!', 'success');
         }
         
         // ==================== FUNÇÕES DO BANCO ====================
@@ -2843,7 +2815,7 @@
             try {
                 // Coletar todos os dados
                 const allData = {
-                    version: '3.0',
+                    version: '4.0',
                     exportDate: new Date().toISOString(),
                     settings: {
                         currentYear: currentYear,
@@ -2971,58 +2943,109 @@
         // ==================== IMPORTAR EXCEL ====================
         async function importExcel(file) {
             return new Promise((resolve, reject) => {
-                // Simulação de importação de Excel
-                // Em produção, você precisaria usar uma biblioteca como SheetJS
-                showNotification('Importação de Excel não implementada neste exemplo. Use o formato JSON para importar.', 'warning');
-                resolve();
-                
-                /*
-                // Código real para importar Excel (requer biblioteca SheetJS)
                 const reader = new FileReader();
                 
                 reader.onload = async (event) => {
                     try {
-                        const data = new Uint8Array(event.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
+                        const data = event.target.result;
                         
-                        // Processar os dados do Excel
-                        let importedCount = 0;
-                        for (const row of jsonData) {
-                            // Converter dados do Excel para formato do sistema
-                            const transaction = {
-                                conta: row.Conta || row.conta || '',
-                                valor: parseFloat(row.Valor || row.valor || 0),
-                                // ... outros campos
-                            };
+                        // Verificar se é CSV
+                        if (file.name.endsWith('.csv')) {
+                            const rows = data.split('\n').filter(row => row.trim() !== '');
                             
-                            if (transaction.conta && transaction.valor > 0) {
-                                await addTransaction(transaction);
-                                importedCount++;
+                            let importedCount = 0;
+                            for (let i = 1; i < rows.length; i++) { // Pular cabeçalho
+                                const columns = rows[i].split(',').map(col => col.trim());
+                                
+                                // Verificar se tem pelo menos 6 colunas
+                                if (columns.length >= 6) {
+                                    const [conta, valorStr, parcela, periodo, tipoNome, categoriaNome] = columns;
+                                    
+                                    // Converter valor
+                                    const valor = parseFloat(valorStr.replace('R$', '').replace(',', '.').trim()) || 0;
+                                    
+                                    if (conta && valor > 0) {
+                                        // Encontrar tipo pelo nome
+                                        const tipoObj = customTypes.find(t => t.name === tipoNome);
+                                        const tipo = tipoObj ? tipoObj.id : 'cartao_credito';
+                                        
+                                        // Encontrar categoria pelo nome
+                                        const categoriaObj = customCategories.find(c => c.name === categoriaNome);
+                                        const categoria = categoriaObj ? categoriaObj.id : 'outros';
+                                        
+                                        // Extrair mês inicial do período
+                                        const periodoMatch = periodo.match(/^([a-z]{3})/i);
+                                        const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                                        const mes = periodoMatch ? meses.indexOf(periodoMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+                                        
+                                        // Separar período
+                                        const periodoParts = periodo.split(' - ');
+                                        const mesInicial = periodoParts[0] || '';
+                                        const mesFinal = periodoParts[1] || '';
+                                        
+                                        // Extrair parcelas
+                                        let parcelaInicial = null;
+                                        let parcelaFinal = null;
+                                        if (parcela && parcela.includes('/') && parcela !== '-') {
+                                            const partes = parcela.split('/');
+                                            parcelaInicial = parseInt(partes[0]) || null;
+                                            parcelaFinal = parseInt(partes[1]) || null;
+                                        }
+                                        
+                                        const transaction = {
+                                            conta: conta,
+                                            valor: valor,
+                                            parcelaInicial: parcelaInicial,
+                                            parcelaFinal: parcelaFinal,
+                                            mesInicial: mesInicial,
+                                            mesFinal: mesFinal,
+                                            tipo: tipo,
+                                            categoria: categoria,
+                                            mes: mes,
+                                            ano: currentYear,
+                                            data: new Date().toISOString().split('T')[0]
+                                        };
+                                        
+                                        await addTransaction(transaction);
+                                        importedCount++;
+                                    }
+                                }
                             }
-                        }
-                        
-                        if (importedCount > 0) {
-                            allTransactions = await getTransactionsForYear(currentYear);
-                            updateDashboard();
-                            updateTransactionsTable();
-                            updateTransactionCount();
                             
-                            showNotification(`${importedCount} transações importadas do Excel!`, 'success');
+                            if (importedCount > 0) {
+                                allTransactions = await getTransactionsForYear(currentYear);
+                                updateDashboard();
+                                updateTransactionsTable();
+                                updateTransactionCount();
+                                
+                                showNotification(`${importedCount} transações importadas do arquivo!`, 'success');
+                            } else {
+                                showNotification('Nenhuma transação válida encontrada no arquivo', 'warning');
+                            }
                         } else {
-                            showNotification('Nenhuma transação válida encontrada no arquivo Excel', 'warning');
+                            // Para XLSX/XLS, mostrar mensagem informativa
+                            showNotification('Para importar arquivos Excel (.xlsx, .xls), converta primeiro para CSV ou use o formato especificado', 'info');
                         }
                         
                         resolve();
                     } catch (error) {
-                        showNotification('Erro ao importar Excel: ' + error.message, 'error');
+                        console.error('Erro ao importar Excel:', error);
+                        showNotification('Erro ao importar arquivo. Certifique-se de que o formato está correto.', 'error');
                         reject(error);
                     }
                 };
                 
-                reader.readAsArrayBuffer(file);
-                */
+                reader.onerror = () => {
+                    showNotification('Erro ao ler arquivo', 'error');
+                    reject(new Error('Erro ao ler arquivo'));
+                };
+                
+                // Ler como texto para CSV, como array buffer para Excel
+                if (file.name.endsWith('.csv')) {
+                    reader.readAsText(file);
+                } else {
+                    reader.readAsArrayBuffer(file);
+                }
             });
         }
         
