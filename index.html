@@ -1579,35 +1579,7 @@
             updateUI();
         }
         
-        async function importSampleDataFromJSON() {
-            // Dados de exemplo baseados no JSON fornecido
-            const sampleData = [
-                // Transações do JSON
-                { conta: "ML", valor: 3.53, parcelaInicial: 7, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "jul/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "ML_3.53_1" },
-                { conta: "ML", valor: 60.9, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "jun/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "ML_60.9_2" },
-                { conta: "FLEX", valor: 79, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "FLEX_79_3" },
-                { conta: "MARCO", valor: 108.85, parcelaInicial: 2, parcelaFinal: 6, mesInicial: "fev/26", mesFinal: "jun/26", tipo: "cartao_credito", categoria: "moradia", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "MARCO_108.85_4" },
-                { conta: "GOL", valor: 253.41, parcelaInicial: 2, parcelaFinal: 10, mesInicial: "fev/26", mesFinal: "out/26", tipo: "cartao_credito", categoria: "transporte", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "GOL_253.41_5" },
-                { conta: "FERNAN", valor: 37.49, parcelaInicial: 3, parcelaFinal: 4, mesInicial: "fev/26", mesFinal: "mar/26", tipo: "cartao_credito", categoria: "vestuario", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "FERNAN_37.49_6" },
-                { conta: "CEA", valor: 60, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "vestuario", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "CEA_60_7" },
-                { conta: "TELE FAR", valor: 155.99, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "saude", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "TELE FAR_155.99_8" },
-                { conta: "HAVAN", valor: 59.99, parcelaInicial: 4, parcelaFinal: 10, mesInicial: "fev/26", mesFinal: "ago/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "HAVAN_59.99_9" },
-                { conta: "FORT", valor: 84.86, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "supermercado", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "FORT_84.86_10" },
-                { conta: "PENSÃO", valor: 640, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "dinheiro", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "PENSÃO_640_11" },
-                { conta: "CASA", valor: 840, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "dinheiro", categoria: "moradia", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "CASA_840_12" },
-                { conta: "TENDA", valor: 200, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "dinheiro", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "TENDA_200_13" },
-                { conta: "DESC SAL", valor: 560, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "dinheiro", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "DESC SAL_560_14" },
-                { conta: "GAS CLIO", valor: 320, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "cartao_credito", categoria: "combustivel", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "GAS CLIO_320_15" },
-                { conta: "CIGARRO", valor: 260, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "cartao_credito", categoria: "lazer", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "CIGARRO_260_16" },
-                { conta: "TENDA II", valor: 30, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "TENDA II_30_17" },
-                { conta: "MANT UNO", valor: 157, parcelaInicial: 1, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "cartao_credito", categoria: "transporte", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "MANT UNO_157_18" },
-                { conta: "GUINCHO", valor: 64, parcelaInicial: 1, parcelaFinal: 2, mesInicial: "fev/26", mesFinal: "mar/26", tipo: "cartao_credito", categoria: "transporte", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "GUINCHO_64_19" },
-                { conta: "LANCHE NDD", valor: 25, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "LANCHE NDD_25_20" },
-                { conta: "99", valor: 142, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "transporte", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "99_142_21" },
-                { conta: "ML", valor: 25.81, parcelaInicial: 4, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "out/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "ML_25.81_22" },
-                { conta: "ML", valor: 10.06, parcelaInicial: 5, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "set/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "ML_10.06_23" },
-                { conta: "GUIA TENDA", valor: 250, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "pix", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "GUIA TENDA_250_24" }
-            ];
+        
             
             // Processar cada transação para criar múltiplas entradas quando necessário
             for (const transaction of sampleData) {
