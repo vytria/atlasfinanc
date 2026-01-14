@@ -1412,15 +1412,13 @@
             
             // Carregar transações do ano atual
             allTransactions = await getTransactionsForYear(currentYear);
-            
-            // Se não houver transações, adicionar exemplos
-            if (allTransactions.length === 0) {
-                // dados de exemplo removidos
-                allTransactions = await getTransactionsForYear(currentYear);
-            }
-            
+
+            // NÃO inserir dados de exemplo, apenas inicializar corretamente
             updateUI();
-        }
+            updateDashboard();
+            updateTransactionsTable();
+            updateTransactionCount();
+
         
         // Adicionar dados de exemplo
         async function addSampleData(){ }
