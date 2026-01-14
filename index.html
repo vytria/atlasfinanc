@@ -1407,7 +1407,7 @@
         
         // ==================== BANCO DE DADOS LOCAL ====================
         const DB_NAME = 'AtlasFinanceDB';
-        const DB_VERSION = 5; // Versão atualizada para período
+        const DB_VERSION = 6; // Versão atualizada para período
         const STORE_TRANSACTIONS = 'transactions';
         const STORE_SETTINGS = 'settings';
         const STORE_CATEGORIES = 'categories';
@@ -1497,6 +1497,7 @@
                         store.createIndex('tipo', 'tipo', { unique: false });
                         store.createIndex('categoria', 'categoria', { unique: false });
                         store.createIndex('status', 'status', { unique: false });
+                        store.createIndex('transactionGroup', 'transactionGroup', { unique: false });
                     }
                     
                     if (!db.objectStoreNames.contains(STORE_CATEGORIES)) {
@@ -1557,8 +1558,8 @@
             monthlyIncomes = await getIncomesForYear(currentYear);
             if (Object.keys(monthlyIncomes).length === 0) {
                 const defaultIncomes = {
-                    1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
-                    7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
+                    1: 4300, 2: 4300, 3: 4300, 4: 4300, 5: 4300, 6: 4300,
+                    7: 4300, 8: 4300, 9: 4300, 10: 4300, 11: 4300, 12: 4300
                 };
                 
                 for (const [month, income] of Object.entries(defaultIncomes)) {
@@ -1570,70 +1571,50 @@
             allTransactions = await getTransactionsForYear(currentYear);
             
             if (allTransactions.length === 0) {
-                await addSampleData();
+                // Importar dados de exemplo do JSON fornecido
+                await importSampleDataFromJSON();
                 allTransactions = await getTransactionsForYear(currentYear);
             }
             
             updateUI();
         }
         
-        async function addSampleData() {
-            // DADOS DE EXEMPLO QUE REFLETEM O PERÍODO CORRETAMENTE
+        async function importSampleDataFromJSON() {
+            // Dados de exemplo baseados no JSON fornecido
             const sampleData = [
-                { 
-                    conta: "ML", 
-                    valor: 60.90, 
-                    parcelaInicial: 8, 
-                    parcelaFinal: 12, 
-                    mesInicial: "fev/26", 
-                    mesFinal: "jun/26", 
-                    status: "Ativa", 
-                    tipo: "cartao_credito", 
-                    mes: 2, // Mês inicial
-                    categoria: "outros", 
-                    ano: currentYear, 
-                    data: `${currentYear}-02-01`,
-                    isRecurring: true, // Indica que é recorrente
-                    periodMonths: [2, 3, 4, 5, 6] // Meses em que ocorre
-                },
-                { 
-                    conta: "GOL", 
-                    valor: 253.41, 
-                    parcelaInicial: 2, 
-                    parcelaFinal: 10, 
-                    mesInicial: "fev/26", 
-                    mesFinal: "out/26", 
-                    status: "Ativa", 
-                    tipo: "cartao_credito", 
-                    mes: 2, 
-                    categoria: "transporte", 
-                    ano: currentYear, 
-                    data: `${currentYear}-02-01`,
-                    isRecurring: true,
-                    periodMonths: [2, 3, 4, 5, 6, 7, 8, 9, 10]
-                },
-                { 
-                    conta: "Supermercado", 
-                    valor: 250.75, 
-                    parcelaInicial: null, 
-                    parcelaFinal: null, 
-                    mesInicial: "fev/26", 
-                    mesFinal: "fev/26", // Único mês
-                    status: "Inativa", 
-                    tipo: "cartao_debito", 
-                    mes: 2, 
-                    categoria: "supermercado", 
-                    ano: currentYear, 
-                    data: `${currentYear}-02-10`,
-                    isRecurring: false // Não é recorrente
-                }
+                // Transações do JSON
+                { conta: "ML", valor: 3.53, parcelaInicial: 7, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "jul/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "ML_3.53_1" },
+                { conta: "ML", valor: 60.9, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "jun/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "ML_60.9_2" },
+                { conta: "FLEX", valor: 79, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "FLEX_79_3" },
+                { conta: "MARCO", valor: 108.85, parcelaInicial: 2, parcelaFinal: 6, mesInicial: "fev/26", mesFinal: "jun/26", tipo: "cartao_credito", categoria: "moradia", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "MARCO_108.85_4" },
+                { conta: "GOL", valor: 253.41, parcelaInicial: 2, parcelaFinal: 10, mesInicial: "fev/26", mesFinal: "out/26", tipo: "cartao_credito", categoria: "transporte", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "GOL_253.41_5" },
+                { conta: "FERNAN", valor: 37.49, parcelaInicial: 3, parcelaFinal: 4, mesInicial: "fev/26", mesFinal: "mar/26", tipo: "cartao_credito", categoria: "vestuario", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "FERNAN_37.49_6" },
+                { conta: "CEA", valor: 60, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "vestuario", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "CEA_60_7" },
+                { conta: "TELE FAR", valor: 155.99, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "saude", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "TELE FAR_155.99_8" },
+                { conta: "HAVAN", valor: 59.99, parcelaInicial: 4, parcelaFinal: 10, mesInicial: "fev/26", mesFinal: "ago/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "HAVAN_59.99_9" },
+                { conta: "FORT", valor: 84.86, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "supermercado", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "FORT_84.86_10" },
+                { conta: "PENSÃO", valor: 640, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "dinheiro", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "PENSÃO_640_11" },
+                { conta: "CASA", valor: 840, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "dinheiro", categoria: "moradia", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "CASA_840_12" },
+                { conta: "TENDA", valor: 200, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "dinheiro", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "TENDA_200_13" },
+                { conta: "DESC SAL", valor: 560, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "dinheiro", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "DESC SAL_560_14" },
+                { conta: "GAS CLIO", valor: 320, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "cartao_credito", categoria: "combustivel", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "GAS CLIO_320_15" },
+                { conta: "CIGARRO", valor: 260, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "cartao_credito", categoria: "lazer", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "CIGARRO_260_16" },
+                { conta: "TENDA II", valor: 30, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "TENDA II_30_17" },
+                { conta: "MANT UNO", valor: 157, parcelaInicial: 1, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "dez/26", tipo: "cartao_credito", categoria: "transporte", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "MANT UNO_157_18" },
+                { conta: "GUINCHO", valor: 64, parcelaInicial: 1, parcelaFinal: 2, mesInicial: "fev/26", mesFinal: "mar/26", tipo: "cartao_credito", categoria: "transporte", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "GUINCHO_64_19" },
+                { conta: "LANCHE NDD", valor: 25, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "LANCHE NDD_25_20" },
+                { conta: "99", valor: 142, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "cartao_credito", categoria: "transporte", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "99_142_21" },
+                { conta: "ML", valor: 25.81, parcelaInicial: 4, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "out/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "ML_25.81_22" },
+                { conta: "ML", valor: 10.06, parcelaInicial: 5, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "set/26", tipo: "cartao_credito", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "ML_10.06_23" },
+                { conta: "GUIA TENDA", valor: 250, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", tipo: "pix", categoria: "outros", mes: 2, ano: 2026, data: "2026-02-01", status: "Ativa", transactionGroup: "GUIA TENDA_250_24" }
             ];
             
+            // Processar cada transação para criar múltiplas entradas quando necessário
             for (const transaction of sampleData) {
-                await addTransaction(transaction);
+                await processTransactionWithPeriod(transaction);
             }
             
-            showNotification('Dados de exemplo adicionados!', 'success');
+            showNotification('Dados de exemplo importados com sucesso!', 'success');
         }
         
         // ==================== FUNÇÕES DO BANCO ====================
@@ -1643,7 +1624,7 @@
                 const store = tx.objectStore(STORE_TRANSACTIONS);
                 
                 if (!transaction.data) {
-                    transaction.data = new Date().toISOString().split('T')[0];
+                    transaction.data = `${transaction.ano}-${String(transaction.mes).padStart(2, '0')}-01`;
                 }
                 
                 if (!transaction.ano) {
@@ -1723,6 +1704,42 @@
                 
                 request.onsuccess = () => {
                     resolve();
+                };
+                
+                request.onerror = (event) => {
+                    reject(event.target.error);
+                };
+            });
+        }
+        
+        function deleteTransactionsByGroup(groupId) {
+            return new Promise((resolve, reject) => {
+                const tx = db.transaction([STORE_TRANSACTIONS], 'readwrite');
+                const store = tx.objectStore(STORE_TRANSACTIONS);
+                const index = store.index('transactionGroup');
+                const request = index.getAll(groupId);
+                
+                request.onsuccess = () => {
+                    const transactions = request.result;
+                    let deletedCount = 0;
+                    
+                    if (transactions.length === 0) {
+                        resolve(0);
+                        return;
+                    }
+                    
+                    transactions.forEach(transaction => {
+                        store.delete(transaction.id);
+                        deletedCount++;
+                    });
+                    
+                    tx.oncomplete = () => {
+                        resolve(deletedCount);
+                    };
+                    
+                    tx.onerror = (event) => {
+                        reject(event.target.error);
+                    };
                 };
                 
                 request.onerror = (event) => {
@@ -1915,15 +1932,17 @@
             const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
-            const currentMonth = currentDate.getMonth(); // 0-11
+            const currentMonth = currentDate.getMonth() + 1; // 1-12
             
             const mesFinalIndex = meses.indexOf(mesFinalStr);
             if (mesFinalIndex === -1) return 'Inativa';
             
+            const mesFinalNum = mesFinalIndex + 1;
+            
             if (anoFinal < currentYear) return 'Inativa';
             if (anoFinal > currentYear) return 'Ativa';
             
-            return mesFinalIndex >= currentMonth ? 'Ativa' : 'Inativa';
+            return mesFinalNum >= currentMonth ? 'Ativa' : 'Inativa';
         }
         
         function formatCurrency(value) {
@@ -1936,6 +1955,7 @@
         function parseBrazilianCurrency(value) {
             if (!value) return 0;
             
+            // Remove pontos de milhar e substitui vírgula decimal por ponto
             const cleaned = String(value)
                 .replace(/\./g, '')
                 .replace(',', '.');
@@ -1996,11 +2016,19 @@
         // Esta é a função principal que processa o período
         async function processTransactionWithPeriod(formData) {
             const conta = formData.conta;
-            const valor = parseBrazilianCurrency(formData.valor);
-            const parcela = formData.parcela;
-            const periodo = formData.periodo.trim();
+            const valor = formData.valor;
+            const parcelaInicial = formData.parcelaInicial || null;
+            const parcelaFinal = formData.parcelaFinal || null;
+            const periodo = formData.mesInicial && formData.mesFinal ? 
+                (formData.mesInicial === formData.mesFinal ? 
+                    formData.mesInicial : 
+                    `${formData.mesInicial} - ${formData.mesFinal}`) : 
+                formData.periodo;
+            
             const tipo = formData.tipo;
             const categoria = formData.categoria;
+            const mes = formData.mes || 1;
+            const ano = formData.ano || currentYear;
             
             // Verificar se é um intervalo (ex: "fev/26 - dez/26")
             const periodoParts = periodo.split(' - ');
@@ -2014,28 +2042,31 @@
             let transacoesCriadas = [];
             let transacoesIds = [];
             
+            // Criar um ID único para este grupo de transações
+            const transactionGroup = `${conta}_${valor}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+            
             // SE FOR UM INTERVALO (mais de um mês)
             if (mesInicial.mes !== mesFinal.mes || mesInicial.ano !== mesFinal.ano) {
                 // Calcular todos os meses no intervalo
                 const mesesNoIntervalo = getMonthsBetween(mesInicial, mesFinal);
                 
                 // Criar uma transação para CADA MÊS
-                for (let mesObj of mesesNoIntervalo) {
+                for (let i = 0; i < mesesNoIntervalo.length; i++) {
+                    const mesObj = mesesNoIntervalo[i];
+                    
                     // Determinar parcela atual se houver parcelamento
                     let parcelaAtual = null;
                     let parcelaTotal = null;
                     
-                    if (parcela && parcela !== '-' && parcela.includes('/')) {
-                        const partesParcela = parcela.split('/');
+                    if (parcelaInicial !== null && parcelaFinal !== null) {
+                        parcelaAtual = parcelaInicial + i;
+                        parcelaTotal = parcelaFinal;
+                    } else if (formData.parcela && formData.parcela !== '-' && formData.parcela.includes('/')) {
+                        const partesParcela = formData.parcela.split('/');
                         const parcelaInicial = parseInt(partesParcela[0]) || 1;
                         const totalParcelas = parseInt(partesParcela[1]) || 1;
                         
-                        // Calcular qual parcela é este mês
-                        const mesesDesdeInicio = mesesNoIntervalo.findIndex(m => 
-                            m.mes === mesObj.mes && m.ano === mesObj.ano
-                        ) + 1;
-                        
-                        parcelaAtual = parcelaInicial + (mesesDesdeInicio - 1);
+                        parcelaAtual = parcelaInicial + i;
                         parcelaTotal = totalParcelas;
                     }
                     
@@ -2051,9 +2082,9 @@
                         mes: mesObj.mes,
                         ano: mesObj.ano,
                         data: `${mesObj.ano}-${String(mesObj.mes).padStart(2, '0')}-01`,
-                        isRecurring: true,
-                        periodMonths: mesesNoIntervalo.map(m => m.mes),
-                        originalPeriod: periodo
+                        status: "Ativa",
+                        transactionGroup: transactionGroup,
+                        isRecurring: true
                     };
                     
                     try {
@@ -2070,19 +2101,12 @@
                     success: true,
                     count: transacoesCriadas.length,
                     message: `${transacoesCriadas.length} transações criadas para o período ${periodo}`,
-                    ids: transacoesIds
+                    ids: transacoesIds,
+                    groupId: transactionGroup
                 };
             } 
             // SE FOR APENAS UM MÊS (ex: "fev/26")
             else {
-                let parcelaInicial = null;
-                let parcelaFinal = null;
-                if (parcela && parcela !== '-' && parcela.includes('/')) {
-                    const partes = parcela.split('/');
-                    parcelaInicial = parseInt(partes[0]) || null;
-                    parcelaFinal = parseInt(partes[1]) || null;
-                }
-                
                 const transaction = {
                     conta: conta,
                     valor: valor,
@@ -2095,8 +2119,9 @@
                     mes: mesInicial.mes,
                     ano: mesInicial.ano,
                     data: `${mesInicial.ano}-${String(mesInicial.mes).padStart(2, '0')}-01`,
-                    isRecurring: false,
-                    originalPeriod: periodo
+                    status: "Ativa",
+                    transactionGroup: null,
+                    isRecurring: false
                 };
                 
                 try {
@@ -2105,7 +2130,8 @@
                         success: true,
                         count: 1,
                         message: 'Transação única criada',
-                        ids: [id]
+                        ids: [id],
+                        groupId: null
                     };
                 } catch (error) {
                     return {
@@ -2118,7 +2144,40 @@
         
         // ==================== MANIPULAÇÃO DE TRANSAÇÕES ====================
         async function addNewTransaction(formData) {
-            const resultado = await processTransactionWithPeriod(formData);
+            const conta = formData.conta;
+            const valorStr = formData.valor;
+            const parcela = formData.parcela;
+            const periodo = formData.periodo;
+            const tipo = formData.tipo;
+            const categoria = formData.categoria;
+            
+            const valorNumerico = parseBrazilianCurrency(valorStr);
+            if (isNaN(valorNumerico) || valorNumerico <= 0) {
+                showNotification('Valor inválido! Use o formato brasileiro (ex: 150,00)', 'error');
+                return false;
+            }
+            
+            // Extrair informações de parcela se houver
+            let parcelaInicial = null;
+            let parcelaFinal = null;
+            if (parcela && parcela !== '-' && parcela.includes('/')) {
+                const partes = parcela.split('/');
+                parcelaInicial = parseInt(partes[0]) || null;
+                parcelaFinal = parseInt(partes[1]) || null;
+            }
+            
+            const transactionData = {
+                conta: conta,
+                valor: valorNumerico,
+                parcelaInicial: parcelaInicial,
+                parcelaFinal: parcelaFinal,
+                parcela: parcela,
+                periodo: periodo,
+                tipo: tipo,
+                categoria: categoria
+            };
+            
+            const resultado = await processTransactionWithPeriod(transactionData);
             
             if (resultado.success) {
                 // Recarregar transações do ano atual
@@ -2189,59 +2248,45 @@
                     return;
                 }
                 
-                // Se for uma transação recorrente, precisamos atualizar todas as transações do mesmo grupo
-                if (transaction.isRecurring && transaction.originalPeriod) {
-                    // Encontrar todas as transações com o mesmo originalPeriod
-                    const transacoesDoGrupo = allTransactions.filter(t => 
-                        t.originalPeriod === transaction.originalPeriod && 
-                        t.conta === transaction.conta &&
-                        t.valor === transaction.valor
-                    );
+                // Extrair informações de parcela
+                let parcelaInicial = null;
+                let parcelaFinal = null;
+                if (parcela && parcela !== '-' && parcela.includes('/')) {
+                    const partes = parcela.split('/');
+                    parcelaInicial = parseInt(partes[0]) || null;
+                    parcelaFinal = parseInt(partes[1]) || null;
+                }
+                
+                const periodoParts = periodo.split(' - ');
+                const mesInicialStr = periodoParts[0].trim();
+                const mesFinalStr = periodoParts[1] ? periodoParts[1].trim() : mesInicialStr;
+                
+                const mesInicial = parseMonthYear(mesInicialStr);
+                
+                // Se for uma transação recorrente (tem transactionGroup)
+                if (transaction.transactionGroup) {
+                    // Excluir todas as transações do grupo
+                    await deleteTransactionsByGroup(transaction.transactionGroup);
                     
-                    // Atualizar cada uma
-                    for (const trans of transacoesDoGrupo) {
-                        const periodoParts = periodo.split(' - ');
-                        const mesInicialStr = periodoParts[0].trim();
-                        const mesFinalStr = periodoParts[1] ? periodoParts[1].trim() : mesInicialStr;
-                        
-                        let parcelaInicial = null;
-                        let parcelaFinal = null;
-                        if (parcela && parcela !== '-' && parcela.includes('/')) {
-                            const partes = parcela.split('/');
-                            parcelaInicial = parseInt(partes[0]) || null;
-                            parcelaFinal = parseInt(partes[1]) || null;
-                        }
-                        
-                        await updateTransaction(trans.id, {
-                            conta: conta,
-                            valor: valorNumerico,
-                            parcelaInicial: parcelaInicial,
-                            parcelaFinal: parcelaFinal,
-                            mesInicial: mesInicialStr,
-                            mesFinal: mesFinalStr,
-                            tipo: tipo,
-                            categoria: categoria,
-                            originalPeriod: periodo
-                        });
+                    // Criar novas transações com os dados atualizados
+                    const transactionData = {
+                        conta: conta,
+                        valor: valorNumerico,
+                        parcelaInicial: parcelaInicial,
+                        parcelaFinal: parcelaFinal,
+                        parcela: parcela,
+                        periodo: periodo,
+                        tipo: tipo,
+                        categoria: categoria
+                    };
+                    
+                    const resultado = await processTransactionWithPeriod(transactionData);
+                    
+                    if (resultado.success) {
+                        showNotification(`${resultado.count} transações atualizadas!`, 'success');
                     }
-                    
-                    showNotification(`${transacoesDoGrupo.length} transações atualizadas!`, 'success');
                 } else {
                     // Transação única
-                    const periodoParts = periodo.split(' - ');
-                    const mesInicialStr = periodoParts[0].trim();
-                    const mesFinalStr = periodoParts[1] ? periodoParts[1].trim() : mesInicialStr;
-                    
-                    const mesInicial = parseMonthYear(mesInicialStr);
-                    
-                    let parcelaInicial = null;
-                    let parcelaFinal = null;
-                    if (parcela && parcela !== '-' && parcela.includes('/')) {
-                        const partes = parcela.split('/');
-                        parcelaInicial = parseInt(partes[0]) || null;
-                        parcelaFinal = parseInt(partes[1]) || null;
-                    }
-                    
                     await updateTransaction(id, {
                         conta: conta,
                         valor: valorNumerico,
@@ -2253,7 +2298,7 @@
                         categoria: categoria,
                         mes: mesInicial.mes,
                         ano: mesInicial.ano,
-                        originalPeriod: periodo
+                        status: calculateStatus(mesFinalStr, mesInicial.ano)
                     });
                     
                     showNotification('Transação atualizada com sucesso!', 'success');
@@ -2288,17 +2333,17 @@
             
             let mensagem = 'Tem certeza que deseja excluir esta transação?';
             let transacoesParaExcluir = [id];
+            let grupoId = null;
             
             // Se for recorrente, perguntar se quer excluir todas
-            if (transaction.isRecurring && transaction.originalPeriod) {
+            if (transaction.transactionGroup) {
                 const transacoesDoGrupo = allTransactions.filter(t => 
-                    t.originalPeriod === transaction.originalPeriod && 
-                    t.conta === transaction.conta
+                    t.transactionGroup === transaction.transactionGroup
                 );
                 
                 if (transacoesDoGrupo.length > 1) {
                     if (confirm(`Esta transação faz parte de um grupo de ${transacoesDoGrupo.length} transações recorrentes. Deseja excluir todas?`)) {
-                        transacoesParaExcluir = transacoesDoGrupo.map(t => t.id);
+                        grupoId = transaction.transactionGroup;
                         mensagem = `Tem certeza que deseja excluir TODAS as ${transacoesDoGrupo.length} transações deste grupo?`;
                     }
                 }
@@ -2306,17 +2351,21 @@
             
             if (confirm(mensagem)) {
                 try {
-                    for (const transId of transacoesParaExcluir) {
-                        await deleteTransaction(transId);
+                    if (grupoId) {
+                        // Excluir por grupo
+                        await deleteTransactionsByGroup(grupoId);
+                        allTransactions = allTransactions.filter(t => t.transactionGroup !== grupoId);
+                        showNotification(`${transacoesDoGrupo.length} transações excluídas com sucesso!`, 'success');
+                    } else {
+                        // Excluir transação única
+                        await deleteTransaction(id);
+                        allTransactions = allTransactions.filter(t => t.id !== id);
+                        showNotification('Transação excluída com sucesso!', 'success');
                     }
-                    
-                    allTransactions = allTransactions.filter(t => !transacoesParaExcluir.includes(t.id));
                     
                     updateDashboard();
                     updateTransactionsTable();
                     updateTransactionCount();
-                    
-                    showNotification(`${transacoesParaExcluir.length} transação(ões) excluída(s) com sucesso!`, 'success');
                 } catch (error) {
                     showNotification('Erro ao excluir transação: ' + error.message, 'error');
                 }
@@ -2508,12 +2557,14 @@
             const currentMonth = new Date().getMonth() + 1;
             const lastMonth = currentMonth === 1 ? 12 : currentMonth - 1;
             
+            // Calcular despesas do mês atual
             const currentMonthExpenses = allTransactions
                 .filter(t => t.mes === currentMonth && t.ano === currentYear)
                 .reduce((sum, t) => sum + t.valor, 0);
                 
+            // Calcular despesas do mês anterior
             const lastMonthExpenses = allTransactions
-                .filter(t => t.mes === lastMonth && t.ano === currentYear)
+                .filter(t => t.mes === lastMonth && t.ano === (currentMonth === 1 ? currentYear - 1 : currentYear))
                 .reduce((sum, t) => sum + t.valor, 0);
             
             const currentMonthIncome = monthlyIncomes[currentMonth] || 0;
@@ -2522,7 +2573,7 @@
             const currentBalance = currentMonthIncome - currentMonthExpenses;
             const lastMonthBalance = lastMonthIncome - lastMonthExpenses;
             
-            const toInvest = currentBalance * 0.6;
+            const toInvest = currentBalance > 0 ? currentBalance * 0.6 : 0;
             
             document.getElementById('totalIncome').textContent = formatCurrency(currentMonthIncome);
             document.getElementById('totalExpenses').textContent = formatCurrency(currentMonthExpenses);
@@ -2532,7 +2583,7 @@
             updateTrend('incomeTrend', currentMonthIncome, lastMonthIncome);
             updateTrend('expensesTrend', currentMonthExpenses, lastMonthExpenses);
             updateTrend('balanceTrend', currentBalance, lastMonthBalance);
-            updateTrend('investTrend', toInvest, lastMonthBalance * 0.6);
+            updateTrend('investTrend', toInvest, lastMonthBalance > 0 ? lastMonthBalance * 0.6 : 0);
             
             updateDoughnutChart();
             updateBarChart();
@@ -2575,10 +2626,12 @@
             tableBody.innerHTML = '';
             
             const sortedTransactions = [...allTransactions].sort((a, b) => {
-                return new Date(b.data) - new Date(a.data);
+                if (a.ano !== b.ano) return b.ano - a.ano;
+                if (a.mes !== b.mes) return b.mes - a.mes;
+                return b.id - a.id;
             });
             
-            sortedTransactions.slice(0, 10).forEach(transaction => {
+            sortedTransactions.slice(0, 25).forEach(transaction => {
                 const row = document.createElement('tr');
                 const statusClass = transaction.status === 'Ativa' ? 'status-active' : 'status-inactive';
                 const parcelaText = transaction.parcelaInicial ? 
@@ -2591,14 +2644,19 @@
                 const typeName = type ? type.name : transaction.tipo;
                 
                 // Indicador de transação recorrente
-                const recurringIndicator = transaction.isRecurring ? 
+                const recurringIndicator = transaction.isRecurring || transaction.transactionGroup ? 
                     ' <span style="color: var(--success); font-size: 10px;"><i class="fas fa-sync-alt"></i></span>' : '';
+                
+                // Formatar período
+                const periodoFormatado = transaction.mesInicial === transaction.mesFinal ? 
+                    transaction.mesInicial : 
+                    `${transaction.mesInicial} - ${transaction.mesFinal}`;
                 
                 row.innerHTML = `
                     <td><strong>${transaction.conta}</strong>${recurringIndicator}</td>
                     <td>${formatCurrency(transaction.valor)}</td>
                     <td>${parcelaText}</td>
-                    <td>${transaction.mesInicial} ${transaction.mesFinal && transaction.mesFinal !== transaction.mesInicial ? '- ' + transaction.mesFinal : ''}</td>
+                    <td>${periodoFormatado}</td>
                     <td><span class="status-badge ${statusClass}">${transaction.status}</span></td>
                     <td>${typeName}</td>
                     <td>${categoryName}</td>
@@ -2942,8 +3000,7 @@
             });
         }
         
-        // ==================== RESTANTE DAS FUNÇÕES (CATEGORIAS, TIPOS, RECEITAS, ANOS) ====================
-        // [Estas funções permanecem iguais ao código original]
+        // ==================== FUNÇÕES DE CONFIGURAÇÃO ====================
         async function addNewCategory() {
             const nameInput = document.getElementById('newCategoryName');
             const name = nameInput.value.trim();
@@ -3133,8 +3190,8 @@
                 
                 if (Object.keys(monthlyIncomes).length === 0) {
                     const defaultIncomes = {
-                        1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
-                        7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
+                        1: 4300, 2: 4300, 3: 4300, 4: 4300, 5: 4300, 6: 4300,
+                        7: 4300, 8: 4300, 9: 4300, 10: 4300, 11: 4300, 12: 4300
                     };
                     
                     for (const [month, income] of Object.entries(defaultIncomes)) {
@@ -3236,15 +3293,27 @@
                                 continue;
                             }
                             
-                            // Usar a nova função para processar o período
-                            const resultado = await processTransactionWithPeriod({
+                            // Extrair informações de parcela
+                            let parcelaInicial = null;
+                            let parcelaFinal = null;
+                            if (parcela && parcela !== '-' && parcela.includes('/')) {
+                                const partes = parcela.split('/');
+                                parcelaInicial = parseInt(partes[0]) || null;
+                                parcelaFinal = parseInt(partes[1]) || null;
+                            }
+                            
+                            const transactionData = {
                                 conta: conta,
-                                valor: valorStr,
+                                valor: valor,
+                                parcelaInicial: parcelaInicial,
+                                parcelaFinal: parcelaFinal,
                                 parcela: parcela,
                                 periodo: periodo,
                                 tipo: tipo.id,
                                 categoria: categoria.id
-                            });
+                            };
+                            
+                            const resultado = await processTransactionWithPeriod(transactionData);
                             
                             if (resultado.success) {
                                 importedCount += resultado.count;
@@ -3285,7 +3354,7 @@
         async function exportData() {
             try {
                 const allData = {
-                    version: '5.0',
+                    version: '6.0',
                     exportDate: new Date().toISOString(),
                     settings: {
                         currentYear: currentYear,
@@ -3454,12 +3523,6 @@
                 
                 if (!conta || !valor || !periodo || !tipo || !categoria) {
                     showNotification('Preencha todos os campos obrigatórios!', 'error');
-                    return;
-                }
-                
-                const valorNumerico = parseBrazilianCurrency(valor);
-                if (isNaN(valorNumerico) || valorNumerico <= 0) {
-                    showNotification('Valor inválido! Use o formato brasileiro (ex: 150,00)', 'error');
                     return;
                 }
                 
