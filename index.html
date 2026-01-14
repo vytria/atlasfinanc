@@ -1954,91 +1954,94 @@
             document.head.appendChild(style);
         }
         
-        // ==================== FUNÇÕES DE IMPORTAR EXCEL ====================
         function processExcelData(data) {
-            const transactions = [];
-            
-            data.forEach((row, index) => {
-                // Verificar se tem as colunas mínimas necessárias
-                if (row.length >= 6) {
-                    const conta = row[0] || '';
-                    const valorStr = row[1] || '0';
+    const transactions = [];
+    
+    data.forEach((row, index) => {
+        // Verificar se tem as colunas mínimas necessárias
+        if (row.length >= 6) {
+            const conta = row[0] || '';
+            const valorStr = row[1] || '0';
+            const parcela = row[2] || '';
+            const periodo = row[3] || '';
+            const tipo = row[4] || '';
+            const categoria = row[5] || '';
 
-                    // Função que converte formato BR certo
-                    function parseValorBR(valor) {
-                        let str = valor.toString().trim();
-    
-                        // Remove R$
-                        str = str.replace(/R\$/gi, '');
-    
-                        // Se não tem vírgula, converte direto
-                        if (!str.includes(',')) {
-                            return parseFloat(str) || 0;
-                        }
-    
-                        // Se tem vírgula E ponto (ex: 1.500,00)
-                        if (str.includes('.') && str.includes(',')) {
-                            // Remove pontos (milhar) e troca vírgula por ponto (decimal)
-                            str = str.replace(/\./g, '').replace(',', '.');
-                        } 
-                        // Se só tem vírgula (ex: 3,53)
-                        else if (str.includes(',') && !str.includes('.')) {
-                            str = str.replace(',', '.');
-                        }
-    
-                        return parseFloat(str) || 0;
-                    }
+            // Função que converte formato BR certo
+            function parseValorBR(valor) {
+                let str = valor.toString().trim();
 
-                    const valor = parseValorBR(valorStr);
-                    
-                    if (conta && valor > 0) {
-                        // Processar período
-                        const periodoParts = periodo.split('-').map(p => p.trim());
-                        const mesInicial = periodoParts[0] || '';
-                        const mesFinal = periodoParts[1] || mesInicial;
-                        
-                        // Processar parcela
-                        let parcelaInicial = null;
-                        let parcelaFinal = null;
-                        if (parcela && parcela.includes('/')) {
-                            const partes = parcela.split('/');
-                            parcelaInicial = parseInt(partes[0]) || null;
-                            parcelaFinal = parseInt(partes[1]) || null;
-                        }
-                        
-                        // Determinar mês a partir do período
-                        const mesMatch = mesInicial.match(/^([a-z]{3})/i);
-                        const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-                        const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
-                        
-                        // Encontrar IDs correspondentes
-                        const tipoObj = customTypes.find(t => 
-                            t.name.toLowerCase() === tipo.toLowerCase() || t.id === tipo.toLowerCase()
-                        );
-                        
-                        const categoriaObj = customCategories.find(c => 
-                            c.name.toLowerCase() === categoria.toLowerCase() || c.id === categoria.toLowerCase()
-                        );
-                        
-                        transactions.push({
-                            conta: conta,
-                            valor: valor,
-                            parcelaInicial: parcelaInicial,
-                            parcelaFinal: parcelaFinal,
-                            mesInicial: mesInicial,
-                            mesFinal: mesFinal,
-                            tipo: tipoObj ? tipoObj.id : tipo || 'outros',
-                            categoria: categoriaObj ? categoriaObj.id : categoria || 'outros',
-                            mes: mes,
-                            ano: currentYear,
-                            data: new Date().toISOString().split('T')[0]
-                        });
-                    }
+                // Remove R$
+                str = str.replace(/R\$/gi, '');
+
+                // Se não tem vírgula, converte direto
+                if (!str.includes(',')) {
+                    return parseFloat(str) || 0;
                 }
-            });
+
+                // Se tem vírgula E ponto (ex: 1.500,00)
+                if (str.includes('.') && str.includes(',')) {
+                    // Remove pontos (milhar) e troca vírgula por ponto (decimal)
+                    str = str.replace(/\./g, '').replace(',', '.');
+                } 
+                // Se só tem vírgula (ex: 3,53)
+                else if (str.includes(',') && !str.includes('.')) {
+                    str = str.replace(',', '.');
+                }
+
+                return parseFloat(str) || 0;
+            }
+
+            const valor = parseValorBR(valorStr);
             
-            return transactions;
+            if (conta && valor > 0) {
+                // Processar período
+                const periodoParts = periodo.split('-').map(p => p.trim());
+                const mesInicial = periodoParts[0] || '';
+                const mesFinal = periodoParts[1] || mesInicial;
+                
+                // Processar parcela
+                let parcelaInicial = null;
+                let parcelaFinal = null;
+                if (parcela && parcela.includes('/')) {
+                    const partes = parcela.split('/');
+                    parcelaInicial = parseInt(partes[0]) || null;
+                    parcelaFinal = parseInt(partes[1]) || null;
+                }
+                
+                // Determinar mês a partir do período
+                const mesMatch = mesInicial.match(/^([a-z]{3})/i);
+                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+                
+                // Encontrar IDs correspondentes
+                const tipoObj = customTypes.find(t => 
+                    t.name.toLowerCase() === tipo.toLowerCase() || t.id === tipo.toLowerCase()
+                );
+                
+                const categoriaObj = customCategories.find(c => 
+                    c.name.toLowerCase() === categoria.toLowerCase() || c.id === categoria.toLowerCase()
+                );
+                
+                transactions.push({
+                    conta: conta,
+                    valor: valor,
+                    parcelaInicial: parcelaInicial,
+                    parcelaFinal: parcelaFinal,
+                    mesInicial: mesInicial,
+                    mesFinal: mesFinal,
+                    tipo: tipoObj ? tipoObj.id : tipo || 'outros',
+                    categoria: categoriaObj ? categoriaObj.id : categoria || 'outros',
+                    mes: mes,
+                    ano: currentYear,
+                    data: new Date().toISOString().split('T')[0]
+                });
+            }
         }
+    });
+    
+    return transactions;
+}
         
         function showExcelPreview(data) {
             const previewDiv = document.getElementById('excelPreview');
