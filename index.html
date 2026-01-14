@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlas - Controle Financeiro 4.0</title>
+    <title>Atlas - Controle Financeiro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         /* MANTENDO TODOS OS ESTILOS ORIGINAIS */
         :root {
@@ -740,6 +741,68 @@
             cursor: pointer;
         }
 
+        /* Modal de Importação Excel */
+        .excel-info-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .excel-info-modal.active {
+            display: flex;
+        }
+
+        .excel-info-container {
+            width: 600px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .excel-info-content {
+            padding: 25px;
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .excel-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        .excel-table th, .excel-table td {
+            border: 1px solid var(--gray-light);
+            padding: 8px;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        .excel-table th {
+            background-color: var(--gray-light);
+            font-weight: 600;
+        }
+
+        .excel-table td {
+            background-color: white;
+        }
+
+        .excel-table tr:nth-child(even) td {
+            background-color: #f8f9fa;
+        }
+
         @media (max-width: 992px) {
             .sidebar {
                 transform: translateX(-100%);
@@ -877,17 +940,17 @@
                 
                 <div class="form-group">
                     <label for="transValor"><i class="fas fa-money-bill-wave"></i> Valor (R$) *</label>
-                    <input type="number" step="0.01" id="transValor" placeholder="Ex: 150.99" class="form-control" required>
+                    <input type="text" id="transValor" placeholder="Ex: 150,00 ou 1.210,68" class="form-control" required>
                 </div>
                 
                 <div class="form-group">
                     <label for="transParcela"><i class="fas fa-calendar-alt"></i> Parcela (opcional)</label>
-                    <input type="text" id="transParcela" placeholder="Ex: 7/12 ou deixe em branco" class="form-control">
+                    <input type="text" id="transParcela" placeholder="Ex: 7/12 ou -" class="form-control">
                 </div>
                 
                 <div class="form-group">
                     <label for="transPeriodo"><i class="fas fa-calendar"></i> Período *</label>
-                    <input type="text" id="transPeriodo" placeholder="Ex: fev/26 - nov/26" class="form-control" required>
+                    <input type="text" id="transPeriodo" placeholder="Ex: fev/26 - dez/26" class="form-control" required>
                 </div>
                 
                 <div class="form-group">
@@ -1016,6 +1079,68 @@
                             <i class="fas fa-save"></i> Alterar Ano
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Informações do Excel -->
+    <div class="excel-info-modal" id="excelInfoModal">
+        <div class="excel-info-container">
+            <div class="chat-header">
+                <h3><i class="fas fa-file-excel"></i> Formato do Excel</h3>
+                <button class="close-btn" id="closeExcelInfo">&times;</button>
+            </div>
+            <div class="excel-info-content">
+                <p><strong>O arquivo Excel deve ter exatamente esta ordem de colunas:</strong></p>
+                <table class="excel-table">
+                    <thead>
+                        <tr>
+                            <th>Coluna</th>
+                            <th>Descrição</th>
+                            <th>Exemplo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>Conta/Nome</td>
+                            <td>Shopping, Mercado, Energia</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>Valor</td>
+                            <td>150,00 ou 1.210,68</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>Parcela</td>
+                            <td>7/12 ou -</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>Período</td>
+                            <td>fev/26 - dez/26 ou fev/26</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>Tipo</td>
+                            <td>Cartão de Crédito, Pix, etc.</td>
+                        </tr>
+                        <tr>
+                            <td>6</td>
+                            <td>Categoria</td>
+                            <td>Lazer, Alimentação, etc.</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <p style="margin-top: 15px; color: var(--danger); font-weight: 600;">
+                    <i class="fas fa-exclamation-triangle"></i> IMPORTANTE: As colunas devem estar exatamente nesta ordem!
+                </p>
+                <div style="margin-top: 20px; display: flex; justify-content: center;">
+                    <button class="btn btn-primary" id="proceedExcelImport">
+                        <i class="fas fa-check"></i> Entendi, Prosseguir
+                    </button>
                 </div>
             </div>
         </div>
@@ -1239,7 +1364,7 @@
     <script>
         // ==================== BANCO DE DADOS LOCAL ====================
         const DB_NAME = 'AtlasFinanceDB';
-        const DB_VERSION = 3; // Versão atualizada
+        const DB_VERSION = 4; // Versão atualizada para categorias e tipos
         const STORE_TRANSACTIONS = 'transactions';
         const STORE_SETTINGS = 'settings';
         const STORE_CATEGORIES = 'categories';
@@ -1267,40 +1392,33 @@
             7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
         };
         
-        // Categorias padrão
+        // CATEGORIAS INICIAIS CONFORME SOLICITADO
         const defaultCategories = [
-            { id: 'ml', name: 'Mercado Livre (ML)', custom: false },
-            { id: 'mercado', name: 'Supermercado', custom: false },
-            { id: 'energia', name: 'Energia Elétrica', custom: false },
             { id: 'agua', name: 'Água', custom: false },
-            { id: 'internet', name: 'Internet', custom: false },
-            { id: 'celular', name: 'Celular', custom: false },
             { id: 'aluguel', name: 'Aluguel', custom: false },
-            { id: 'transporte', name: 'Transporte', custom: false },
+            { id: 'celular', name: 'Celular', custom: false },
             { id: 'combustivel', name: 'Combustível', custom: false },
-            { id: 'restaurante', name: 'Restaurante', custom: false },
-            { id: 'lazer', name: 'Lazer', custom: false },
-            { id: 'saude', name: 'Saúde', custom: false },
             { id: 'educacao', name: 'Educação', custom: false },
+            { id: 'energia_eletrica', name: 'Energia Elétrica', custom: false },
+            { id: 'internet', name: 'Internet', custom: false },
+            { id: 'lazer', name: 'Lazer', custom: false },
+            { id: 'moradia', name: 'Moradia', custom: false },
+            { id: 'supermercado', name: 'Supermercado', custom: false },
+            { id: 'saude', name: 'Saúde', custom: false },
+            { id: 'transporte', name: 'Transporte', custom: false },
             { id: 'vestuario', name: 'Vestuário', custom: false },
             { id: 'outros', name: 'Outros', custom: false }
         ];
         
-        // Tipos padrão
+        // TIPOS INICIAIS CONFORME SOLICITADO
         const defaultTypes = [
+            { id: 'alimentacao', name: 'Alimentação', custom: false },
+            { id: 'boleto', name: 'Boleto', custom: false },
             { id: 'cartao_credito', name: 'Cartão de Crédito', custom: false },
             { id: 'cartao_debito', name: 'Cartão de Débito', custom: false },
-            { id: 'pix', name: 'PIX', custom: false },
-            { id: 'dinheiro', name: 'Dinheiro', custom: false },
-            { id: 'boleto', name: 'Boleto', custom: false },
             { id: 'debito_conta', name: 'Débito em Conta', custom: false },
-            { id: 'alimentacao', name: 'Alimentação', custom: false },
-            { id: 'transporte', name: 'Transporte', custom: false },
-            { id: 'moradia', name: 'Moradia', custom: false },
-            { id: 'lazer', name: 'Lazer', custom: false },
-            { id: 'saude', name: 'Saúde', custom: false },
-            { id: 'educacao', name: 'Educação', custom: false },
-            { id: 'investimento', name: 'Investimento', custom: false }
+            { id: 'dinheiro', name: 'Dinheiro', custom: false },
+            { id: 'pix', name: 'Pix', custom: false }
         ];
         
         // ==================== INICIALIZAÇÃO DO BANCO ====================
@@ -1432,10 +1550,10 @@
         // Adicionar dados de exemplo
         async function addSampleData() {
             const sampleData = [
-                { conta: "ML", valor: 3.53, parcelaInicial: 7, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jul", status: "Ativa", tipo: "cartao_credito", mes: 2, categoria: "ml", ano: currentYear, data: `${currentYear}-02-01` },
-                { conta: "ML", valor: 6.04, parcelaInicial: 8, parcelaFinal: 12, mesInicial: "fev", mesFinal: "jun", status: "Ativa", tipo: "cartao_credito", mes: 2, categoria: "ml", ano: currentYear, data: `${currentYear}-02-01` },
-                { conta: "Energia", valor: 155.99, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "fev", status: "Inativa", tipo: "boleto", mes: 2, categoria: "energia", ano: currentYear, data: `${currentYear}-02-05` },
-                { conta: "Supermercado", valor: 250.75, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev", mesFinal: "fev", status: "Inativa", tipo: "cartao_debito", mes: 2, categoria: "mercado", ano: currentYear, data: `${currentYear}-02-10` }
+                { conta: "Shopping", valor: 150.00, parcelaInicial: 7, parcelaFinal: 12, mesInicial: "fev/26", mesFinal: "dez/26", status: "Ativa", tipo: "cartao_credito", mes: 2, categoria: "lazer", ano: currentYear, data: `${currentYear}-02-01` },
+                { conta: "Supermercado", valor: 250.75, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", status: "Inativa", tipo: "cartao_debito", mes: 2, categoria: "supermercado", ano: currentYear, data: `${currentYear}-02-10` },
+                { conta: "Energia", valor: 155.99, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", status: "Inativa", tipo: "boleto", mes: 2, categoria: "energia_eletrica", ano: currentYear, data: `${currentYear}-02-05` },
+                { conta: "Internet", valor: 89.90, parcelaInicial: null, parcelaFinal: null, mesInicial: "fev/26", mesFinal: "fev/26", status: "Inativa", tipo: "debito_conta", mes: 2, categoria: "internet", ano: currentYear, data: `${currentYear}-02-15` }
             ];
             
             for (const transaction of sampleData) {
@@ -1720,23 +1838,30 @@
         
         // ==================== FUNÇÕES UTILITÁRIAS ====================
         function calculateStatus(mesFinal, year) {
-            if (mesFinal === 'Morreu') return 'Inativa';
+            if (!mesFinal) return 'Inativa';
+            
+            // Extrair mês e ano do formato "fev/26"
+            const partes = mesFinal.split('/');
+            if (partes.length !== 2) return 'Inativa';
+            
+            const mesFinalStr = partes[0];
+            const anoFinal = parseInt('20' + partes[1]);
             
             const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
             const currentDate = new Date();
             const currentYear = currentDate.getFullYear();
             const currentMonth = currentDate.getMonth(); // 0-11
             
-            // Se o ano da transação for menor que o atual, é inativa
-            if (year < currentYear) return 'Inativa';
-            
-            // Se for um ano futuro, está ativa
-            if (year > currentYear) return 'Ativa';
-            
-            // Mesmo ano, verificar mês
-            const mesFinalIndex = meses.indexOf(mesFinal);
+            const mesFinalIndex = meses.indexOf(mesFinalStr);
             if (mesFinalIndex === -1) return 'Inativa';
             
+            // Se o ano final for menor que o atual, é inativa
+            if (anoFinal < currentYear) return 'Inativa';
+            
+            // Se for um ano futuro, está ativa
+            if (anoFinal > currentYear) return 'Ativa';
+            
+            // Mesmo ano, verificar mês
             return mesFinalIndex >= currentMonth ? 'Ativa' : 'Inativa';
         }
         
@@ -1745,6 +1870,18 @@
                 style: 'currency',
                 currency: 'BRL'
             }).format(value || 0);
+        }
+        
+        // Converter valor brasileiro para número
+        function parseBrazilianCurrency(value) {
+            if (!value) return 0;
+            
+            // Remover pontos de milhar e substituir vírgula decimal por ponto
+            const cleaned = String(value)
+                .replace(/\./g, '')  // Remove pontos de milhar
+                .replace(',', '.');  // Substitui vírgula decimal por ponto
+            
+            return parseFloat(cleaned) || 0;
         }
         
         function showNotification(message, type = 'info') {
@@ -1779,18 +1916,39 @@
                 }, 300);
             }, 3000);
             
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-                @keyframes slideOut {
-                    from { transform: translateX(0); opacity: 1; }
-                    to { transform: translateX(100%); opacity: 0; }
-                }
-            `;
-            document.head.appendChild(style);
+            // Adicionar estilos de animação se não existirem
+            if (!document.getElementById('notification-styles')) {
+                const style = document.createElement('style');
+                style.id = 'notification-styles';
+                style.textContent = `
+                    @keyframes slideIn {
+                        from { transform: translateX(100%); opacity: 0; }
+                        to { transform: translateX(0); opacity: 1; }
+                    }
+                    @keyframes slideOut {
+                        from { transform: translateX(0); opacity: 1; }
+                        to { transform: translateX(100%); opacity: 0; }
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+        
+        // Extrair mês do período (ex: "fev/26" retorna 2)
+        function extractMonthFromPeriodo(periodo) {
+            if (!periodo) return new Date().getMonth() + 1;
+            
+            const partes = periodo.split(' - ');
+            const mesInicial = partes[0];
+            
+            // Extrair mês da string (ex: "fev/26")
+            const mesMatch = mesInicial.match(/^([a-z]{3})/i);
+            if (!mesMatch) return new Date().getMonth() + 1;
+            
+            const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+            const mesIndex = meses.indexOf(mesMatch[1].toLowerCase());
+            
+            return mesIndex !== -1 ? mesIndex + 1 : new Date().getMonth() + 1;
         }
         
         // ==================== ATUALIZAÇÃO DA INTERFACE ====================
@@ -2095,7 +2253,7 @@
                     <td><strong>${transaction.conta}</strong></td>
                     <td>${formatCurrency(transaction.valor)}</td>
                     <td>${parcelaText}</td>
-                    <td>${transaction.mesInicial} - ${transaction.mesFinal}</td>
+                    <td>${transaction.mesInicial} ${transaction.mesFinal && transaction.mesFinal !== transaction.mesInicial ? '- ' + transaction.mesFinal : ''}</td>
                     <td><span class="status-badge ${statusClass}">${transaction.status}</span></td>
                     <td>${typeName}</td>
                     <td>${categoryName}</td>
@@ -2442,13 +2600,11 @@
         
         // ==================== MANIPULAÇÃO DE TRANSAÇÕES ====================
         async function addNewTransaction(formData) {
-            const mesMatch = formData.periodo.match(/^([a-z]{3})/i);
-            const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-            const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+            const mes = extractMonthFromPeriodo(formData.periodo);
             
             let parcelaInicial = null;
             let parcelaFinal = null;
-            if (formData.parcela && formData.parcela.includes('/')) {
+            if (formData.parcela && formData.parcela !== '-' && formData.parcela.includes('/')) {
                 const partes = formData.parcela.split('/');
                 parcelaInicial = parseInt(partes[0]) || null;
                 parcelaFinal = parseInt(partes[1]) || null;
@@ -2456,11 +2612,11 @@
             
             const periodoParts = formData.periodo.split(' - ');
             const mesInicial = periodoParts[0] || '';
-            const mesFinal = periodoParts[1] || '';
+            const mesFinal = periodoParts[1] || mesInicial;
             
             const transaction = {
                 conta: formData.conta,
-                valor: parseFloat(formData.valor),
+                valor: parseBrazilianCurrency(formData.valor),
                 parcelaInicial: parcelaInicial,
                 parcelaFinal: parcelaFinal,
                 mesInicial: mesInicial,
@@ -2497,16 +2653,19 @@
             
             // Preencher o formulário de chat com os dados da transação
             document.getElementById('transConta').value = transaction.conta;
-            document.getElementById('transValor').value = transaction.valor;
+            document.getElementById('transValor').value = transaction.valor.toFixed(2).replace('.', ',');
             document.getElementById('transParcela').value = transaction.parcelaInicial ? 
                 `${transaction.parcelaInicial}/${transaction.parcelaFinal}` : '';
-            document.getElementById('transPeriodo').value = `${transaction.mesInicial} - ${transaction.mesFinal}`;
+            document.getElementById('transPeriodo').value = transaction.mesFinal && transaction.mesFinal !== transaction.mesInicial ?
+                `${transaction.mesInicial} - ${transaction.mesFinal}` : transaction.mesInicial;
             document.getElementById('transTipo').value = transaction.tipo;
             document.getElementById('transCategoria').value = transaction.categoria;
             
             // Alterar o botão para "Salvar Edição"
             const addButton = document.getElementById('addViaChat');
             const originalText = addButton.innerHTML;
+            const originalHandler = addButton.onclick;
+            
             addButton.innerHTML = '<i class="fas fa-save"></i> Salvar Edição';
             addButton.onclick = async () => {
                 const conta = document.getElementById('transConta').value.trim();
@@ -2521,18 +2680,17 @@
                     return;
                 }
                 
-                if (isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
-                    showNotification('Valor inválido!', 'error');
+                const valorNumerico = parseBrazilianCurrency(valor);
+                if (isNaN(valorNumerico) || valorNumerico <= 0) {
+                    showNotification('Valor inválido! Use o formato brasileiro (ex: 150,00)', 'error');
                     return;
                 }
                 
-                const mesMatch = periodo.match(/^([a-z]{3})/i);
-                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-                const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+                const mes = extractMonthFromPeriodo(periodo);
                 
                 let parcelaInicial = null;
                 let parcelaFinal = null;
-                if (parcela && parcela.includes('/')) {
+                if (parcela && parcela !== '-' && parcela.includes('/')) {
                     const partes = parcela.split('/');
                     parcelaInicial = parseInt(partes[0]) || null;
                     parcelaFinal = parseInt(partes[1]) || null;
@@ -2540,12 +2698,12 @@
                 
                 const periodoParts = periodo.split(' - ');
                 const mesInicial = periodoParts[0] || '';
-                const mesFinal = periodoParts[1] || '';
+                const mesFinal = periodoParts[1] || mesInicial;
                 
                 try {
                     await updateTransaction(id, {
                         conta: conta,
-                        valor: parseFloat(valor),
+                        valor: valorNumerico,
                         parcelaInicial: parcelaInicial,
                         parcelaFinal: parcelaFinal,
                         mesInicial: mesInicial,
@@ -2565,7 +2723,7 @@
                     
                     // Restaurar botão original
                     addButton.innerHTML = originalText;
-                    addButton.onclick = originalAddHandler;
+                    addButton.onclick = originalHandler;
                     
                     // Limpar formulário e fechar modal
                     document.getElementById('transConta').value = '';
@@ -2580,9 +2738,6 @@
                     showNotification('Erro ao atualizar transação: ' + error.message, 'error');
                 }
             };
-            
-            // Salvar o handler original
-            const originalAddHandler = addButton.onclick;
             
             // Abrir o modal
             document.getElementById('chatModal').classList.add('active');
@@ -2612,6 +2767,12 @@
             
             if (!name) {
                 showNotification('Digite o nome da categoria!', 'error');
+                return;
+            }
+            
+            // Verificar se já existe
+            if (customCategories.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+                showNotification('Esta categoria já existe!', 'error');
                 return;
             }
             
@@ -2689,6 +2850,12 @@
             
             if (!name) {
                 showNotification('Digite o nome do tipo!', 'error');
+                return;
+            }
+            
+            // Verificar se já existe
+            if (customTypes.some(t => t.name.toLowerCase() === name.toLowerCase())) {
+                showNotification('Este tipo já existe!', 'error');
                 return;
             }
             
@@ -2838,12 +3005,146 @@
             }
         }
         
+        // ==================== IMPORTAR EXCEL ====================
+        async function importExcel(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async (event) => {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        
+                        // Verificar se o arquivo tem pelo menos 1 linha de dados
+                        if (jsonData.length <= 1) {
+                            showNotification('O arquivo Excel está vazio ou não contém dados!', 'error');
+                            reject(new Error('Arquivo vazio'));
+                            return;
+                        }
+                        
+                        // Processar os dados do Excel
+                        let importedCount = 0;
+                        let skippedCount = 0;
+                        
+                        // Começar da linha 1 (ignorar cabeçalho se existir)
+                        const startRow = jsonData[0].length === 6 ? 1 : 0;
+                        
+                        for (let i = startRow; i < jsonData.length; i++) {
+                            const row = jsonData[i];
+                            
+                            // Verificar se a linha tem dados suficientes
+                            if (!row || row.length < 6) {
+                                skippedCount++;
+                                continue;
+                            }
+                            
+                            const conta = String(row[0] || '').trim();
+                            const valorStr = String(row[1] || '').trim();
+                            const parcela = String(row[2] || '').trim();
+                            const periodo = String(row[3] || '').trim();
+                            const tipoNome = String(row[4] || '').trim();
+                            const categoriaNome = String(row[5] || '').trim();
+                            
+                            // Validar dados obrigatórios
+                            if (!conta || !valorStr || !periodo || !tipoNome || !categoriaNome) {
+                                skippedCount++;
+                                continue;
+                            }
+                            
+                            // Encontrar tipo pelo nome
+                            const tipo = customTypes.find(t => 
+                                t.name.toLowerCase() === tipoNome.toLowerCase());
+                            
+                            // Encontrar categoria pelo nome
+                            const categoria = customCategories.find(c => 
+                                c.name.toLowerCase() === categoriaNome.toLowerCase());
+                            
+                            if (!tipo || !categoria) {
+                                skippedCount++;
+                                continue;
+                            }
+                            
+                            const valor = parseBrazilianCurrency(valorStr);
+                            if (isNaN(valor) || valor <= 0) {
+                                skippedCount++;
+                                continue;
+                            }
+                            
+                            const mes = extractMonthFromPeriodo(periodo);
+                            
+                            let parcelaInicial = null;
+                            let parcelaFinal = null;
+                            if (parcela && parcela !== '-' && parcela.includes('/')) {
+                                const partes = parcela.split('/');
+                                parcelaInicial = parseInt(partes[0]) || null;
+                                parcelaFinal = parseInt(partes[1]) || null;
+                            }
+                            
+                            const periodoParts = periodo.split(' - ');
+                            const mesInicial = periodoParts[0] || '';
+                            const mesFinal = periodoParts[1] || mesInicial;
+                            
+                            const transaction = {
+                                conta: conta,
+                                valor: valor,
+                                parcelaInicial: parcelaInicial,
+                                parcelaFinal: parcelaFinal,
+                                mesInicial: mesInicial,
+                                mesFinal: mesFinal,
+                                tipo: tipo.id,
+                                categoria: categoria.id,
+                                mes: mes,
+                                ano: currentYear,
+                                data: new Date().toISOString().split('T')[0]
+                            };
+                            
+                            try {
+                                await addTransaction(transaction);
+                                importedCount++;
+                            } catch (error) {
+                                console.error('Erro ao importar transação:', error);
+                                skippedCount++;
+                            }
+                        }
+                        
+                        if (importedCount > 0) {
+                            // Recarregar transações
+                            allTransactions = await getTransactionsForYear(currentYear);
+                            
+                            updateDashboard();
+                            updateTransactionsTable();
+                            updateTransactionCount();
+                            
+                            showNotification(`${importedCount} transações importadas do Excel! ${skippedCount > 0 ? `(${skippedCount} ignoradas)` : ''}`, 'success');
+                        } else {
+                            showNotification('Nenhuma transação válida encontrada no arquivo Excel', 'warning');
+                        }
+                        
+                        resolve();
+                    } catch (error) {
+                        console.error('Erro ao processar Excel:', error);
+                        showNotification('Erro ao importar Excel: Formato inválido ou arquivo corrompido', 'error');
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => {
+                    showNotification('Erro ao ler arquivo Excel', 'error');
+                    reject(new Error('Erro ao ler arquivo'));
+                };
+                
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
         // ==================== EXPORTAÇÃO/IMPORTAÇÃO ====================
         async function exportData() {
             try {
                 // Coletar todos os dados
                 const allData = {
-                    version: '3.0',
+                    version: '4.0',
                     exportDate: new Date().toISOString(),
                     settings: {
                         currentYear: currentYear,
@@ -2968,67 +3269,7 @@
             });
         }
         
-        // ==================== IMPORTAR EXCEL ====================
-        async function importExcel(file) {
-            return new Promise((resolve, reject) => {
-                // Simulação de importação de Excel
-                // Em produção, você precisaria usar uma biblioteca como SheetJS
-                showNotification('Importação de Excel não implementada neste exemplo. Use o formato JSON para importar.', 'warning');
-                resolve();
-                
-                /*
-                // Código real para importar Excel (requer biblioteca SheetJS)
-                const reader = new FileReader();
-                
-                reader.onload = async (event) => {
-                    try {
-                        const data = new Uint8Array(event.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
-                        
-                        // Processar os dados do Excel
-                        let importedCount = 0;
-                        for (const row of jsonData) {
-                            // Converter dados do Excel para formato do sistema
-                            const transaction = {
-                                conta: row.Conta || row.conta || '',
-                                valor: parseFloat(row.Valor || row.valor || 0),
-                                // ... outros campos
-                            };
-                            
-                            if (transaction.conta && transaction.valor > 0) {
-                                await addTransaction(transaction);
-                                importedCount++;
-                            }
-                        }
-                        
-                        if (importedCount > 0) {
-                            allTransactions = await getTransactionsForYear(currentYear);
-                            updateDashboard();
-                            updateTransactionsTable();
-                            updateTransactionCount();
-                            
-                            showNotification(`${importedCount} transações importadas do Excel!`, 'success');
-                        } else {
-                            showNotification('Nenhuma transação válida encontrada no arquivo Excel', 'warning');
-                        }
-                        
-                        resolve();
-                    } catch (error) {
-                        showNotification('Erro ao importar Excel: ' + error.message, 'error');
-                        reject(error);
-                    }
-                };
-                
-                reader.readAsArrayBuffer(file);
-                */
-            });
-        }
-        
         // ==================== EVENT LISTENERS ====================
-        let originalAddHandler = null;
-        
         document.addEventListener('DOMContentLoaded', async function() {
             try {
                 await initDatabase();
@@ -3061,16 +3302,20 @@
                 document.getElementById('chatModal').classList.remove('active');
                 // Restaurar botão original se estiver em modo edição
                 const addButton = document.getElementById('addViaChat');
-                if (originalAddHandler) {
-                    addButton.innerHTML = '<i class="fas fa-plus"></i> Adicionar Transação';
-                    addButton.onclick = originalAddHandler;
-                    originalAddHandler = null;
-                }
+                addButton.innerHTML = '<i class="fas fa-plus"></i> Adicionar Transação';
+                addButton.onclick = addViaChatHandler;
+                
+                // Limpar formulário
+                document.getElementById('transConta').value = '';
+                document.getElementById('transValor').value = '';
+                document.getElementById('transParcela').value = '';
+                document.getElementById('transPeriodo').value = '';
+                document.getElementById('transTipo').value = '';
+                document.getElementById('transCategoria').value = '';
             });
             
-            // Configurar handler original do botão de adicionar
-            const addButton = document.getElementById('addViaChat');
-            originalAddHandler = async () => {
+            // Handler para adicionar via chat
+            const addViaChatHandler = async () => {
                 const conta = document.getElementById('transConta').value.trim();
                 const valor = document.getElementById('transValor').value;
                 const parcela = document.getElementById('transParcela').value.trim();
@@ -3083,8 +3328,9 @@
                     return;
                 }
                 
-                if (isNaN(parseFloat(valor)) || parseFloat(valor) <= 0) {
-                    showNotification('Valor inválido!', 'error');
+                const valorNumerico = parseBrazilianCurrency(valor);
+                if (isNaN(valorNumerico) || valorNumerico <= 0) {
+                    showNotification('Valor inválido! Use o formato brasileiro (ex: 150,00)', 'error');
                     return;
                 }
                 
@@ -3104,7 +3350,7 @@
                 }
             };
             
-            addButton.onclick = originalAddHandler;
+            document.getElementById('addViaChat').onclick = addViaChatHandler;
             
             // Configurações
             document.getElementById('configBtn').addEventListener('click', () => {
@@ -3144,6 +3390,8 @@
             // Exportação/Importação
             document.getElementById('exportBtn').addEventListener('click', exportData);
             document.getElementById('exportHeaderBtn').addEventListener('click', exportData);
+            
+            // Importar JSON
             document.getElementById('importBtn').addEventListener('click', () => {
                 document.getElementById('fileImport').click();
             });
@@ -3152,16 +3400,26 @@
                 document.getElementById('fileImport').click();
             });
             
-            document.getElementById('importExcelBtn').addEventListener('click', () => {
-                document.getElementById('excelImport').click();
-            });
-            
             document.getElementById('fileImport').addEventListener('change', async (event) => {
                 const file = event.target.files[0];
                 if (file) {
                     await importData(file);
                     event.target.value = '';
                 }
+            });
+            
+            // Importar Excel
+            document.getElementById('importExcelBtn').addEventListener('click', () => {
+                document.getElementById('excelInfoModal').classList.add('active');
+            });
+            
+            document.getElementById('closeExcelInfo').addEventListener('click', () => {
+                document.getElementById('excelInfoModal').classList.remove('active');
+            });
+            
+            document.getElementById('proceedExcelImport').addEventListener('click', () => {
+                document.getElementById('excelInfoModal').classList.remove('active');
+                document.getElementById('excelImport').click();
             });
             
             document.getElementById('excelImport').addEventListener('change', async (event) => {
@@ -3227,6 +3485,7 @@
                 if (e.key === 'Escape') {
                     document.getElementById('chatModal').classList.remove('active');
                     document.getElementById('configModal').classList.remove('active');
+                    document.getElementById('excelInfoModal').classList.remove('active');
                 }
             });
         }
