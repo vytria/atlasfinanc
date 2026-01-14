@@ -6,7 +6,7 @@
     <title>Atlas - Controle Financeiro 4.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         /* MANTENDO TODOS OS ESTILOS ORIGINAIS */
         :root {
@@ -723,127 +723,6 @@
             gap: 8px;
         }
 
-        /* Modal de Importação Excel */
-        .excel-modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.7);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .excel-modal.active {
-            display: flex;
-        }
-
-        .excel-container {
-            width: 500px;
-            max-width: 90%;
-            background-color: white;
-            border-radius: var(--border-radius);
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            overflow: hidden;
-            max-height: 90vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .excel-header {
-            background-color: var(--success);
-            color: white;
-            padding: 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .excel-header h3 {
-            font-size: 20px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .excel-content {
-            padding: 25px;
-            flex: 1;
-            overflow-y: auto;
-        }
-
-        .excel-instructions {
-            background-color: rgba(67, 97, 238, 0.1);
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--primary);
-        }
-
-        .excel-instructions h4 {
-            margin-bottom: 10px;
-            color: var(--primary);
-        }
-
-        .excel-instructions ul {
-            margin-left: 20px;
-            margin-bottom: 10px;
-        }
-
-        .excel-instructions li {
-            margin-bottom: 5px;
-        }
-
-        .excel-format-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 10px;
-        }
-
-        .excel-format-table th {
-            background-color: var(--gray-light);
-            padding: 10px;
-            text-align: left;
-            font-weight: 600;
-        }
-
-        .excel-format-table td {
-            padding: 10px;
-            border: 1px solid var(--gray-light);
-        }
-
-        .excel-dropzone {
-            border: 2px dashed var(--primary);
-            border-radius: 12px;
-            padding: 40px 20px;
-            text-align: center;
-            margin: 20px 0;
-            cursor: pointer;
-            transition: var(--transition);
-        }
-
-        .excel-dropzone:hover {
-            background-color: rgba(67, 97, 238, 0.05);
-        }
-
-        .excel-dropzone i {
-            font-size: 48px;
-            color: var(--primary);
-            margin-bottom: 15px;
-        }
-
-        .excel-preview {
-            max-height: 300px;
-            overflow-y: auto;
-            margin-top: 20px;
-            border: 1px solid var(--gray-light);
-            border-radius: 8px;
-        }
-
         .mobile-toggle {
             display: none;
             position: fixed;
@@ -1143,70 +1022,6 @@
         </div>
     </div>
     
-    <!-- Modal de Importação Excel -->
-    <div class="excel-modal" id="excelModal">
-        <div class="excel-container">
-            <div class="excel-header">
-                <h3><i class="fas fa-file-excel"></i> Importar Excel</h3>
-                <button class="close-btn" id="closeExcel">&times;</button>
-            </div>
-            <div class="excel-content">
-                <div class="excel-instructions">
-                    <h4>Formato do Arquivo Excel</h4>
-                    <p>O arquivo Excel deve conter as colunas na seguinte ordem:</p>
-                    <table class="excel-format-table">
-                        <tr>
-                            <th>Coluna 1</th>
-                            <th>Coluna 2</th>
-                            <th>Coluna 3</th>
-                            <th>Coluna 4</th>
-                            <th>Coluna 5</th>
-                            <th>Coluna 6</th>
-                        </tr>
-                        <tr>
-                            <td>Conta/Nome</td>
-                            <td>Valor</td>
-                            <td>Parcela</td>
-                            <td>Período</td>
-                            <td>Tipo</td>
-                            <td>Categoria</td>
-                        </tr>
-                    </table>
-                    <p><strong>Exemplo:</strong> "Shopping", "150,00", "7/12", "fev/26 - dez/26", "Cartão de Crédito", "Lazer"</p>
-                </div>
-                
-                <div class="excel-dropzone" id="excelDropzone">
-                    <i class="fas fa-file-upload"></i>
-                    <h4>Arraste e solte seu arquivo Excel aqui</h4>
-                    <p>ou clique para selecionar</p>
-                    <p style="font-size: 12px; color: var(--gray); margin-top: 10px;">
-                        Formatos suportados: .xlsx, .xls, .csv
-                    </p>
-                </div>
-                
-                <div style="text-align: center; margin: 20px 0;">
-                    <p>ou</p>
-                    <button class="btn btn-primary" id="browseExcelBtn">
-                        <i class="fas fa-folder-open"></i> Procurar Arquivo
-                    </button>
-                </div>
-                
-                <div id="excelPreview" class="excel-preview" style="display: none;">
-                    <!-- Pré-visualização dos dados será exibida aqui -->
-                </div>
-                
-                <div id="excelActions" style="display: none; margin-top: 20px; text-align: center;">
-                    <button class="btn btn-success" id="confirmImportBtn">
-                        <i class="fas fa-check"></i> Confirmar Importação
-                    </button>
-                    <button class="btn btn-outline" id="cancelImportBtn" style="margin-left: 10px;">
-                        <i class="fas fa-times"></i> Cancelar
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-    
     <!-- Mobile Toggle -->
     <button class="mobile-toggle" id="mobileToggle">
         <i class="fas fa-bars"></i>
@@ -1420,7 +1235,7 @@
 
     <!-- Inputs ocultos para importação -->
     <input type="file" id="fileImport" accept=".json" style="display: none;">
-    <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" style="display: none;">
+    <input type="file" id="excelImport" accept=".xlsx,.xls,.csv" style="display: none;">
 
     <script>
         // ==================== BANCO DE DADOS LOCAL ====================
@@ -1440,7 +1255,6 @@
         let customTypes = [];
         let monthlyIncomes = {};
         let availableYears = [currentYear];
-        let excelImportData = [];
         
         // Mapeamento de meses
         const monthMap = {
@@ -1454,7 +1268,7 @@
             7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
         };
         
-        // Categorias iniciais conforme solicitado
+        // CATEGORIAS PADRÃO EXATAMENTE COMO ESPECIFICADO
         const defaultCategories = [
             { id: 'agua', name: 'Água', custom: false },
             { id: 'aluguel', name: 'Aluguel', custom: false },
@@ -1472,7 +1286,7 @@
             { id: 'outros', name: 'Outros', custom: false }
         ];
         
-        // Tipos iniciais conforme solicitado
+        // TIPOS PADRÃO EXATAMENTE COMO ESPECIFICADO
         const defaultTypes = [
             { id: 'alimentacao', name: 'Alimentação', custom: false },
             { id: 'boleto', name: 'Boleto', custom: false },
@@ -1600,9 +1414,7 @@
             // Carregar transações do ano atual
             allTransactions = await getTransactionsForYear(currentYear);
             
-            // Remover dados de exemplo (conforme solicitado)
-            // Não adicionar dados de exemplo automaticamente
-            
+            // Remover dados de exemplo - não adicionar automaticamente
             updateUI();
         }
         
@@ -1952,232 +1764,6 @@
                 }
             `;
             document.head.appendChild(style);
-        }
-        
-        function processExcelData(data) {
-    const transactions = [];
-    
-    data.forEach((row, index) => {
-        // Verificar se tem as colunas mínimas necessárias
-        if (row.length >= 6) {
-            const conta = row[0] || '';
-            const valorStr = row[1] || '0';
-            const parcela = row[2] || '';
-            const periodo = row[3] || '';
-            const tipo = row[4] || '';
-            const categoria = row[5] || '';
-
-            // Função que converte formato BR certo
-            function parseValorBR(valor) {
-                let str = valor.toString().trim();
-
-                // Remove R$
-                str = str.replace(/R\$/gi, '');
-
-                // Se não tem vírgula, converte direto
-                if (!str.includes(',')) {
-                    return parseFloat(str) || 0;
-                }
-
-                // Se tem vírgula E ponto (ex: 1.500,00)
-                if (str.includes('.') && str.includes(',')) {
-                    // Remove pontos (milhar) e troca vírgula por ponto (decimal)
-                    str = str.replace(/\./g, '').replace(',', '.');
-                } 
-                // Se só tem vírgula (ex: 3,53)
-                else if (str.includes(',') && !str.includes('.')) {
-                    str = str.replace(',', '.');
-                }
-
-                return parseFloat(str) || 0;
-            }
-
-            const valor = parseValorBR(valorStr);
-            
-            if (conta && valor > 0) {
-                // Processar período
-                const periodoParts = periodo.split('-').map(p => p.trim());
-                const mesInicial = periodoParts[0] || '';
-                const mesFinal = periodoParts[1] || mesInicial;
-                
-                // Processar parcela
-                let parcelaInicial = null;
-                let parcelaFinal = null;
-                if (parcela && parcela.includes('/')) {
-                    const partes = parcela.split('/');
-                    parcelaInicial = parseInt(partes[0]) || null;
-                    parcelaFinal = parseInt(partes[1]) || null;
-                }
-                
-                // Determinar mês a partir do período
-                const mesMatch = mesInicial.match(/^([a-z]{3})/i);
-                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
-                const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
-                
-                // Encontrar IDs correspondentes
-                const tipoObj = customTypes.find(t => 
-                    t.name.toLowerCase() === tipo.toLowerCase() || t.id === tipo.toLowerCase()
-                );
-                
-                const categoriaObj = customCategories.find(c => 
-                    c.name.toLowerCase() === categoria.toLowerCase() || c.id === categoria.toLowerCase()
-                );
-                
-                transactions.push({
-                    conta: conta,
-                    valor: valor,
-                    parcelaInicial: parcelaInicial,
-                    parcelaFinal: parcelaFinal,
-                    mesInicial: mesInicial,
-                    mesFinal: mesFinal,
-                    tipo: tipoObj ? tipoObj.id : tipo || 'outros',
-                    categoria: categoriaObj ? categoriaObj.id : categoria || 'outros',
-                    mes: mes,
-                    ano: currentYear,
-                    data: new Date().toISOString().split('T')[0]
-                });
-            }
-        }
-    });
-    
-    return transactions;
-}
-        
-        function showExcelPreview(data) {
-            const previewDiv = document.getElementById('excelPreview');
-            const actionsDiv = document.getElementById('excelActions');
-            
-            if (data.length === 0) {
-                previewDiv.innerHTML = '<p style="color: var(--danger); padding: 20px; text-align: center;">Nenhum dado válido encontrado no arquivo.</p>';
-                actionsDiv.style.display = 'none';
-                return;
-            }
-            
-            let html = `
-                <div style="padding: 15px;">
-                    <h4 style="margin-bottom: 15px;">Pré-visualização (${data.length} transações encontradas)</h4>
-                    <table style="width: 100%; border-collapse: collapse;">
-                        <thead>
-                            <tr style="background-color: var(--gray-light);">
-                                <th style="padding: 8px; border: 1px solid var(--gray);">Conta</th>
-                                <th style="padding: 8px; border: 1px solid var(--gray);">Valor</th>
-                                <th style="padding: 8px; border: 1px solid var(--gray);">Parcela</th>
-                                <th style="padding: 8px; border: 1px solid var(--gray);">Período</th>
-                                <th style="padding: 8px; border: 1px solid var(--gray);">Tipo</th>
-                                <th style="padding: 8px; border: 1px solid var(--gray);">Categoria</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-            `;
-            
-            // Mostrar apenas as primeiras 10 linhas
-            data.slice(0, 10).forEach((transaction, index) => {
-                html += `
-                    <tr>
-                        <td style="padding: 8px; border: 1px solid var(--gray-light);">${transaction.conta}</td>
-                        <td style="padding: 8px; border: 1px solid var(--gray-light);">${formatCurrency(transaction.valor)}</td>
-                        <td style="padding: 8px; border: 1px solid var(--gray-light);">${transaction.parcelaInicial ? `${transaction.parcelaInicial}/${transaction.parcelaFinal}` : '-'}</td>
-                        <td style="padding: 8px; border: 1px solid var(--gray-light);">${transaction.mesInicial} ${transaction.mesFinal ? '- ' + transaction.mesFinal : ''}</td>
-                        <td style="padding: 8px; border: 1px solid var(--gray-light);">
-                            ${customTypes.find(t => t.id === transaction.tipo)?.name || transaction.tipo}
-                        </td>
-                        <td style="padding: 8px; border: 1px solid var(--gray-light);">
-                            ${customCategories.find(c => c.id === transaction.categoria)?.name || transaction.categoria}
-                        </td>
-                    </tr>
-                `;
-            });
-            
-            if (data.length > 10) {
-                html += `
-                    <tr>
-                        <td colspan="6" style="padding: 8px; text-align: center; font-style: italic;">
-                            ... e mais ${data.length - 10} transações
-                        </td>
-                    </tr>
-                `;
-            }
-            
-            html += `
-                        </tbody>
-                    </table>
-                </div>
-            `;
-            
-            previewDiv.innerHTML = html;
-            previewDiv.style.display = 'block';
-            actionsDiv.style.display = 'block';
-        }
-        
-        async function importExcelFile(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                
-                reader.onload = async (event) => {
-                    try {
-                        const data = new Uint8Array(event.target.result);
-                        const workbook = XLSX.read(data, { type: 'array' });
-                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { 
-                            header: 1,
-                            raw: false,          // <--- ISSO AQUI É A CHAVE!
-                            defval: ''           // <--- MANTÉM COMO TEXTO
-                        });
-                        
-                        // Processar dados do Excel
-                        const processedData = processExcelData(jsonData.slice(1)); // Pular cabeçalho
-                        excelImportData = processedData;
-                        
-                        // Mostrar pré-visualização
-                        showExcelPreview(processedData);
-                        
-                        resolve(processedData);
-                    } catch (error) {
-                        showNotification('Erro ao processar arquivo Excel: ' + error.message, 'error');
-                        reject(error);
-                    }
-                };
-                
-                reader.onerror = () => {
-                    showNotification('Erro ao ler arquivo Excel', 'error');
-                    reject(new Error('Erro ao ler arquivo Excel'));
-                };
-                
-                reader.readAsArrayBuffer(file);
-            });
-        }
-        
-        async function confirmExcelImport() {
-            if (excelImportData.length === 0) {
-                showNotification('Nenhum dado para importar', 'error');
-                return;
-            }
-            
-            try {
-                let importedCount = 0;
-                for (const transaction of excelImportData) {
-                    await addTransaction(transaction);
-                    importedCount++;
-                }
-                
-                // Atualizar dados
-                allTransactions = await getTransactionsForYear(currentYear);
-                
-                // Atualizar interface
-                updateDashboard();
-                updateTransactionsTable();
-                updateTransactionCount();
-                
-                // Fechar modal e limpar dados
-                document.getElementById('excelModal').classList.remove('active');
-                excelImportData = [];
-                document.getElementById('excelPreview').style.display = 'none';
-                document.getElementById('excelActions').style.display = 'none';
-                
-                showNotification(`${importedCount} transações importadas com sucesso!`, 'success');
-            } catch (error) {
-                showNotification('Erro ao importar transações: ' + error.message, 'error');
-            }
         }
         
         // ==================== ATUALIZAÇÃO DA INTERFACE ====================
@@ -3034,7 +2620,7 @@
         
         function editCategory(id) {
             const category = customCategories.find(c => c.id === id);
-            if (!category || !category.custom) return;
+            if (!category) return;
             
             const newName = prompt('Editar nome da categoria:', category.name);
             if (newName && newName.trim() !== '' && newName !== category.name) {
@@ -3051,7 +2637,7 @@
         
         async function deleteCategoryPrompt(id) {
             const category = customCategories.find(c => c.id === id);
-            if (!category || !category.custom) return;
+            if (!category) return;
             
             // Verificar se a categoria está sendo usada em transações
             const isUsed = allTransactions.some(t => t.categoria === id);
@@ -3118,7 +2704,7 @@
         
         function editType(id) {
             const type = customTypes.find(t => t.id === id);
-            if (!type || !type.custom) return;
+            if (!type) return;
             
             const newName = prompt('Editar nome do tipo:', type.name);
             if (newName && newName.trim() !== '' && newName !== type.name) {
@@ -3135,7 +2721,7 @@
         
         async function deleteTypePrompt(id) {
             const type = customTypes.find(t => t.id === id);
-            if (!type || !type.custom) return;
+            if (!type) return;
             
             // Verificar se o tipo está sendo usado em transações
             const isUsed = allTransactions.some(t => t.tipo === id);
@@ -3369,6 +2955,172 @@
             });
         }
         
+        // ==================== IMPORTAR EXCEL ====================
+        async function importExcel(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                
+                reader.onload = async (event) => {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        
+                        if (!jsonData || jsonData.length < 2) {
+                            throw new Error('Arquivo Excel vazio ou formato inválido');
+                        }
+                        
+                        // Remover cabeçalho
+                        const rows = jsonData.slice(1);
+                        
+                        let importedCount = 0;
+                        let errors = [];
+                        
+                        for (let i = 0; i < rows.length; i++) {
+                            const row = rows[i];
+                            
+                            // Verificar se a linha tem dados suficientes (pelo menos 6 colunas)
+                            if (row.length < 6) {
+                                errors.push(`Linha ${i + 2}: Dados insuficientes`);
+                                continue;
+                            }
+                            
+                            // Extrair dados conforme o formato especificado
+                            const conta = row[0] ? String(row[0]).trim() : '';
+                            const valorStr = row[1] ? String(row[1]).trim() : '0';
+                            const parcela = row[2] ? String(row[2]).trim() : '';
+                            const periodo = row[3] ? String(row[3]).trim() : '';
+                            const tipo = row[4] ? String(row[4]).trim() : '';
+                            const categoria = row[5] ? String(row[5]).trim() : '';
+                            
+                            // Validar campos obrigatórios
+                            if (!conta || !valorStr || !periodo || !tipo || !categoria) {
+                                errors.push(`Linha ${i + 2}: Campos obrigatórios faltando`);
+                                continue;
+                            }
+                            
+                            // Converter valor
+                            let valor = 0;
+                            try {
+                                // Remover R$ e pontos, substituir vírgula por ponto
+                                const valorClean = valorStr
+                                    .replace('R$', '')
+                                    .replace('.', '')
+                                    .replace(',', '.')
+                                    .trim();
+                                valor = parseFloat(valorClean);
+                                if (isNaN(valor) || valor <= 0) {
+                                    errors.push(`Linha ${i + 2}: Valor inválido: ${valorStr}`);
+                                    continue;
+                                }
+                            } catch (e) {
+                                errors.push(`Linha ${i + 2}: Valor inválido: ${valorStr}`);
+                                continue;
+                            }
+                            
+                            // Encontrar tipo correspondente
+                            const tipoObj = customTypes.find(t => 
+                                t.name.toLowerCase() === tipo.toLowerCase() ||
+                                t.id.toLowerCase() === tipo.toLowerCase()
+                            );
+                            
+                            if (!tipoObj) {
+                                errors.push(`Linha ${i + 2}: Tipo não encontrado: ${tipo}`);
+                                continue;
+                            }
+                            
+                            // Encontrar categoria correspondente
+                            const categoriaObj = customCategories.find(c => 
+                                c.name.toLowerCase() === categoria.toLowerCase() ||
+                                c.id.toLowerCase() === categoria.toLowerCase()
+                            );
+                            
+                            if (!categoriaObj) {
+                                errors.push(`Linha ${i + 2}: Categoria não encontrada: ${categoria}`);
+                                continue;
+                            }
+                            
+                            // Extrair mês inicial do período
+                            const periodoParts = periodo.split(' - ');
+                            const mesInicial = periodoParts[0] || '';
+                            const mesFinal = periodoParts[1] || mesInicial;
+                            
+                            // Determinar mês numérico
+                            const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                            const mesMatch = mesInicial.match(/^([a-z]{3})/i);
+                            const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+                            
+                            // Extrair parcelas
+                            let parcelaInicial = null;
+                            let parcelaFinal = null;
+                            if (parcela && parcela.includes('/') && parcela !== '-') {
+                                const partes = parcela.split('/');
+                                parcelaInicial = parseInt(partes[0]) || null;
+                                parcelaFinal = parseInt(partes[1]) || null;
+                            }
+                            
+                            // Criar transação
+                            const transaction = {
+                                conta: conta,
+                                valor: valor,
+                                parcelaInicial: parcelaInicial,
+                                parcelaFinal: parcelaFinal,
+                                mesInicial: mesInicial,
+                                mesFinal: mesFinal,
+                                tipo: tipoObj.id,
+                                categoria: categoriaObj.id,
+                                mes: mes,
+                                ano: currentYear,
+                                data: new Date().toISOString().split('T')[0]
+                            };
+                            
+                            try {
+                                await addTransaction(transaction);
+                                importedCount++;
+                            } catch (error) {
+                                errors.push(`Linha ${i + 2}: Erro ao salvar: ${error.message}`);
+                            }
+                        }
+                        
+                        // Atualizar dados
+                        allTransactions = await getTransactionsForYear(currentYear);
+                        
+                        updateDashboard();
+                        updateTransactionsTable();
+                        updateTransactionCount();
+                        
+                        if (importedCount > 0) {
+                            let message = `${importedCount} transações importadas com sucesso!`;
+                            if (errors.length > 0) {
+                                message += ` ${errors.length} erros encontrados.`;
+                            }
+                            showNotification(message, 'success');
+                            
+                            // Mostrar erros se houver
+                            if (errors.length > 0) {
+                                console.error('Erros na importação:', errors);
+                            }
+                        } else {
+                            showNotification('Nenhuma transação válida encontrada no arquivo Excel', 'warning');
+                        }
+                        
+                        resolve();
+                    } catch (error) {
+                        showNotification('Erro ao importar Excel: ' + error.message, 'error');
+                        reject(error);
+                    }
+                };
+                
+                reader.onerror = () => {
+                    showNotification('Erro ao ler arquivo Excel', 'error');
+                    reject(new Error('Erro ao ler arquivo Excel'));
+                };
+                
+                reader.readAsArrayBuffer(file);
+            });
+        }
+        
         // ==================== EVENT LISTENERS ====================
         let originalAddHandler = null;
         
@@ -3396,7 +3148,8 @@
         
         function setupEventListeners() {
             // Chat
-            document.getElementById('chatBtn').addEventListener('click', () => {
+            document.getElementById('chatBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('chatModal').classList.add('active');
             });
             
@@ -3450,7 +3203,8 @@
             addButton.onclick = originalAddHandler;
             
             // Configurações
-            document.getElementById('configBtn').addEventListener('click', () => {
+            document.getElementById('configBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('configModal').classList.add('active');
             });
             
@@ -3485,74 +3239,29 @@
             document.getElementById('addYearBtn').addEventListener('click', addNewYear);
             
             // Exportação/Importação
-            document.getElementById('exportBtn').addEventListener('click', exportData);
-            document.getElementById('exportHeaderBtn').addEventListener('click', exportData);
-            document.getElementById('importBtn').addEventListener('click', () => {
+            document.getElementById('exportBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                exportData();
+            });
+            
+            document.getElementById('exportHeaderBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                exportData();
+            });
+            
+            document.getElementById('importBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('fileImport').click();
             });
             
-            document.getElementById('importDataBtn').addEventListener('click', () => {
+            document.getElementById('importDataBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('fileImport').click();
             });
             
-            // Importar Excel
-            document.getElementById('importExcelBtn').addEventListener('click', () => {
-                document.getElementById('excelModal').classList.add('active');
-            });
-            
-            document.getElementById('closeExcel').addEventListener('click', () => {
-                document.getElementById('excelModal').classList.remove('active');
-                excelImportData = [];
-                document.getElementById('excelPreview').style.display = 'none';
-                document.getElementById('excelActions').style.display = 'none';
-            });
-            
-            document.getElementById('browseExcelBtn').addEventListener('click', () => {
-                document.getElementById('excelFileInput').click();
-            });
-            
-            document.getElementById('excelFileInput').addEventListener('change', async (event) => {
-                const file = event.target.files[0];
-                if (file) {
-                    await importExcelFile(file);
-                    event.target.value = '';
-                }
-            });
-            
-            // Drag and drop para Excel
-            const dropzone = document.getElementById('excelDropzone');
-            dropzone.addEventListener('dragover', (e) => {
+            document.getElementById('importExcelBtn').addEventListener('click', (e) => {
                 e.preventDefault();
-                dropzone.style.backgroundColor = 'rgba(67, 97, 238, 0.05)';
-            });
-            
-            dropzone.addEventListener('dragleave', (e) => {
-                e.preventDefault();
-                dropzone.style.backgroundColor = '';
-            });
-            
-            dropzone.addEventListener('drop', async (e) => {
-                e.preventDefault();
-                dropzone.style.backgroundColor = '';
-                
-                const file = e.dataTransfer.files[0];
-                if (file && (file.name.endsWith('.xlsx') || file.name.endsWith('.xls') || file.name.endsWith('.csv'))) {
-                    await importExcelFile(file);
-                } else {
-                    showNotification('Por favor, selecione um arquivo Excel (.xlsx, .xls, .csv)', 'error');
-                }
-            });
-            
-            dropzone.addEventListener('click', () => {
-                document.getElementById('excelFileInput').click();
-            });
-            
-            // Botões do modal de Excel
-            document.getElementById('confirmImportBtn').addEventListener('click', confirmExcelImport);
-            document.getElementById('cancelImportBtn').addEventListener('click', () => {
-                excelImportData = [];
-                document.getElementById('excelPreview').style.display = 'none';
-                document.getElementById('excelActions').style.display = 'none';
+                document.getElementById('excelImport').click();
             });
             
             document.getElementById('fileImport').addEventListener('change', async (event) => {
@@ -3563,13 +3272,23 @@
                 }
             });
             
+            document.getElementById('excelImport').addEventListener('change', async (event) => {
+                const file = event.target.files[0];
+                if (file) {
+                    await importExcel(file);
+                    event.target.value = '';
+                }
+            });
+            
             // Botão nova transação
-            document.getElementById('addTransactionBtn').addEventListener('click', () => {
+            document.getElementById('addTransactionBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('chatModal').classList.add('active');
             });
             
             // Limpar tudo
-            document.getElementById('clearAllBtn').addEventListener('click', async () => {
+            document.getElementById('clearAllBtn').addEventListener('click', async (e) => {
+                e.preventDefault();
                 if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.')) {
                     try {
                         const tx = db.transaction(
@@ -3618,7 +3337,16 @@
                 if (e.key === 'Escape') {
                     document.getElementById('chatModal').classList.remove('active');
                     document.getElementById('configModal').classList.remove('active');
-                    document.getElementById('excelModal').classList.remove('active');
+                }
+            });
+            
+            // Fechar modais ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('chat-modal')) {
+                    document.getElementById('chatModal').classList.remove('active');
+                }
+                if (e.target.classList.contains('config-modal')) {
+                    document.getElementById('configModal').classList.remove('active');
                 }
             });
         }
