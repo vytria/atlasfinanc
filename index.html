@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Atlas - Controle Financeiro</title>
+    <title>Atlas - Controle Financeiro 4.0</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         /* MANTENDO TODOS OS ESTILOS ORIGINAIS */
         :root {
@@ -722,6 +723,93 @@
             gap: 8px;
         }
 
+        /* Modal de Importação Excel */
+        .excel-import-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .excel-import-modal.active {
+            display: flex;
+        }
+
+        .excel-import-container {
+            width: 800px;
+            max-width: 90%;
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .excel-preview {
+            margin-top: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+            border: 1px solid var(--gray-light);
+            border-radius: 8px;
+        }
+
+        .excel-preview table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .excel-preview th {
+            background-color: var(--primary);
+            color: white;
+            padding: 10px;
+            font-size: 12px;
+            position: sticky;
+            top: 0;
+        }
+
+        .excel-preview td {
+            padding: 8px 10px;
+            border: 1px solid var(--gray-light);
+            font-size: 12px;
+        }
+
+        .excel-preview tr:nth-child(even) {
+            background-color: var(--light);
+        }
+
+        .excel-errors {
+            margin-top: 15px;
+            padding: 15px;
+            background-color: rgba(247, 37, 133, 0.1);
+            border-radius: 8px;
+            border-left: 4px solid var(--danger);
+        }
+
+        .excel-errors h4 {
+            color: var(--danger);
+            margin-bottom: 10px;
+        }
+
+        .excel-errors ul {
+            list-style-type: none;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .excel-errors li {
+            padding: 5px 0;
+            color: var(--dark);
+            font-size: 12px;
+        }
+
         .mobile-toggle {
             display: none;
             position: fixed;
@@ -798,6 +886,10 @@
             .chart-legend {
                 flex-direction: column;
                 gap: 10px;
+            }
+            
+            .excel-import-container {
+                width: 95%;
             }
         }
     </style>
@@ -1021,6 +1113,59 @@
         </div>
     </div>
     
+    <!-- Modal de Importação Excel -->
+    <div class="excel-import-modal" id="excelImportModal">
+        <div class="excel-import-container">
+            <div class="chat-header">
+                <h3><i class="fas fa-file-excel"></i> Importar Excel</h3>
+                <button class="close-btn" id="closeExcelImport">&times;</button>
+            </div>
+            
+            <div class="config-content">
+                <div class="config-section">
+                    <h4><i class="fas fa-info-circle"></i> Formato do Arquivo</h4>
+                    <p>O arquivo Excel deve ter as seguintes colunas (nesta ordem):</p>
+                    <ol style="margin-left: 20px; margin-bottom: 15px;">
+                        <li><strong>Conta/Nome</strong> (ex.: "Shopping")</li>
+                        <li><strong>Valor</strong> (ex.: "150,00")</li>
+                        <li><strong>Parcela</strong> (ex.: "7/12" ou "-")</li>
+                        <li><strong>Período</strong> (ex.: "fev/26 - dez/26" ou "fev/26")</li>
+                        <li><strong>Tipo</strong> (ex.: "Cartão de Crédito")</li>
+                        <li><strong>Categoria</strong> (ex.: "Lazer")</li>
+                    </ol>
+                    
+                    <div class="form-group">
+                        <label for="excelFileInput"><i class="fas fa-file-upload"></i> Selecione o arquivo Excel</label>
+                        <input type="file" id="excelFileInput" accept=".xlsx,.xls,.csv" class="form-control">
+                    </div>
+                </div>
+                
+                <div id="excelPreviewSection" style="display: none;">
+                    <div class="config-section">
+                        <h4><i class="fas fa-eye"></i> Pré-visualização</h4>
+                        <p>Primeiras 10 linhas do arquivo:</p>
+                        <div class="excel-preview" id="excelPreview">
+                            <!-- Preview será carregado aqui -->
+                        </div>
+                    </div>
+                    
+                    <div id="excelErrors" class="excel-errors" style="display: none;">
+                        <!-- Erros serão mostrados aqui -->
+                    </div>
+                    
+                    <div class="form-group" style="display: flex; gap: 10px; margin-top: 20px;">
+                        <button class="btn btn-primary" id="confirmImport" style="flex: 1;">
+                            <i class="fas fa-check"></i> Confirmar Importação
+                        </button>
+                        <button class="btn btn-outline" id="cancelImport" style="flex: 1;">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Mobile Toggle -->
     <button class="mobile-toggle" id="mobileToggle">
         <i class="fas fa-bars"></i>
@@ -1234,12 +1379,11 @@
 
     <!-- Inputs ocultos para importação -->
     <input type="file" id="fileImport" accept=".json" style="display: none;">
-    <input type="file" id="excelImport" accept=".xlsx,.xls,.csv" style="display: none;">
 
     <script>
         // ==================== BANCO DE DADOS LOCAL ====================
         const DB_NAME = 'AtlasFinanceDB';
-        const DB_VERSION = 3; // Versão atualizada
+        const DB_VERSION = 4;
         const STORE_TRANSACTIONS = 'transactions';
         const STORE_SETTINGS = 'settings';
         const STORE_CATEGORIES = 'categories';
@@ -1267,34 +1411,34 @@
             7: 'jul', 8: 'ago', 9: 'set', 10: 'out', 11: 'nov', 12: 'dez'
         };
         
-        // Categorias padrão
+        // CATEGORIAS PADRÃO EXATAMENTE COMO ESPECIFICADO
         const defaultCategories = [
-    { id: 'agua', name: 'Água', custom: false },
-    { id: 'aluguel', name: 'Aluguel', custom: false },
-    { id: 'celular', name: 'Celular', custom: false },
-    { id: 'combustivel', name: 'Combustível', custom: false },
-    { id: 'educacao', name: 'Educação', custom: false },
-    { id: 'energia', name: 'Energia Elétrica', custom: false },
-    { id: 'internet', name: 'Internet', custom: false },
-    { id: 'lazer', name: 'Lazer', custom: false },
-    { id: 'moradia', name: 'Moradia', custom: false },
-    { id: 'supermercado', name: 'Supermercado', custom: false },
-    { id: 'saude', name: 'Saúde', custom: false },
-    { id: 'transporte', name: 'Transporte', custom: false },
-    { id: 'vestuario', name: 'Vestuário', custom: false },
-    { id: 'outros', name: 'Outros', custom: false }
-];
+            { id: 'agua', name: 'Água', custom: false },
+            { id: 'aluguel', name: 'Aluguel', custom: false },
+            { id: 'celular', name: 'Celular', custom: false },
+            { id: 'combustivel', name: 'Combustível', custom: false },
+            { id: 'educacao', name: 'Educação', custom: false },
+            { id: 'energia_eletrica', name: 'Energia Elétrica', custom: false },
+            { id: 'internet', name: 'Internet', custom: false },
+            { id: 'lazer', name: 'Lazer', custom: false },
+            { id: 'moradia', name: 'Moradia', custom: false },
+            { id: 'supermercado', name: 'Supermercado', custom: false },
+            { id: 'saude', name: 'Saúde', custom: false },
+            { id: 'transporte', name: 'Transporte', custom: false },
+            { id: 'vestuario', name: 'Vestuário', custom: false },
+            { id: 'outros', name: 'Outros', custom: false }
+        ];
         
-        // Tipos padrão
+        // TIPOS PADRÃO EXATAMENTE COMO ESPECIFICADO
         const defaultTypes = [
-    { id: 'alimentacao', name: 'Alimentação', custom: false },
-    { id: 'boleto', name: 'Boleto', custom: false },
-    { id: 'cartao_credito', name: 'Cartão de Crédito', custom: false },
-    { id: 'cartao_debito', name: 'Cartão de Débito', custom: false },
-    { id: 'debito_conta', name: 'Débito em Conta', custom: false },
-    { id: 'dinheiro', name: 'Dinheiro', custom: false },
-    { id: 'pix', name: 'Pix', custom: false }
-];
+            { id: 'alimentacao', name: 'Alimentação', custom: false },
+            { id: 'boleto', name: 'Boleto', custom: false },
+            { id: 'cartao_credito', name: 'Cartão de Crédito', custom: false },
+            { id: 'cartao_debito', name: 'Cartão de Débito', custom: false },
+            { id: 'debito_conta', name: 'Débito em Conta', custom: false },
+            { id: 'dinheiro', name: 'Dinheiro', custom: false },
+            { id: 'pix', name: 'Pix', custom: false }
+        ];
         
         // ==================== INICIALIZAÇÃO DO BANCO ====================
         function initDatabase() {
@@ -1399,7 +1543,7 @@
             monthlyIncomes = await getIncomesForYear(currentYear);
             if (Object.keys(monthlyIncomes).length === 0) {
                 // Receitas padrão
-                // const defaultIncomes REMOVIDO = {
+                const defaultIncomes = {
                     1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
                     7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
                 };
@@ -1413,24 +1557,7 @@
             // Carregar transações do ano atual
             allTransactions = await getTransactionsForYear(currentYear);
             
-            // Se não houver transações, adicionar exemplos
-            if (allTransactions.length === 0) {
-                // dados de exemplo removidos
-                allTransactions = await getTransactionsForYear(currentYear);
-            }
-            
             updateUI();
-        }
-        
-        // Adicionar dados de exemplo
-        async function addSampleData(){ }
-            ];
-            
-            for (const transaction of sampleData) {
-                await addTransaction(transaction);
-            }
-            
-            showNotification('Dados de exemplo adicionados!', 'success');
         }
         
         // ==================== FUNÇÕES DO BANCO ====================
@@ -1733,6 +1860,34 @@
                 style: 'currency',
                 currency: 'BRL'
             }).format(value || 0);
+        }
+        
+        function parseBrazilianCurrency(value) {
+            // Remove R$, espaços e converte vírgula para ponto
+            if (!value) return 0;
+            
+            let strValue = String(value).trim();
+            
+            // Remove R$, $ e quaisquer caracteres não numéricos, exceto vírgula e ponto
+            strValue = strValue.replace(/[^\d,.-]/g, '');
+            
+            // Se tiver ponto como separador de milhar, remove
+            if (strValue.indexOf('.') !== -1 && strValue.indexOf(',') !== -1) {
+                // Formato: 1.234,56 → remove ponto
+                strValue = strValue.replace(/\./g, '');
+            }
+            
+            // Substitui vírgula por ponto para parseFloat
+            strValue = strValue.replace(',', '.');
+            
+            const numValue = parseFloat(strValue);
+            
+            if (isNaN(numValue)) {
+                console.warn(`Valor não pôde ser convertido: "${value}" -> "${strValue}"`);
+                return 0;
+            }
+            
+            return numValue;
         }
         
         function showNotification(message, type = 'info') {
@@ -2603,6 +2758,13 @@
                 return;
             }
             
+            // Verificar se já existe
+            const exists = customCategories.find(c => c.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                showNotification('Esta categoria já existe!', 'error');
+                return;
+            }
+            
             // Gerar ID único
             const id = 'cat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
             
@@ -2677,6 +2839,13 @@
             
             if (!name) {
                 showNotification('Digite o nome do tipo!', 'error');
+                return;
+            }
+            
+            // Verificar se já existe
+            const exists = customTypes.find(t => t.name.toLowerCase() === name.toLowerCase());
+            if (exists) {
+                showNotification('Este tipo já existe!', 'error');
                 return;
             }
             
@@ -2782,7 +2951,7 @@
                 
                 // Se não houver receitas para este ano, criar padrão
                 if (Object.keys(monthlyIncomes).length === 0) {
-                    // const defaultIncomes REMOVIDO = {
+                    const defaultIncomes = {
                         1: 3200, 2: 4250, 3: 3800, 4: 4100, 5: 3950, 6: 4800,
                         7: 5200, 8: 4900, 9: 5300, 10: 5100, 11: 4700, 12: 5500
                     };
@@ -2831,7 +3000,7 @@
             try {
                 // Coletar todos os dados
                 const allData = {
-                    version: '3.0',
+                    version: '4.0',
                     exportDate: new Date().toISOString(),
                     settings: {
                         currentYear: currentYear,
@@ -2957,15 +3126,82 @@
         }
         
         // ==================== IMPORTAR EXCEL ====================
-        async function importExcel(file) {
-            return new Promise((resolve, reject) => {
-                // Simulação de importação de Excel
-                // Em produção, você precisaria usar uma biblioteca como SheetJS
-                showNotification('Importação de Excel não implementada neste exemplo. Use o formato JSON para importar.', 'warning');
-                resolve();
+        let excelData = null;
+        let excelErrors = [];
+        
+        function showExcelPreview(data, errors = []) {
+            const previewSection = document.getElementById('excelPreviewSection');
+            const previewTable = document.getElementById('excelPreview');
+            const errorsContainer = document.getElementById('excelErrors');
+            
+            previewSection.style.display = 'block';
+            
+            // Limpar preview anterior
+            previewTable.innerHTML = '';
+            
+            if (!data || data.length === 0) {
+                previewTable.innerHTML = '<p style="padding: 20px; text-align: center; color: var(--gray);">Nenhum dado para mostrar</p>';
+                return;
+            }
+            
+            // Criar tabela de preview
+            const table = document.createElement('table');
+            
+            // Cabeçalho
+            const thead = document.createElement('thead');
+            const headerRow = document.createElement('tr');
+            ['Conta/Nome', 'Valor', 'Parcela', 'Período', 'Tipo', 'Categoria'].forEach(header => {
+                const th = document.createElement('th');
+                th.textContent = header;
+                headerRow.appendChild(th);
+            });
+            thead.appendChild(headerRow);
+            table.appendChild(thead);
+            
+            // Corpo
+            const tbody = document.createElement('tbody');
+            
+            // Mostrar apenas as primeiras 10 linhas
+            data.slice(0, 10).forEach((row, index) => {
+                const tr = document.createElement('tr');
                 
-                /*
-                // Código real para importar Excel (requer biblioteca SheetJS)
+                // Marcar linhas com erro
+                const rowHasError = errors.some(error => error.includes(`Linha ${index + 2}`));
+                if (rowHasError) {
+                    tr.style.backgroundColor = 'rgba(247, 37, 133, 0.1)';
+                }
+                
+                row.forEach(cell => {
+                    const td = document.createElement('td');
+                    td.textContent = cell || '';
+                    tr.appendChild(td);
+                });
+                
+                tbody.appendChild(tr);
+            });
+            
+            table.appendChild(tbody);
+            previewTable.appendChild(table);
+            
+            // Mostrar erros se houver
+            if (errors.length > 0) {
+                errorsContainer.style.display = 'block';
+                errorsContainer.innerHTML = `
+                    <h4><i class="fas fa-exclamation-triangle"></i> Erros encontrados (${errors.length})</h4>
+                    <ul>
+                        ${errors.map(error => `<li>${error}</li>`).join('')}
+                    </ul>
+                `;
+            } else {
+                errorsContainer.style.display = 'none';
+            }
+            
+            // Rolagem para a seção de preview
+            previewSection.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function processExcelFile(file) {
+            return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 
                 reader.onload = async (event) => {
@@ -2973,45 +3209,222 @@
                         const data = new Uint8Array(event.target.result);
                         const workbook = XLSX.read(data, { type: 'array' });
                         const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                        const jsonData = XLSX.utils.sheet_to_json(firstSheet);
                         
-                        // Processar os dados do Excel
-                        let importedCount = 0;
-                        for (const row of jsonData) {
-                            // Converter dados do Excel para formato do sistema
-                            const transaction = {
-                                conta: row.Conta || row.conta || '',
-                                valor: parseFloat(row.Valor || row.valor || 0),
-                                // ... outros campos
-                            };
-                            
-                            if (transaction.conta && transaction.valor > 0) {
-                                await addTransaction(transaction);
-                                importedCount++;
+                        // Converter para JSON mantendo cabeçalhos
+                        const jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1 });
+                        
+                        if (!jsonData || jsonData.length < 2) {
+                            reject(new Error('Arquivo Excel vazio ou formato inválido'));
+                            return;
+                        }
+                        
+                        // Verificar cabeçalho (opcional, mas bom para validação)
+                        const headers = jsonData[0];
+                        const expectedHeaders = ['Conta/Nome', 'Valor', 'Parcela', 'Período', 'Tipo', 'Categoria'];
+                        
+                        let headerMatch = true;
+                        headers.forEach((header, index) => {
+                            if (header && expectedHeaders[index] && 
+                                !header.toString().toLowerCase().includes(expectedHeaders[index].toLowerCase().split('/')[0])) {
+                                headerMatch = false;
                             }
+                        });
+                        
+                        if (!headerMatch) {
+                            console.warn('Cabeçalhos do Excel não correspondem exatamente ao formato esperado');
                         }
                         
-                        if (importedCount > 0) {
-                            allTransactions = await getTransactionsForYear(currentYear);
-                            updateDashboard();
-                            updateTransactionsTable();
-                            updateTransactionCount();
+                        // Processar dados para preview
+                        const previewData = jsonData.slice(0, 11); // Cabeçalho + 10 linhas
+                        const allRows = jsonData.slice(1); // Remover cabeçalho
+                        
+                        // Validar dados básicos
+                        const errors = [];
+                        
+                        allRows.forEach((row, index) => {
+                            if (row.length < 6) {
+                                errors.push(`Linha ${index + 2}: Dados insuficientes (${row.length} colunas)`);
+                                return;
+                            }
                             
-                            showNotification(`${importedCount} transações importadas do Excel!`, 'success');
-                        } else {
-                            showNotification('Nenhuma transação válida encontrada no arquivo Excel', 'warning');
-                        }
+                            const conta = row[0] ? String(row[0]).trim() : '';
+                            const valor = row[1];
+                            const tipo = row[4] ? String(row[4]).trim() : '';
+                            const categoria = row[5] ? String(row[5]).trim() : '';
+                            
+                            if (!conta) {
+                                errors.push(`Linha ${index + 2}: Conta/Nome está vazio`);
+                            }
+                            
+                            if (!valor && valor !== 0) {
+                                errors.push(`Linha ${index + 2}: Valor está vazio`);
+                            }
+                            
+                            if (!tipo) {
+                                errors.push(`Linha ${index + 2}: Tipo está vazio`);
+                            } else if (!customTypes.find(t => t.name.toLowerCase() === tipo.toLowerCase())) {
+                                errors.push(`Linha ${index + 2}: Tipo não encontrado: "${tipo}"`);
+                            }
+                            
+                            if (!categoria) {
+                                errors.push(`Linha ${index + 2}: Categoria está vazia`);
+                            } else if (!customCategories.find(c => c.name.toLowerCase() === categoria.toLowerCase())) {
+                                errors.push(`Linha ${index + 2}: Categoria não encontrada: "${categoria}"`);
+                            }
+                        });
                         
-                        resolve();
+                        resolve({
+                            previewData: previewData,
+                            allRows: allRows,
+                            errors: errors
+                        });
+                        
                     } catch (error) {
-                        showNotification('Erro ao importar Excel: ' + error.message, 'error');
                         reject(error);
                     }
                 };
                 
+                reader.onerror = () => {
+                    reject(new Error('Erro ao ler arquivo Excel'));
+                };
+                
                 reader.readAsArrayBuffer(file);
-                */
             });
+        }
+        
+        async function confirmExcelImport() {
+            if (!excelData || !excelData.allRows) {
+                showNotification('Nenhum dado para importar', 'error');
+                return;
+            }
+            
+            const errors = [];
+            let importedCount = 0;
+            
+            for (let i = 0; i < excelData.allRows.length; i++) {
+                const row = excelData.allRows[i];
+                
+                // Pular linhas vazias
+                if (row.every(cell => !cell || cell.toString().trim() === '')) {
+                    continue;
+                }
+                
+                // Validar novamente
+                if (row.length < 6) {
+                    errors.push(`Linha ${i + 2}: Dados insuficientes`);
+                    continue;
+                }
+                
+                const conta = row[0] ? String(row[0]).trim() : '';
+                const valorRaw = row[1];
+                const parcela = row[2] ? String(row[2]).trim() : '';
+                const periodo = row[3] ? String(row[3]).trim() : '';
+                const tipo = row[4] ? String(row[4]).trim() : '';
+                const categoria = row[5] ? String(row[5]).trim() : '';
+                
+                // Validações
+                if (!conta || !valorRaw || !periodo || !tipo || !categoria) {
+                    errors.push(`Linha ${i + 2}: Campos obrigatórios faltando`);
+                    continue;
+                }
+                
+                // Converter valor
+                let valor = 0;
+                try {
+                    valor = parseBrazilianCurrency(valorRaw);
+                    if (valor <= 0) {
+                        errors.push(`Linha ${i + 2}: Valor inválido ou zero: ${valorRaw}`);
+                        continue;
+                    }
+                } catch (e) {
+                    errors.push(`Linha ${i + 2}: Valor inválido: ${valorRaw}`);
+                    continue;
+                }
+                
+                // Encontrar tipo
+                const tipoObj = customTypes.find(t => t.name.toLowerCase() === tipo.toLowerCase());
+                if (!tipoObj) {
+                    errors.push(`Linha ${i + 2}: Tipo não encontrado: ${tipo}`);
+                    continue;
+                }
+                
+                // Encontrar categoria
+                const categoriaObj = customCategories.find(c => c.name.toLowerCase() === categoria.toLowerCase());
+                if (!categoriaObj) {
+                    errors.push(`Linha ${i + 2}: Categoria não encontrada: ${categoria}`);
+                    continue;
+                }
+                
+                // Extrair período
+                const periodoParts = periodo.split(' - ');
+                const mesInicial = periodoParts[0] || '';
+                const mesFinal = periodoParts[1] || mesInicial;
+                
+                // Determinar mês
+                const meses = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun', 'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                const mesMatch = mesInicial.match(/^([a-z]{3})/i);
+                const mes = mesMatch ? meses.indexOf(mesMatch[1].toLowerCase()) + 1 : new Date().getMonth() + 1;
+                
+                // Extrair parcelas
+                let parcelaInicial = null;
+                let parcelaFinal = null;
+                if (parcela && parcela.includes('/') && parcela !== '-') {
+                    const partes = parcela.split('/');
+                    parcelaInicial = parseInt(partes[0]) || null;
+                    parcelaFinal = parseInt(partes[1]) || null;
+                }
+                
+                // Criar transação
+                const transaction = {
+                    conta: conta,
+                    valor: valor,
+                    parcelaInicial: parcelaInicial,
+                    parcelaFinal: parcelaFinal,
+                    mesInicial: mesInicial,
+                    mesFinal: mesFinal,
+                    tipo: tipoObj.id,
+                    categoria: categoriaObj.id,
+                    mes: mes,
+                    ano: currentYear,
+                    data: new Date().toISOString().split('T')[0]
+                };
+                
+                try {
+                    await addTransaction(transaction);
+                    importedCount++;
+                } catch (error) {
+                    errors.push(`Linha ${i + 2}: Erro ao salvar: ${error.message}`);
+                }
+            }
+            
+            // Atualizar dados
+            allTransactions = await getTransactionsForYear(currentYear);
+            
+            updateDashboard();
+            updateTransactionsTable();
+            updateTransactionCount();
+            
+            // Fechar modal
+            document.getElementById('excelImportModal').classList.remove('active');
+            
+            // Mostrar resultado
+            if (importedCount > 0) {
+                let message = `${importedCount} transações importadas com sucesso!`;
+                if (errors.length > 0) {
+                    message += ` ${errors.length} erros ignorados.`;
+                }
+                showNotification(message, 'success');
+            } else {
+                showNotification('Nenhuma transação válida encontrada para importar', 'warning');
+            }
+            
+            // Resetar dados
+            excelData = null;
+            excelErrors = [];
+            
+            // Limpar preview
+            document.getElementById('excelPreviewSection').style.display = 'none';
+            document.getElementById('excelFileInput').value = '';
         }
         
         // ==================== EVENT LISTENERS ====================
@@ -3041,7 +3454,8 @@
         
         function setupEventListeners() {
             // Chat
-            document.getElementById('chatBtn').addEventListener('click', () => {
+            document.getElementById('chatBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('chatModal').classList.add('active');
             });
             
@@ -3095,7 +3509,8 @@
             addButton.onclick = originalAddHandler;
             
             // Configurações
-            document.getElementById('configBtn').addEventListener('click', () => {
+            document.getElementById('configBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('configModal').classList.add('active');
             });
             
@@ -3130,18 +3545,29 @@
             document.getElementById('addYearBtn').addEventListener('click', addNewYear);
             
             // Exportação/Importação
-            document.getElementById('exportBtn').addEventListener('click', exportData);
-            document.getElementById('exportHeaderBtn').addEventListener('click', exportData);
-            document.getElementById('importBtn').addEventListener('click', () => {
+            document.getElementById('exportBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                exportData();
+            });
+            
+            document.getElementById('exportHeaderBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                exportData();
+            });
+            
+            document.getElementById('importBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('fileImport').click();
             });
             
-            document.getElementById('importDataBtn').addEventListener('click', () => {
+            document.getElementById('importDataBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('fileImport').click();
             });
             
-            document.getElementById('importExcelBtn').addEventListener('click', () => {
-                document.getElementById('excelImport').click();
+            document.getElementById('importExcelBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                document.getElementById('excelImportModal').classList.add('active');
             });
             
             document.getElementById('fileImport').addEventListener('change', async (event) => {
@@ -3152,21 +3578,50 @@
                 }
             });
             
-            document.getElementById('excelImport').addEventListener('change', async (event) => {
+            // Importação Excel
+            document.getElementById('excelFileInput').addEventListener('change', async (event) => {
                 const file = event.target.files[0];
                 if (file) {
-                    await importExcel(file);
-                    event.target.value = '';
+                    try {
+                        const result = await processExcelFile(file);
+                        excelData = result;
+                        excelErrors = result.errors;
+                        
+                        showExcelPreview(result.previewData, result.errors);
+                    } catch (error) {
+                        showNotification('Erro ao processar arquivo Excel: ' + error.message, 'error');
+                        console.error('Erro no processamento Excel:', error);
+                    }
                 }
             });
             
+            document.getElementById('confirmImport').addEventListener('click', confirmExcelImport);
+            
+            document.getElementById('cancelImport').addEventListener('click', () => {
+                document.getElementById('excelImportModal').classList.remove('active');
+                excelData = null;
+                excelErrors = [];
+                document.getElementById('excelPreviewSection').style.display = 'none';
+                document.getElementById('excelFileInput').value = '';
+            });
+            
+            document.getElementById('closeExcelImport').addEventListener('click', () => {
+                document.getElementById('excelImportModal').classList.remove('active');
+                excelData = null;
+                excelErrors = [];
+                document.getElementById('excelPreviewSection').style.display = 'none';
+                document.getElementById('excelFileInput').value = '';
+            });
+            
             // Botão nova transação
-            document.getElementById('addTransactionBtn').addEventListener('click', () => {
+            document.getElementById('addTransactionBtn').addEventListener('click', (e) => {
+                e.preventDefault();
                 document.getElementById('chatModal').classList.add('active');
             });
             
             // Limpar tudo
-            document.getElementById('clearAllBtn').addEventListener('click', async () => {
+            document.getElementById('clearAllBtn').addEventListener('click', async (e) => {
+                e.preventDefault();
                 if (confirm('Tem certeza que deseja limpar TODOS os dados? Esta ação não pode ser desfeita.')) {
                     try {
                         const tx = db.transaction(
@@ -3215,6 +3670,20 @@
                 if (e.key === 'Escape') {
                     document.getElementById('chatModal').classList.remove('active');
                     document.getElementById('configModal').classList.remove('active');
+                    document.getElementById('excelImportModal').classList.remove('active');
+                }
+            });
+            
+            // Fechar modais ao clicar fora
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('chat-modal')) {
+                    document.getElementById('chatModal').classList.remove('active');
+                }
+                if (e.target.classList.contains('config-modal')) {
+                    document.getElementById('configModal').classList.remove('active');
+                }
+                if (e.target.classList.contains('excel-import-modal')) {
+                    document.getElementById('excelImportModal').classList.remove('active');
                 }
             });
         }
