@@ -2330,7 +2330,7 @@
         async function deleteTrans(id) {
             const transaction = allTransactions.find(t => t.id === id);
             if (!transaction) return;
-            
+
             let mensagem = 'Tem certeza que deseja excluir esta transação?';
             let transacoesParaExcluir = [id];
             let grupoId = null;
